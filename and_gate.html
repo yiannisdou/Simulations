@@ -243,32 +243,12 @@
       </table>
     </div>
     <div class="card">
-      <h2>Μετρήσεις</h2>
-      <table class="meas">
-        <tbody>
-          <tr><td>Τάση εισόδου V<sub>A</sub></td><td id="mVA"></td></tr>
-          <tr><td>Τάση εισόδου V<sub>B</sub></td><td id="mVB"></td></tr>
-          <tr><td>Τάση εξόδου V<sub>Y</sub></td><td id="mVY"></td></tr>
-          <tr><td>Τάση στην R3 (V<sub>R3</sub>)</td><td id="mVR"></td></tr>
-          <tr><td>Τάση στο LED (V<sub>LED</sub>)</td><td id="mVL"></td></tr>
-          <tr><td>Ρεύμα στην R1 (I<sub>R1</sub>)</td><td id="mIA"></td></tr>
-          <tr><td>Ρεύμα στην R2 (I<sub>R2</sub>)</td><td id="mIB"></td></tr>
-          <tr><td>Ρεύμα που βγαίνει από την είσοδο A</td><td id="mIAin"></td></tr>
-          <tr><td>Ρεύμα που βγαίνει από την είσοδο B</td><td id="mIBin"></td></tr>
-          <tr><td>Ρεύμα LED (I<sub>LED</sub>)</td><td id="mIL"></td></tr>
-        </tbody>
-      </table>
+      <h2>Πώς λειτουργεί</h2>
+      <p class="note">Η πύλη <b>AND</b> δίνει έξοδο <b>1</b> μόνο όταν <b>όλες</b> οι είσοδοι είναι 1. Αρκεί μία είσοδος να είναι 0 για να γίνει η έξοδος 0.</p>
+      <p class="note" id="expIn"></p>
+      <p class="note" id="expLvl"></p>
+      <p class="note" id="expOut"></p>
     </div>
-  </div>
-
-  <div class="card">
-    <h2>Πώς λειτουργεί</h2>
-    <p class="note">Η πύλη <b>AND</b> δίνει έξοδο <b>1</b> μόνο όταν <b>όλες</b> οι είσοδοι είναι 1. Αρκεί μία είσοδος να είναι 0 για να γίνει η έξοδος 0.</p>
-    <p class="note" id="expIn"></p>
-    <p class="note" id="expLvl"></p>
-    <p class="note" id="expOut"></p>
-    <p class="note">Χρώματα αγωγών: <span style="color:#e8411f;font-weight:700">κόκκινο = 5 V</span>, <span style="color:#ef8a3a;font-weight:700">πορτοκαλί = ενδιάμεση τάση</span>, <span style="color:#8a94a6;font-weight:700">γκρι = 0 V</span>. Οι μπλε κουκκίδες δείχνουν τη συμβατική φορά του ρεύματος (από + προς GND). Η ταχύτητά τους είναι μεγαλύτερη όταν το ρεύμα είναι μεγαλύτερο.</p>
-    <p class="note" style="font-size:.9rem" id="expAss"></p>
   </div>
 </div>
 
@@ -299,7 +279,7 @@
   };
   var EXP = {
     cmos: {
-      inp: '<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι\' αυτό αρκεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.',
+      inp: '<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι\' αυτό μπορεί να συνδεθεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.',
       lvl: '<b>Λογικά επίπεδα εισόδου (74HC08 στα 5 V):</b> λογικό 0 κάτω από ≈ 1,5 V, λογικό 1 πάνω από ≈ 3,5 V.',
       out: '<b>Έξοδος:</b> όταν Y = 1 (≈ 5 V), το ρεύμα περνά από την R3 = 220 Ω και το LED. Με τάση ορθής πόλωσης LED ≈ 2 V: I = (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Η αντίσταση περιορίζει το ρεύμα ώστε να μην καταστραφεί το LED.',
       ass: 'Παραδοχές της προσομοίωσης: ιδανική τροφοδοσία 5 V, έξοδος πύλης 5 V / 0 V, είσοδοι CMOS χωρίς ρεύμα, κόκκινο LED με V<sub>F</sub> ≈ 2 V.'
@@ -307,7 +287,7 @@
     ttl: {
       inp: '<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (έως 0,4 mA για το 74LS08, τυπικά ≈ 0,3 mA). Αυτό το ρεύμα περνά από την pull-down προς το GND και δημιουργεί τάση πάνω της. Με <b>1 kΩ</b>: 0,3 mA × 1 kΩ ≈ 0,3 V, κάτω από τα 0,8 V, άρα η είσοδος διαβάζεται 0. Με 10 kΩ η τάση θα ανέβαινε πάνω από 0,8 V και η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη! Με κλειστό διακόπτη περνούν 5 V / 1 kΩ = 5 mA.',
       lvl: '<b>Λογικά επίπεδα εισόδου TTL:</b> λογικό 0 κάτω από 0,8 V (V<sub>IL</sub>), λογικό 1 πάνω από 2,0 V (V<sub>IH</sub>). Ανάμεσα η κατάσταση είναι απροσδιόριστη.',
-      out: '<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η V<sub>Y</sub> πέφτει περίπου στα 3 V: I ≈ (3 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι\' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V.',
+      out: '<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η τάση εξόδου πέφτει περίπου στα 3 V: I ≈ (3 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι\' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V.',
       ass: 'Παραδοχές της προσομοίωσης: τροφοδοσία 5 V, τυπικές τιμές 74LS08 (ρεύμα εισόδου στο 0 ≈ 0,3 mA, ρεύμα εισόδου στο 1 ≈ 0, V<sub>OH</sub> ≈ 3 V με φορτίο το LED, V<sub>OL</sub> ≈ 0,2 V), κόκκινο LED με V<sub>F</sub> ≈ 2 V.'
     }
   };
@@ -389,8 +369,7 @@
     $('famTTL').classList.toggle('sel', family === 'ttl');
     var E = EXP[family];
     $('expIn').innerHTML = E.inp; $('expLvl').innerHTML = E.lvl;
-    $('expOut').innerHTML = E.out; $('expAss').innerHTML = E.ass;
-    $('mIAin').textContent = fmtI(IAin); $('mIBin').textContent = fmtI(IBin);
+    $('expOut').innerHTML = E.out;
 
     document.querySelector('#btnA .v').textContent = A;
     document.querySelector('#btnB .v').textContent = B;
@@ -402,11 +381,6 @@
       rows[i].className = rows[i].getAttribute('data-r') === ('' + A + B) ? 'active' : '';
     }
 
-    $('mVA').textContent = fmtV(VA);  $('mVB').textContent = fmtV(VB);
-    $('mVY').textContent = fmtV(VY);  $('mVR').textContent = fmtV(VR);
-    $('mVL').textContent = fmtV(VLED);
-    $('mIA').textContent = fmtI(IA);  $('mIB').textContent = fmtI(IB);
-    $('mIL').textContent = fmtI(IL);
 
     $('status').innerHTML = 'A = ' + A + ', B = ' + B + ' &rarr; Y = A·B = <b>' + Y +
       '</b> &mdash; το LED είναι ' + (Y ? '<span class="on">αναμμένο</span>' : '<span class="off">σβηστό</span>');
