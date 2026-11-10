@@ -62,6 +62,9 @@
   .famnote{text-align:center;color:var(--muted);font-size:.95rem;margin:0 0 4px}
   .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
   #btnTheme{white-space:nowrap}
+  .back{display:inline-block;margin:0 0 10px;color:var(--muted);text-decoration:none;font-size:1rem}
+  .back:hover{color:var(--ink);text-decoration:underline}
+  body.embedded .back{display:none}
 
   /* ---------- Σκούρο θέμα ---------- */
   body.dark{--bg:#0d1219;--card:#161e2b;--ink:#e6ebf2;--muted:#9aa6b8;--line:#2c3a4f}
@@ -90,6 +93,7 @@
 </head>
 <body>
 <div class="wrap">
+  <a id="backLink" class="back" href="index.html">← Όλες οι πύλες</a>
   <div class="head">
     <h1>Προσομοίωση λογικής πύλης NOR</h1>
     <button type="button" id="btnTheme" aria-pressed="false">🌙 Σκούρο θέμα</button>
@@ -513,7 +517,11 @@
     bt.textContent = d ? '☀️ Φωτεινό θέμα' : '🌙 Σκούρο θέμα';
     bt.setAttribute('aria-pressed', d ? 'true' : 'false');
     try { localStorage.setItem('gateSimTheme', d ? 'dark' : 'light'); } catch(e){}
+    $('backLink').href = 'index.html' + (d ? '#dark' : '#light');
   }
+  // μέσα σε iframe (π.χ. στο site) ο σύνδεσμος επιστροφής κρύβεται
+  try { if (window.self !== window.top) document.body.classList.add('embedded'); }
+  catch(e){ document.body.classList.add('embedded'); }
   $('btnTheme').addEventListener('click', function(){ setTheme(!dark); });
   // αρχικό θέμα: #dark ή #light στη διεύθυνση, αλλιώς η τελευταία επιλογή
   (function(){
