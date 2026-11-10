@@ -47,6 +47,7 @@
   .meas td:last-child{font-variant-numeric:tabular-nums;font-weight:700}
   .eq{font-size:1.3rem;text-align:center;margin:4px 0 12px}
   .note{color:var(--muted);font-size:.97rem;line-height:1.45;margin:0 0 8px}
+  .ov{text-decoration:overline}
   .note b{color:var(--ink)}
   .status{text-align:center;font-size:1.15rem;margin:8px 0 0}
   .status .on{color:var(--hi);font-weight:700}
@@ -101,7 +102,7 @@
       <button type="button" id="famTTL">TTL (74LS08)</button>
     </div>
     <p class="famnote" id="famNote"></p>
-    <svg viewBox="0 0 840 420" role="img" aria-label="Κύκλωμα πύλης AND με διακόπτες εισόδου, αντιστάσεις pull-down 10 kΩ και LED στην έξοδο με αντίσταση 220 Ω">
+    <svg viewBox="0 0 840 420" role="img" aria-label="Κύκλωμα πύλης AND με διακόπτες εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
       <defs>
         <radialGradient id="glow" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".8"/>
@@ -175,8 +176,8 @@
       <!-- ========== ΠΥΛΗ AND ========== -->
       <path d="M400,178 L440,178 A42,42 0 0 1 440,262 L400,262 Z" fill="#fdfdfd" stroke="#1d2433" stroke-width="4"/>
       <text x="436" y="227" font-size="20" font-weight="700" text-anchor="middle" fill="#1d2433">AND</text>
-      <text x="390" y="193" font-size="13" text-anchor="end" fill="#5b6475">A</text>
-      <text x="390" y="257" font-size="13" text-anchor="end" fill="#5b6475">B</text>
+      <text x="370" y="193" font-size="13" text-anchor="end" fill="#5b6475">A</text>
+      <text x="370" y="257" font-size="13" text-anchor="end" fill="#5b6475">B</text>
       <text id="chip" x="440" y="285" font-size="14" font-weight="700" text-anchor="middle" fill="#1d2433">U1: 74HC08</text>
       <text id="gNote1" x="440" y="306" font-size="14" text-anchor="middle" fill="#5b6475">CMOS είσοδοι:</text>
       <text id="gNote2" x="440" y="323" font-size="14" text-anchor="middle" fill="#5b6475">ρεύμα ≈ 0</text>
@@ -245,7 +246,7 @@
     <div class="card">
       <h2>Πώς λειτουργεί</h2>
       <p class="note">Η πύλη <b>AND</b> δίνει έξοδο <b>1</b> μόνο όταν <b>όλες</b> οι είσοδοι είναι 1. Αρκεί μία είσοδος να είναι 0 για να γίνει η έξοδος 0.</p>
-      <p class="note" id="expIn"></p>
+            <p class="note" id="expIn"></p>
       <p class="note" id="expLvl"></p>
       <p class="note" id="expOut"></p>
     </div>
@@ -258,37 +259,44 @@
   var state = {A:0, B:0};
   var family = 'cmos';
   var dark = false;
+  var NIN = 2;
+  function GATE(A, B){ return A & B; }
+  var STATUS_EXPR = "Y = A · B";
   /* Παράμετροι ανά τεχνολογία */
   var FAM = {
-    cmos: {
-      chip: '74HC08', rpd: 10000, rpdTxt: '10 kΩ',
-      iIL: 0,          // ρεύμα που βγαίνει από είσοδο στο 0
-      vOH: 5.0,        // τάση εξόδου στο 1 με φορτίο το LED
-      vOL: 0.0,
-      note1: 'CMOS είσοδοι:', note2: 'ρεύμα ≈ 0',
-      famNote: 'CMOS: είσοδοι χωρίς ρεύμα, pull-down 10 kΩ, έξοδος ≈ 5 V'
+    "cmos": {
+      "chip": "74HC08",
+      "rpd": 10000,
+      "rpdTxt": "10 kΩ",
+      "iIL": 0,
+      "vOH": 5.0,
+      "vOL": 0.0,
+      "note1": "CMOS είσοδοι:",
+      "note2": "ρεύμα ≈ 0",
+      "famNote": "CMOS: είσοδοι χωρίς ρεύμα, pull-down 10 kΩ, έξοδος ≈ 5 V"
     },
-    ttl: {
-      chip: '74LS08', rpd: 1000, rpdTxt: '1 kΩ',
-      iIL: 0.0003,     // τυπικά ≈ 0,3 mA (μέγιστο 0,4 mA)
-      vOH: 3.0,        // η V_OH πέφτει με φορτίο το LED
-      vOL: 0.2,
-      note1: 'TTL είσοδοι: στο 0', note2: 'βγάζουν ρεύμα',
-      famNote: 'TTL: η είσοδος στο 0 βγάζει ρεύμα, pull-down 1 kΩ, έξοδος στο 1 ≈ 3 V με φορτίο'
+    "ttl": {
+      "chip": "74LS08",
+      "rpd": 1000,
+      "rpdTxt": "1 kΩ",
+      "iIL": 0.0003,
+      "vOH": 3.0,
+      "vOL": 0.2,
+      "note1": "TTL είσοδοι: στο 0",
+      "note2": "βγάζουν ρεύμα",
+      "famNote": "TTL: η είσοδος στο 0 βγάζει ρεύμα, pull-down 1 kΩ, έξοδος στο 1 ≈ 3,0 V με φορτίο"
     }
   };
   var EXP = {
-    cmos: {
-      inp: '<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι\' αυτό μπορεί να συνδεθεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.',
-      lvl: '<b>Λογικά επίπεδα εισόδου (74HC08 στα 5 V):</b> λογικό 0 κάτω από ≈ 1,5 V, λογικό 1 πάνω από ≈ 3,5 V.',
-      out: '<b>Έξοδος:</b> όταν Y = 1 (≈ 5 V), το ρεύμα περνά από την R3 = 220 Ω και το LED. Με τάση ορθής πόλωσης LED ≈ 2 V: I = (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Η αντίσταση περιορίζει το ρεύμα ώστε να μην καταστραφεί το LED.',
-      ass: 'Παραδοχές της προσομοίωσης: ιδανική τροφοδοσία 5 V, έξοδος πύλης 5 V / 0 V, είσοδοι CMOS χωρίς ρεύμα, κόκκινο LED με V<sub>F</sub> ≈ 2 V.'
+    "cmos": {
+      "inp": "<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι' αυτό μπορεί να συνδεθεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.",
+      "lvl": "<b>Λογικά επίπεδα εισόδου (74HC08 στα 5 V):</b> λογικό 0 κάτω από ≈ 1,5 V, λογικό 1 πάνω από ≈ 3,5 V.",
+      "out": "<b>Έξοδος:</b> όταν Y = 1 (≈ 5 V), το ρεύμα περνά από την R3 = 220 Ω και το LED. Με τάση ορθής πόλωσης LED ≈ 2 V: I = (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Η αντίσταση περιορίζει το ρεύμα ώστε να μην καταστραφεί το LED."
     },
-    ttl: {
-      inp: '<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (έως 0,4 mA για το 74LS08, τυπικά ≈ 0,3 mA). Αυτό το ρεύμα περνά από την pull-down προς το GND και δημιουργεί τάση πάνω της. Με <b>1 kΩ</b>: 0,3 mA × 1 kΩ ≈ 0,3 V, κάτω από τα 0,8 V, άρα η είσοδος διαβάζεται 0. Με 10 kΩ η τάση θα ανέβαινε πάνω από 0,8 V και η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη! Με κλειστό διακόπτη περνούν 5 V / 1 kΩ = 5 mA.',
-      lvl: '<b>Λογικά επίπεδα εισόδου TTL:</b> λογικό 0 κάτω από 0,8 V (V<sub>IL</sub>), λογικό 1 πάνω από 2,0 V (V<sub>IH</sub>). Ανάμεσα η κατάσταση είναι απροσδιόριστη.',
-      out: '<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η τάση εξόδου πέφτει περίπου στα 3 V: I ≈ (3 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι\' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V.',
-      ass: 'Παραδοχές της προσομοίωσης: τροφοδοσία 5 V, τυπικές τιμές 74LS08 (ρεύμα εισόδου στο 0 ≈ 0,3 mA, ρεύμα εισόδου στο 1 ≈ 0, V<sub>OH</sub> ≈ 3 V με φορτίο το LED, V<sub>OL</sub> ≈ 0,2 V), κόκκινο LED με V<sub>F</sub> ≈ 2 V.'
+    "ttl": {
+      "inp": "<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (έως 0,4 mA για το 74LS08, τυπικά ≈ 0,3 mA). Αυτό το ρεύμα περνά από την pull-down προς το GND και δημιουργεί τάση πάνω της. Με <b>1 kΩ</b>: 0,3 mA × 1 kΩ ≈ 0,3 V, κάτω από τα 0,8 V, άρα η είσοδος διαβάζεται 0. Με 10 kΩ η τάση θα ανέβαινε πάνω από 0,8 V και η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη! Με κλειστό διακόπτη περνούν 5 V / 1 kΩ ≈ 5,0 mA.",
+      "lvl": "<b>Λογικά επίπεδα εισόδου TTL:</b> λογικό 0 κάτω από 0,8 V (V<sub>IL</sub>), λογικό 1 πάνω από 2,0 V (V<sub>IH</sub>). Ανάμεσα η κατάσταση είναι απροσδιόριστη.",
+      "out": "<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η τάση εξόδου πέφτει περίπου στα 3,0 V: I ≈ (3,0 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V."
     }
   };
 
@@ -325,7 +333,7 @@
   /* ---------- απεικόνιση κυκλώματος ---------- */
   function render(){
     var F = FAM[family];
-    var A = state.A, B = state.B, Y = A & B;
+    var A = state.A, B = state.B, Y = GATE(A, B);
     // είσοδοι: κλειστός διακόπτης → 5 V, ανοιχτός → I_IL × R_pd
     var IAin = A ? 0 : F.iIL, IBin = B ? 0 : F.iIL;
     var VA = A ? VCC : IAin * F.rpd, VB = B ? VCC : IBin * F.rpd;
@@ -336,22 +344,23 @@
     var VLED = Y ? VF : VY, VR = Y ? VY - VF : 0;
     var IAsw = A ? IA : 0, IBsw = B ? IB : 0;
 
-    setSwitch('swA', A, 80); setSwitch('swB', B, 270);
+    setSwitch('swA', A, 80); if (NIN === 2) setSwitch('swB', B, 270);
 
-    wire('wA_src', VCC); wire('wB_src', VCC);
+    wire('wA_src', VCC); if (NIN === 2) wire('wB_src', VCC);
     wire('wA_node', VA); wire('wA_pd', VA); wire('wA_gnd', 0);
-    wire('wB_node', VB); wire('wB_pd', VB); wire('wB_gnd', 0);
+    if (NIN === 2) wire('wB_node', VB), wire('wB_pd', VB), wire('wB_gnd', 0);
+    // wire('wB_pd', VB); wire('wB_gnd', 0);
     wire('wY', VY); wire('wL', VLED); wire('wL_gnd', 0);
 
-    vtag('vA', VA); vtag('vB', VB); vtag('vY', VY); vtag('vL', VLED);
+    vtag('vA', VA); if (NIN === 2) vtag('vB', VB); vtag('vY', VY); vtag('vL', VLED);
     $('iA').textContent = IA ? '↓ ' + fmtI(IA) : '';
-    $('iB').textContent = IB ? '↓ ' + fmtI(IB) : '';
+    if (NIN === 2) $('iB').textContent = IB ? '↓ ' + fmtI(IB) : '';
     $('iL').textContent = IL ? '↓ ' + fmtI(IL) : '';
     $('iAin').textContent = IAin ? '↑ ' + fmtI(IAin) : '';
-    $('iBin').textContent = IBin ? '← ' + fmtI(IBin) : '';
+    if (NIN === 2) $('iBin').textContent = IBin ? '← ' + fmtI(IBin) : '';
 
-    flow('fA', IAsw); flow('fB', IBsw); flow('fY', IL);
-    flow('fAin', IAin); flow('fBin', IBin);
+    flow('fA', IAsw); if (NIN === 2) flow('fB', IBsw); flow('fY', IL);
+    flow('fAin', IAin); if (NIN === 2) flow('fBin', IBin);
 
     // φωτεινότητα LED ανάλογη του ρεύματος
     var bright = Math.min(1, IL / 0.0136);
@@ -361,7 +370,7 @@
     $('rays').setAttribute('opacity', Y ? (0.4 + 0.6 * bright).toFixed(2) : 0);
 
     // ετικέτες ανά τεχνολογία
-    $('r1v').textContent = F.rpdTxt; $('r2v').textContent = F.rpdTxt;
+    $('r1v').textContent = F.rpdTxt; if (NIN === 2) $('r2v').textContent = F.rpdTxt;
     $('chip').textContent = 'U1: ' + F.chip;
     $('gNote1').textContent = F.note1; $('gNote2').textContent = F.note2;
     $('famNote').textContent = F.famNote;
@@ -372,17 +381,17 @@
     $('expOut').innerHTML = E.out;
 
     document.querySelector('#btnA .v').textContent = A;
-    document.querySelector('#btnB .v').textContent = B;
+    if (NIN === 2) document.querySelector('#btnB .v').textContent = B;
     $('btnA').classList.toggle('on', !!A);
-    $('btnB').classList.toggle('on', !!B);
+    if (NIN === 2) $('btnB').classList.toggle('on', !!B);
 
     var rows = document.querySelectorAll('#tt tbody tr');
     for (var i=0;i<rows.length;i++){
-      rows[i].className = rows[i].getAttribute('data-r') === ('' + A + B) ? 'active' : '';
+      rows[i].className = rows[i].getAttribute('data-r') === (NIN === 2 ? '' + A + B : '' + A) ? 'active' : '';
     }
 
 
-    $('status').innerHTML = 'A = ' + A + ', B = ' + B + ' &rarr; Y = A·B = <b>' + Y +
+    $('status').innerHTML = (NIN === 2 ? 'A = ' + A + ', B = ' + B : 'A = ' + A) + ' &rarr; ' + STATUS_EXPR + ' = <b>' + Y +
       '</b> &mdash; το LED είναι ' + (Y ? '<span class="on">αναμμένο</span>' : '<span class="off">σβηστό</span>');
   }
 
@@ -408,7 +417,7 @@
     var t0 = tNow - WINDOW;
     var left = 44, right = 12, top = 12, bottom = 26;
     var pw = w - left - right;
-    var rowH = (h - top - bottom) / 3;
+    var rowH = (h - top - bottom) / (NIN + 1);
     function X(t){ return left + (t - t0) / WINDOW * pw; }
 
     ctx.clearRect(0, 0, w, h);
@@ -430,8 +439,9 @@
     var traces = [
       {name:'A', get:function(e){return e.A;}, color:P.A},
       {name:'B', get:function(e){return e.B;}, color:P.B},
-      {name:'Y', get:function(e){return e.A & e.B;}, color:'#e8411f'}
+      {name:'Y', get:function(e){return GATE(e.A, e.B);}, color:'#e8411f'}
     ];
+    if (NIN === 1) traces.splice(1, 1);
     traces.forEach(function(tr, i){
       var yHi = top + i * rowH + rowH * 0.18;
       var yLo = top + i * rowH + rowH * 0.82;
@@ -478,7 +488,7 @@
     else setInputs(state.A, state.B ? 0 : 1);
   }
 
-  ['A','B'].forEach(function(k){
+  (NIN === 2 ? ['A','B'] : ['A']).forEach(function(k){
     var g = $('sw' + k);
     g.addEventListener('click', function(){ toggle(k); });
     g.addEventListener('keydown', function(e){
@@ -491,7 +501,7 @@
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     var k = (e.key || '').toUpperCase();
     if (k === 'A' || k === 'Α') toggle('A');
-    if (k === 'B' || k === 'Β') toggle('B');
+    if (NIN === 2 && (k === 'B' || k === 'Β')) toggle('B');
   });
 
   /* ---------- θέμα φωτεινό / σκούρο ---------- */
@@ -501,13 +511,13 @@
     var bt = $('btnTheme');
     bt.textContent = d ? '☀️ Φωτεινό θέμα' : '🌙 Σκούρο θέμα';
     bt.setAttribute('aria-pressed', d ? 'true' : 'false');
-    try { localStorage.setItem('andGateTheme', d ? 'dark' : 'light'); } catch(e){}
+    try { localStorage.setItem('gateSimTheme', d ? 'dark' : 'light'); } catch(e){}
   }
   $('btnTheme').addEventListener('click', function(){ setTheme(!dark); });
   // αρχικό θέμα: #dark ή #light στη διεύθυνση, αλλιώς η τελευταία επιλογή
   (function(){
     var h = (location.hash || '').toLowerCase(), saved = null;
-    try { saved = localStorage.getItem('andGateTheme'); } catch(e){}
+    try { saved = localStorage.getItem('gateSimTheme'); } catch(e){}
     if (h === '#dark') setTheme(true);
     else if (h === '#light') setTheme(false);
     else setTheme(saved === 'dark');
@@ -520,7 +530,7 @@
     $('circuitCard').classList.toggle('noflow', !this.checked);
   });
 
-  var autoTimer = null, seq = [[0,0],[0,1],[1,0],[1,1]], seqI = 0;
+  var autoTimer = null, seq = NIN === 2 ? [[0,0],[0,1],[1,0],[1,1]] : [[0,0],[1,0]], seqI = 0;
   $('btnAuto').addEventListener('click', function(){
     if (autoTimer){
       clearInterval(autoTimer); autoTimer = null;
@@ -529,7 +539,7 @@
       if (paused) $('btnPause').click();
       seqI = 0; setInputs(seq[0][0], seq[0][1]);
       autoTimer = setInterval(function(){
-        seqI = (seqI + 1) % 4; setInputs(seq[seqI][0], seq[seqI][1]);
+        seqI = (seqI + 1) % seq.length; setInputs(seq[seqI][0], seq[seqI][1]);
       }, 1000);
       this.textContent = '■ Διακοπή ακολουθίας'; this.classList.add('on');
     }

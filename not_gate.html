@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Προσομοίωση πύλης NOT</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --ink:#1d2433; --muted:#5b6475;
+    --line:#d5dbe5; --hi:#e8411f; --accent:#0f7b6c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Calibri,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:960px;margin:0 auto;padding:20px 16px 32px}
+  h1{font-size:1.6rem;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:1rem;line-height:1.4}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  h2{font-size:1.15rem;margin:0 0 10px}
+  svg{width:100%;height:auto;display:block;user-select:none}
+  .sw{cursor:pointer}
+  .sw:focus{outline:none}
+  .sw:focus-visible .hit{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3}
+  .sw:hover .hit{fill:rgba(15,123,108,.06)}
+  .comp{stroke:#1d2433;fill:none;stroke-width:3;stroke-linejoin:round}
+  .wire{fill:none;stroke-width:5;stroke-linejoin:round;stroke-linecap:round;transition:stroke .15s}
+  .flow{fill:none;stroke:#1e7bff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+        stroke-dasharray:0.1 18;animation:flow linear infinite;pointer-events:none}
+  .flow.off{display:none}
+  .noflow .flow{display:none}
+  @keyframes flow{to{stroke-dashoffset:-18.1}}
+  .vtag{font-size:16px;font-weight:700}
+  .itag{font-size:15px;font-weight:700;fill:#1d4ed8}
+  .lbl{font-size:15px;fill:#1d2433}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  button{font:inherit;font-size:1rem;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
+  button:hover{background:#f0f3f8}
+  button.on{background:#e7f4f1;border-color:var(--accent)}
+  button .v{font-weight:700;margin-left:6px}
+  .chk{display:inline-flex;align-items:center;gap:6px;font-size:1rem;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:700px){.grid{grid-template-columns:1fr}}
+  table{border-collapse:collapse;width:100%;font-size:1.05rem;text-align:center}
+  th,td{border:1px solid var(--line);padding:7px}
+  th{background:#eef2f7}
+  tr.active td{background:#fff3c4;font-weight:700}
+  .meas td:first-child{text-align:left}
+  .meas td:last-child{font-variant-numeric:tabular-nums;font-weight:700}
+  .eq{font-size:1.3rem;text-align:center;margin:4px 0 12px}
+  .note{color:var(--muted);font-size:.97rem;line-height:1.45;margin:0 0 8px}
+  .ov{text-decoration:overline}
+  .note b{color:var(--ink)}
+  .status{text-align:center;font-size:1.15rem;margin:8px 0 0}
+  .status .on{color:var(--hi);font-weight:700}
+  .status .off{color:var(--muted);font-weight:700}
+  kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fff;font-size:.9em}
+  canvas{width:100%;height:230px;display:block;border:1px solid var(--line);border-radius:8px;background:#fcfdfe}
+  .seg{display:flex;justify-content:center;gap:0;margin:0 0 6px}
+  .seg button{border-radius:0;min-width:190px}
+  .seg button:first-child{border-radius:8px 0 0 8px}
+  .seg button:last-child{border-radius:0 8px 8px 0;border-left:none}
+  .seg button.sel{background:#1d2433;color:#fff;border-color:#1d2433}
+  .famnote{text-align:center;color:var(--muted);font-size:.95rem;margin:0 0 4px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  #btnTheme{white-space:nowrap}
+
+  /* ---------- Σκούρο θέμα ---------- */
+  body.dark{--bg:#0d1219;--card:#161e2b;--ink:#e6ebf2;--muted:#9aa6b8;--line:#2c3a4f}
+  body.dark button{background:#202c3f;color:var(--ink)}
+  body.dark button:hover{background:#2a3a55}
+  body.dark button.on{background:#123a33;border-color:#2fc4a8}
+  body.dark .seg button.sel{background:#3d9bff;color:#0b1018;border-color:#3d9bff;font-weight:700}
+  body.dark th{background:#202c3f}
+  body.dark tr.active td{background:#4a3b10;color:#ffe08a}
+  body.dark kbd{background:#202c3f}
+  body.dark canvas{background:#101824}
+  svg use{color:#1d2433}
+  body.dark svg use{color:#e6ebf2}
+  body.dark .comp{stroke:#e6ebf2}
+  body.dark .lbl{fill:#e6ebf2}
+  body.dark .itag{fill:#6cb4ff}
+  body.dark .flow{stroke:#3d9bff}
+  body.dark svg [fill="#1d2433"]{fill:#e6ebf2}
+  body.dark svg [stroke="#1d2433"]{stroke:#e6ebf2}
+  body.dark svg [fill="#5b6475"]{fill:#9aa6b8}
+  body.dark svg [fill="#fdfdfd"],
+  body.dark svg [fill="#fff"]{fill:#161e2b}
+  body.dark svg [fill="#f2d4cc"]{fill:#4a2a24}
+  .legend{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>Προσομοίωση λογικής πύλης NOT</h1>
+    <button type="button" id="btnTheme" aria-pressed="false">🌙 Σκούρο θέμα</button>
+  </div>
+  <p class="sub">Κάνε κλικ στον διακόπτη <b>S1</b> (είσοδος A) ή πάτησε το πλήκτρο <kbd>A</kbd>. Παρατήρησε τις τάσεις, το ρεύμα (μπλε κουκκίδες) και το LED στην έξοδο Y.</p>
+
+  <div class="card" id="circuitCard">
+    <div class="seg" role="group" aria-label="Τεχνολογία πύλης">
+      <button type="button" id="famCMOS" class="sel">CMOS (74HC04)</button>
+      <button type="button" id="famTTL">TTL (74LS04)</button>
+    </div>
+    <p class="famnote" id="famNote"></p>
+    <svg viewBox="0 0 840 420" role="img" aria-label="Κύκλωμα πύλης NOT με διακόπτη εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
+      <defs>
+        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".8"/>
+          <stop offset="60%" stop-color="#ff5a2a" stop-opacity=".22"/>
+          <stop offset="100%" stop-color="#ff5a2a" stop-opacity="0"/>
+        </radialGradient>
+        <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#e8411f"/>
+        </marker>
+        <g id="gnd">
+          <line x1="-20" y1="0" x2="20" y2="0" stroke="currentColor" stroke-width="3"/>
+          <line x1="-13" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="3"/>
+          <line x1="-6" y1="14" x2="6" y2="14" stroke="currentColor" stroke-width="3"/>
+        </g>
+      </defs>
+
+      <!-- ========== ΕΙΣΟΔΟΣ A ========== -->
+      <text x="18" y="88" font-size="26" font-weight="700" fill="#1d2433">A</text>
+      <text x="62" y="62" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
+      <polyline class="wire" id="wA_src" points="62,80 100,80"/>
+      <circle cx="62" cy="80" r="5" fill="#fff" stroke="#e8411f" stroke-width="3"/>
+      <polyline class="wire" id="wA_node" points="150,80 350,80 350,220 405,220"/>
+      <polyline class="wire" id="wA_pd" points="220,80 220,105"/>
+      <polyline class="comp" points="220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165"/>
+      <polyline class="wire" id="wA_gnd" points="220,165 220,190"/>
+      <use href="#gnd" x="220" y="190"/>
+      <circle cx="220" cy="80" r="6" fill="#1d2433"/>
+      <text class="lbl" x="240" y="120">R1</text>
+      <text class="lbl" x="240" y="137" id="r1v">10 kΩ</text>
+      <text class="itag" id="iAin" x="358" y="145"></text>
+      <polyline class="flow off" id="fAin" points="405,220 350,220 350,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
+      <text class="vtag" id="vA" x="232" y="70">0,0 V</text>
+      <text class="itag" id="iA" x="240" y="158"></text>
+      <!-- flow A: +5V → S1 → R1 → GND -->
+      <polyline class="flow off" id="fA" points="62,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
+      <!-- switch S1 -->
+      <g id="swA" class="sw" tabindex="0" role="switch" aria-label="Διακόπτης S1, είσοδος A">
+        <rect class="hit" x="84" y="38" width="84" height="62" rx="8" fill="transparent" stroke="none"/>
+        <line class="lever" x1="100" y1="80" x2="145" y2="55" stroke="#e8411f" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="100" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+        <circle cx="150" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+        <text class="lbl" x="125" y="112" text-anchor="middle">S1</text>
+      </g>
+
+      <!-- ========== ΠΥΛΗ NOT ========== -->
+      <path d="M405,180 L405,260 L474,220 Z" fill="#fdfdfd" stroke="#1d2433" stroke-width="4"/>
+      <circle cx="480" cy="220" r="6" fill="#fdfdfd" stroke="#1d2433" stroke-width="3"/>
+      <text x="370" y="213" font-size="13" text-anchor="end" fill="#5b6475">A</text>
+      <text id="chip" x="440" y="285" font-size="14" font-weight="700" text-anchor="middle" fill="#1d2433">U1: 74HC08</text>
+      <text id="gNote1" x="440" y="306" font-size="14" text-anchor="middle" fill="#5b6475">CMOS είσοδοι:</text>
+      <text id="gNote2" x="440" y="323" font-size="14" text-anchor="middle" fill="#5b6475">ρεύμα ≈ 0</text>
+
+      <!-- ========== ΕΞΟΔΟΣ ========== -->
+      <polyline class="wire" id="wY" points="486,220 580,220"/>
+      <circle cx="540" cy="220" r="6" fill="#1d2433"/>
+      <text x="540" y="246" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">Y</text>
+      <text class="vtag" id="vY" x="505" y="206">0,0 V</text>
+      <polyline class="comp" points="580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220"/>
+      <text class="lbl" x="620" y="198" text-anchor="middle">R3  220 Ω</text>
+      <polyline class="wire" id="wL" points="660,220 740,220 740,252"/>
+      <text class="vtag" id="vL" x="672" y="246">0,0 V</text>
+
+      <!-- LED -->
+      <circle id="halo" cx="740" cy="270" r="0" fill="url(#glow)"/>
+      <path id="ledTri" d="M720,252 L760,252 L740,286 Z" fill="#f2d4cc" stroke="#1d2433" stroke-width="3" stroke-linejoin="round"/>
+      <line x1="720" y1="287" x2="760" y2="287" stroke="#1d2433" stroke-width="3"/>
+      <g id="rays" stroke="#e8411f" stroke-width="2.5" opacity="0">
+        <line x1="766" y1="258" x2="788" y2="244" marker-end="url(#arr)"/>
+        <line x1="768" y1="272" x2="792" y2="260" marker-end="url(#arr)"/>
+      </g>
+      <text class="lbl" x="772" y="300">LED1</text>
+      <text class="itag" id="iL" x="756" y="330"></text>
+      <polyline class="wire" id="wL_gnd" points="740,287 740,380"/>
+      <use href="#gnd" x="740" y="380"/>
+      <!-- flow output: Y → R3 → LED → GND -->
+      <polyline class="flow off" id="fY" points="486,220 580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220 740,220 740,380"/>
+    </svg>
+
+    <div class="controls">
+      <button id="btnA" type="button">Είσοδος A:<span class="v">0</span></button>
+      <label class="chk"><input type="checkbox" id="showFlow" checked> Εμφάνιση ροής ρεύματος</label>
+    </div>
+    <p class="status" id="status"></p>
+  </div>
+
+  <div class="card">
+    <div class="legend">
+      <h2 style="margin:0">Χρονοδιάγραμμα (τελευταία 10 s)</h2>
+      <div class="controls" style="margin:0">
+        <button id="btnAuto" type="button">▶ Αυτόματη ακολουθία</button>
+        <button id="btnPause" type="button">⏸ Παύση</button>
+        <button id="btnClear" type="button">Καθαρισμός</button>
+      </div>
+    </div>
+    <canvas id="timing" aria-label="Χρονοδιάγραμμα των σημάτων A και Y"></canvas>
+    <p class="note" style="margin-top:8px">Η <b>αυτόματη ακολουθία</b> αλλάζει την είσοδο 0 → 1 κάθε 1 s. Παρατήρησε ότι το Y είναι πάντα το αντίθετο του A.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Πίνακας αληθείας</h2>
+      <div class="eq">Y = <span class="ov">A</span></div>
+      <table id="tt">
+        <thead><tr><th>A</th><th>Y</th><th>LED</th></tr></thead>
+        <tbody>
+          <tr data-r="0"><td>0</td><td>1</td><td>αναμμένο</td></tr>
+          <tr data-r="1"><td>1</td><td>0</td><td>σβηστό</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Πώς λειτουργεί</h2>
+      <p class="note">Η πύλη <b>NOT</b> (αντιστροφέας) δίνει στην έξοδο την <b>αντίθετη</b> λογική κατάσταση από την είσοδο: όταν A = 0 τότε Y = 1, και όταν A = 1 τότε Y = 0.</p>
+            <p class="note" id="expIn"></p>
+      <p class="note" id="expLvl"></p>
+      <p class="note" id="expOut"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var VCC = 5, R3 = 220, VF = 2.0;
+  var state = {A:0, B:0};
+  var family = 'cmos';
+  var dark = false;
+  var NIN = 1;
+  function GATE(A, B){ return 1 - A; }
+  var STATUS_EXPR = "Y = <span class=\"ov\">A</span>";
+  /* Παράμετροι ανά τεχνολογία */
+  var FAM = {
+    "cmos": {
+      "chip": "74HC04",
+      "rpd": 10000,
+      "rpdTxt": "10 kΩ",
+      "iIL": 0,
+      "vOH": 5.0,
+      "vOL": 0.0,
+      "note1": "CMOS είσοδοι:",
+      "note2": "ρεύμα ≈ 0",
+      "famNote": "CMOS: είσοδοι χωρίς ρεύμα, pull-down 10 kΩ, έξοδος ≈ 5 V"
+    },
+    "ttl": {
+      "chip": "74LS04",
+      "rpd": 1000,
+      "rpdTxt": "1 kΩ",
+      "iIL": 0.0003,
+      "vOH": 3.0,
+      "vOL": 0.2,
+      "note1": "TTL είσοδοι: στο 0",
+      "note2": "βγάζουν ρεύμα",
+      "famNote": "TTL: η είσοδος στο 0 βγάζει ρεύμα, pull-down 1 kΩ, έξοδος στο 1 ≈ 3,0 V με φορτίο"
+    }
+  };
+  var EXP = {
+    "cmos": {
+      "inp": "<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι' αυτό μπορεί να συνδεθεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.",
+      "lvl": "<b>Λογικά επίπεδα εισόδου (74HC04 στα 5 V):</b> λογικό 0 κάτω από ≈ 1,5 V, λογικό 1 πάνω από ≈ 3,5 V.",
+      "out": "<b>Έξοδος:</b> όταν Y = 1 (≈ 5 V), το ρεύμα περνά από την R3 = 220 Ω και το LED. Με τάση ορθής πόλωσης LED ≈ 2 V: I = (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Η αντίσταση περιορίζει το ρεύμα ώστε να μην καταστραφεί το LED."
+    },
+    "ttl": {
+      "inp": "<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (έως 0,4 mA για το 74LS04, τυπικά ≈ 0,3 mA). Αυτό το ρεύμα περνά από την pull-down προς το GND και δημιουργεί τάση πάνω της. Με <b>1 kΩ</b>: 0,3 mA × 1 kΩ ≈ 0,3 V, κάτω από τα 0,8 V, άρα η είσοδος διαβάζεται 0. Με 10 kΩ η τάση θα ανέβαινε πάνω από 0,8 V και η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη! Με κλειστό διακόπτη περνούν 5 V / 1 kΩ ≈ 5,0 mA.",
+      "lvl": "<b>Λογικά επίπεδα εισόδου TTL:</b> λογικό 0 κάτω από 0,8 V (V<sub>IL</sub>), λογικό 1 πάνω από 2,0 V (V<sub>IH</sub>). Ανάμεσα η κατάσταση είναι απροσδιόριστη.",
+      "out": "<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η τάση εξόδου πέφτει περίπου στα 3,0 V: I ≈ (3,0 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V."
+    }
+  };
+
+  /* ---------- βοηθητικά ---------- */
+  function fmtV(v){ return v.toFixed(1).replace('.', ',') + ' V'; }
+  function fmtI(a){ return (a*1000).toFixed(1).replace('.', ',') + ' mA'; }
+  function vColor(v){
+    var t = Math.max(0, Math.min(1, v / VCC));
+    var c0 = [138,148,166], c1 = [232,65,31];
+    var r = Math.round(c0[0] + (c1[0]-c0[0])*t),
+        g = Math.round(c0[1] + (c1[1]-c0[1])*t),
+        b = Math.round(c0[2] + (c1[2]-c0[2])*t);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+  function $(id){ return document.getElementById(id); }
+  function wire(id, v){ $(id).setAttribute('stroke', vColor(v)); }
+  function vtag(id, v){ var t=$(id); t.textContent = fmtV(v); t.setAttribute('fill', v >= 1 ? vColor(Math.max(v,2.5)) : '#5b6475'); }
+  function flow(id, I){
+    var el = $(id);
+    if (I <= 0){ el.classList.add('off'); return; }
+    el.classList.remove('off');
+    // μεγαλύτερο ρεύμα → γρηγορότερες κουκκίδες
+    var mA = I * 1000;
+    var dur = 1.6 / (1 + mA * 0.35);
+    el.style.animationDuration = dur.toFixed(2) + 's';
+  }
+  function setSwitch(id, v, y){
+    var lever = $(id).querySelector('.lever');
+    lever.setAttribute('x2', v ? 150 : 145);
+    lever.setAttribute('y2', v ? y : y - 25);
+    $(id).setAttribute('aria-checked', v ? 'true' : 'false');
+  }
+
+  /* ---------- απεικόνιση κυκλώματος ---------- */
+  function render(){
+    var F = FAM[family];
+    var A = state.A, B = state.B, Y = GATE(A, B);
+    // είσοδοι: κλειστός διακόπτης → 5 V, ανοιχτός → I_IL × R_pd
+    var IAin = A ? 0 : F.iIL, IBin = B ? 0 : F.iIL;
+    var VA = A ? VCC : IAin * F.rpd, VB = B ? VCC : IBin * F.rpd;
+    var IA = VA / F.rpd, IB = VB / F.rpd;
+    // έξοδος
+    var VY = Y ? F.vOH : F.vOL;
+    var IL = Y ? (VY - VF) / R3 : 0;
+    var VLED = Y ? VF : VY, VR = Y ? VY - VF : 0;
+    var IAsw = A ? IA : 0, IBsw = B ? IB : 0;
+
+    setSwitch('swA', A, 80); if (NIN === 2) setSwitch('swB', B, 270);
+
+    wire('wA_src', VCC); if (NIN === 2) wire('wB_src', VCC);
+    wire('wA_node', VA); wire('wA_pd', VA); wire('wA_gnd', 0);
+    if (NIN === 2) wire('wB_node', VB), wire('wB_pd', VB), wire('wB_gnd', 0);
+    // wire('wB_pd', VB); wire('wB_gnd', 0);
+    wire('wY', VY); wire('wL', VLED); wire('wL_gnd', 0);
+
+    vtag('vA', VA); if (NIN === 2) vtag('vB', VB); vtag('vY', VY); vtag('vL', VLED);
+    $('iA').textContent = IA ? '↓ ' + fmtI(IA) : '';
+    if (NIN === 2) $('iB').textContent = IB ? '↓ ' + fmtI(IB) : '';
+    $('iL').textContent = IL ? '↓ ' + fmtI(IL) : '';
+    $('iAin').textContent = IAin ? '↑ ' + fmtI(IAin) : '';
+    if (NIN === 2) $('iBin').textContent = IBin ? '← ' + fmtI(IBin) : '';
+
+    flow('fA', IAsw); if (NIN === 2) flow('fB', IBsw); flow('fY', IL);
+    flow('fAin', IAin); if (NIN === 2) flow('fBin', IBin);
+
+    // φωτεινότητα LED ανάλογη του ρεύματος
+    var bright = Math.min(1, IL / 0.0136);
+    $('ledTri').setAttribute('fill', Y ? (bright > 0.6 ? '#ff4b1f' : '#ff8a66') : '#f2d4cc');
+    $('halo').setAttribute('r', Y ? Math.round(25 + 35 * bright) : 0);
+    $('halo').setAttribute('opacity', Y ? (0.45 + 0.55 * bright).toFixed(2) : 0);
+    $('rays').setAttribute('opacity', Y ? (0.4 + 0.6 * bright).toFixed(2) : 0);
+
+    // ετικέτες ανά τεχνολογία
+    $('r1v').textContent = F.rpdTxt; if (NIN === 2) $('r2v').textContent = F.rpdTxt;
+    $('chip').textContent = 'U1: ' + F.chip;
+    $('gNote1').textContent = F.note1; $('gNote2').textContent = F.note2;
+    $('famNote').textContent = F.famNote;
+    $('famCMOS').classList.toggle('sel', family === 'cmos');
+    $('famTTL').classList.toggle('sel', family === 'ttl');
+    var E = EXP[family];
+    $('expIn').innerHTML = E.inp; $('expLvl').innerHTML = E.lvl;
+    $('expOut').innerHTML = E.out;
+
+    document.querySelector('#btnA .v').textContent = A;
+    if (NIN === 2) document.querySelector('#btnB .v').textContent = B;
+    $('btnA').classList.toggle('on', !!A);
+    if (NIN === 2) $('btnB').classList.toggle('on', !!B);
+
+    var rows = document.querySelectorAll('#tt tbody tr');
+    for (var i=0;i<rows.length;i++){
+      rows[i].className = rows[i].getAttribute('data-r') === (NIN === 2 ? '' + A + B : '' + A) ? 'active' : '';
+    }
+
+
+    $('status').innerHTML = (NIN === 2 ? 'A = ' + A + ', B = ' + B : 'A = ' + A) + ' &rarr; ' + STATUS_EXPR + ' = <b>' + Y +
+      '</b> &mdash; το LED είναι ' + (Y ? '<span class="on">αναμμένο</span>' : '<span class="off">σβηστό</span>');
+  }
+
+  /* ---------- χρονοδιάγραμμα ---------- */
+  var WINDOW = 10000;              // ms
+  var events = [];                 // {t, A, B}
+  var paused = false, pausedAt = 0;
+  function now(){ return performance.now(); }
+  function record(){ events.push({t: now(), A: state.A, B: state.B}); }
+
+  var cv = $('timing'), ctx = cv.getContext('2d');
+  function resize(){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+
+  function drawTiming(){
+    var w = cv.clientWidth, h = cv.clientHeight;
+    var tNow = paused ? pausedAt : now();
+    var t0 = tNow - WINDOW;
+    var left = 44, right = 12, top = 12, bottom = 26;
+    var pw = w - left - right;
+    var rowH = (h - top - bottom) / (NIN + 1);
+    function X(t){ return left + (t - t0) / WINDOW * pw; }
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.font = '13px Calibri, "Segoe UI", Arial, sans-serif';
+
+    // πλέγμα χρόνου ανά 1 s
+    var P = dark ? {grid:'#253246', sep:'#2c3a4f', txt:'#9aa6b8', A:'#5b9bff', B:'#2fc4a8'} : {grid:'#e6eaf0', sep:'#d5dbe5', txt:'#5b6475', A:'#2f6fd6', B:'#0f7b6c'};
+    ctx.strokeStyle = P.grid; ctx.lineWidth = 1; ctx.fillStyle = P.txt;
+    ctx.textAlign = 'center';
+    for (var s = 0; s <= 10; s++){
+      var x = left + s / 10 * pw;
+      ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, h - bottom); ctx.stroke();
+      ctx.fillText((s - 10) + ' s', x, h - 8);
+    }
+
+    // κλάδεμα παλιών γεγονότων (κρατάμε το τελευταίο πριν το t0)
+    while (events.length > 1 && events[1].t <= t0) events.shift();
+
+    var traces = [
+      {name:'A', get:function(e){return e.A;}, color:P.A},
+      {name:'B', get:function(e){return e.B;}, color:P.B},
+      {name:'Y', get:function(e){return GATE(e.A, e.B);}, color:'#e8411f'}
+    ];
+    if (NIN === 1) traces.splice(1, 1);
+    traces.forEach(function(tr, i){
+      var yHi = top + i * rowH + rowH * 0.18;
+      var yLo = top + i * rowH + rowH * 0.82;
+      // ετικέτα
+      ctx.fillStyle = tr.color; ctx.textAlign = 'left';
+      ctx.font = 'bold 16px Calibri, "Segoe UI", Arial, sans-serif';
+      ctx.fillText(tr.name, 8, (yHi + yLo) / 2 + 5);
+      ctx.font = '11px Calibri, "Segoe UI", Arial, sans-serif';
+      ctx.fillStyle = '#8a94a6';
+      ctx.fillText('1', 30, yHi + 4); ctx.fillText('0', 30, yLo + 4);
+      // διαχωριστική γραμμή
+      if (i > 0){
+        ctx.strokeStyle = P.sep; ctx.beginPath();
+        ctx.moveTo(left, top + i * rowH); ctx.lineTo(w - right, top + i * rowH); ctx.stroke();
+      }
+      if (!events.length) return;
+      // κυματομορφή
+      ctx.strokeStyle = tr.color; ctx.lineWidth = 2.5; ctx.lineJoin = 'miter';
+      ctx.beginPath();
+      var first = events[0];
+      var startT = Math.max(first.t, t0);
+      var v = tr.get(first);
+      ctx.moveTo(X(startT), v ? yHi : yLo);
+      for (var k = 1; k < events.length; k++){
+        var e = events[k];
+        if (e.t > tNow) break;
+        var nv = tr.get(e);
+        ctx.lineTo(X(e.t), v ? yHi : yLo);
+        ctx.lineTo(X(e.t), nv ? yHi : yLo);
+        v = nv;
+      }
+      ctx.lineTo(X(tNow), v ? yHi : yLo);
+      ctx.stroke();
+    });
+    ctx.font = '13px Calibri, "Segoe UI", Arial, sans-serif';
+    ctx.font = '13px Calibri, "Segoe UI", Arial, sans-serif';
+    requestAnimationFrame(drawTiming);
+  }
+
+  /* ---------- αλληλεπίδραση ---------- */
+  function setInputs(A, B){ state.A = A; state.B = B; record(); render(); }
+  function toggle(k){
+    if (k === 'A') setInputs(state.A ? 0 : 1, state.B);
+    else setInputs(state.A, state.B ? 0 : 1);
+  }
+
+  (NIN === 2 ? ['A','B'] : ['A']).forEach(function(k){
+    var g = $('sw' + k);
+    g.addEventListener('click', function(){ toggle(k); });
+    g.addEventListener('keydown', function(e){
+      if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(k); }
+    });
+    $('btn' + k).addEventListener('click', function(){ toggle(k); });
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT')) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = (e.key || '').toUpperCase();
+    if (k === 'A' || k === 'Α') toggle('A');
+    if (NIN === 2 && (k === 'B' || k === 'Β')) toggle('B');
+  });
+
+  /* ---------- θέμα φωτεινό / σκούρο ---------- */
+  function setTheme(d){
+    dark = d;
+    document.body.classList.toggle('dark', d);
+    var bt = $('btnTheme');
+    bt.textContent = d ? '☀️ Φωτεινό θέμα' : '🌙 Σκούρο θέμα';
+    bt.setAttribute('aria-pressed', d ? 'true' : 'false');
+    try { localStorage.setItem('gateSimTheme', d ? 'dark' : 'light'); } catch(e){}
+  }
+  $('btnTheme').addEventListener('click', function(){ setTheme(!dark); });
+  // αρχικό θέμα: #dark ή #light στη διεύθυνση, αλλιώς η τελευταία επιλογή
+  (function(){
+    var h = (location.hash || '').toLowerCase(), saved = null;
+    try { saved = localStorage.getItem('gateSimTheme'); } catch(e){}
+    if (h === '#dark') setTheme(true);
+    else if (h === '#light') setTheme(false);
+    else setTheme(saved === 'dark');
+  })();
+
+  $('famCMOS').addEventListener('click', function(){ family = 'cmos'; render(); });
+  $('famTTL').addEventListener('click', function(){ family = 'ttl'; render(); });
+
+  $('showFlow').addEventListener('change', function(){
+    $('circuitCard').classList.toggle('noflow', !this.checked);
+  });
+
+  var autoTimer = null, seq = NIN === 2 ? [[0,0],[0,1],[1,0],[1,1]] : [[0,0],[1,0]], seqI = 0;
+  $('btnAuto').addEventListener('click', function(){
+    if (autoTimer){
+      clearInterval(autoTimer); autoTimer = null;
+      this.textContent = '▶ Αυτόματη ακολουθία'; this.classList.remove('on');
+    } else {
+      if (paused) $('btnPause').click();
+      seqI = 0; setInputs(seq[0][0], seq[0][1]);
+      autoTimer = setInterval(function(){
+        seqI = (seqI + 1) % seq.length; setInputs(seq[seqI][0], seq[seqI][1]);
+      }, 1000);
+      this.textContent = '■ Διακοπή ακολουθίας'; this.classList.add('on');
+    }
+  });
+  $('btnPause').addEventListener('click', function(){
+    paused = !paused;
+    if (paused){ pausedAt = now(); this.textContent = '▶ Συνέχεια'; this.classList.add('on'); }
+    else { this.textContent = '⏸ Παύση'; this.classList.remove('on'); }
+  });
+  $('btnClear').addEventListener('click', function(){
+    events = []; record();
+  });
+
+  record();
+  render();
+  resize();
+  requestAnimationFrame(drawTiming);
+})();
+</script>
+</body>
+</html>

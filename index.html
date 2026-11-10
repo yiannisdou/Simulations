@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Προσομοιώσεις λογικών πυλών</title>
+<style>
+  body{margin:0;font-family:Calibri,"Segoe UI",Arial,sans-serif;background:#f4f6f9;color:#1d2433}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+  h1{font-size:1.7rem;margin:0 0 6px}
+  p{color:#5b6475;margin:0 0 20px;line-height:1.45}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+  a.card{display:block;background:#fff;border:1px solid #d5dbe5;border-radius:12px;padding:16px;text-decoration:none;color:inherit}
+  a.card:hover{border-color:#0f7b6c;background:#f7fbfa}
+  .n{font-size:1.3rem;font-weight:700}
+  .eq{font-size:1.05rem;margin:6px 0 4px}
+  .c{font-size:.92rem;color:#5b6475}
+  .ov{text-decoration:overline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Προσομοιώσεις λογικών πυλών</h1>
+  <p>Διαδραστικές προσομοιώσεις με διακόπτες εισόδου, LED στην έξοδο, ροή ρεύματος, χρονοδιάγραμμα και επιλογή τεχνολογίας CMOS (74HC) ή TTL (74LS).</p>
+  <div class="grid">
+    <a class="card" href="buffer_gate.html"><div class="n">BUFFER</div><div class="eq">Y = A</div><div class="c">74HC125 / 74LS125</div></a>
+    <a class="card" href="not_gate.html"><div class="n">NOT</div><div class="eq">Y = <span class="ov">A</span></div><div class="c">74HC04 / 74LS04</div></a>
+    <a class="card" href="and_gate.html"><div class="n">AND</div><div class="eq">Y = A · B</div><div class="c">74HC08 / 74LS08</div></a>
+    <a class="card" href="or_gate.html"><div class="n">OR</div><div class="eq">Y = A + B</div><div class="c">74HC32 / 74LS32</div></a>
+    <a class="card" href="nand_gate.html"><div class="n">NAND</div><div class="eq">Y = <span class="ov">A · B</span></div><div class="c">74HC00 / 74LS00</div></a>
+    <a class="card" href="nor_gate.html"><div class="n">NOR</div><div class="eq">Y = <span class="ov">A + B</span></div><div class="c">74HC02 / 74LS02</div></a>
+    <a class="card" href="xor_gate.html"><div class="n">XOR</div><div class="eq">Y = A ⊕ B</div><div class="c">74HC86 / 74LS86</div></a>
+    <a class="card" href="xnor_gate.html"><div class="n">XNOR</div><div class="eq">Y = <span class="ov">A ⊕ B</span></div><div class="c">74HC7266 / 74LS86 + 74LS04</div></a>
+  </div>
+</div>
+</body>
+</html>
