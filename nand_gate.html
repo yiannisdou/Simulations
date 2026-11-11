@@ -88,6 +88,42 @@
   body.dark svg [fill="#fdfdfd"],
   body.dark svg [fill="#fff"]{fill:#161e2b}
   body.dark svg [fill="#f2d4cc"]{fill:#4a2a24}
+  details.how summary{cursor:pointer;font-weight:700;font-size:1.1rem}
+  details.how[open] summary{margin-bottom:8px}
+  @media (min-width:1000px){
+    .wrap{max-width:1880px;padding:10px 18px 12px}
+    h1{font-size:1.4rem}
+    .back{margin:0 0 4px;font-size:.95rem}
+    .sub{margin:0 0 10px;font-size:.95rem}
+    .layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(340px,1fr);gap:14px;align-items:start}
+    .card{padding:12px 14px;margin-bottom:12px}
+    #circuitCard svg{max-height:calc(100vh - 285px)}
+    .seg{margin-bottom:2px}
+    .famnote{margin-bottom:0}
+    .controls{margin-top:4px}
+    .status{margin-top:4px}
+    canvas{height:165px}
+    .legend{margin-bottom:6px}
+    .legend button{padding:5px 10px;font-size:.92rem}
+    .eq{margin:0 0 8px;font-size:1.2rem}
+    th,td{padding:5px}
+    .colR h2{margin-bottom:6px}
+    .colR .note{font-size:.93rem}
+    .colR > .card:first-child{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:10px}
+    .colR > .card:first-child table{grid-column:1 / -1}
+    .colR > .card:first-child .eq{margin:0 0 6px}
+    .colR > .card:first-child h2{margin:0 0 6px}
+    .legend h2{font-size:1.05rem}
+  }
+  @media (min-width:1000px) and (max-height:760px){
+    canvas{height:130px}
+    th,td{padding:4px}
+  }
+  @media (min-width:1000px) and (max-height:650px){
+    canvas{height:112px}
+    .card{margin-bottom:8px;padding:10px 12px}
+  }
+  .itag, #vL, #gNote1, #gNote2{display:none}
   .legend{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
 </style>
 </head>
@@ -100,58 +136,60 @@
   </div>
   <p class="sub">Κάνε κλικ στους διακόπτες <b>S1</b> (είσοδος A) και <b>S2</b> (είσοδος B) ή πάτησε τα πλήκτρα <kbd>A</kbd> και <kbd>B</kbd>. Παρατήρησε τις τάσεις, το ρεύμα (μπλε κουκκίδες) και το LED στην έξοδο Y.</p>
 
-  <div class="card" id="circuitCard">
-    <div class="seg" role="group" aria-label="Τεχνολογία πύλης">
-      <button type="button" id="famCMOS" class="sel">CMOS (74HC00)</button>
-      <button type="button" id="famTTL">TTL (74LS00)</button>
-    </div>
-    <p class="famnote" id="famNote"></p>
-    <svg viewBox="0 0 840 420" role="img" aria-label="Κύκλωμα πύλης NAND με διακόπτες εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
-      <defs>
-        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".8"/>
-          <stop offset="60%" stop-color="#ff5a2a" stop-opacity=".22"/>
-          <stop offset="100%" stop-color="#ff5a2a" stop-opacity="0"/>
-        </radialGradient>
-        <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#e8411f"/>
-        </marker>
-        <g id="gnd">
-          <line x1="-20" y1="0" x2="20" y2="0" stroke="currentColor" stroke-width="3"/>
-          <line x1="-13" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="3"/>
-          <line x1="-6" y1="14" x2="6" y2="14" stroke="currentColor" stroke-width="3"/>
+  <div class="layout">
+    <div class="colL">
+    <div class="card" id="circuitCard">
+      <div class="seg" role="group" aria-label="Τεχνολογία πύλης">
+        <button type="button" id="famCMOS" class="sel">CMOS (74HC00)</button>
+        <button type="button" id="famTTL">TTL (74LS00)</button>
+      </div>
+      <p class="famnote" id="famNote"></p>
+      <svg viewBox="0 35 840 378" role="img" aria-label="Κύκλωμα πύλης NAND με διακόπτες εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".8"/>
+            <stop offset="60%" stop-color="#ff5a2a" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="#ff5a2a" stop-opacity="0"/>
+          </radialGradient>
+          <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#e8411f"/>
+          </marker>
+          <g id="gnd">
+            <line x1="-20" y1="0" x2="20" y2="0" stroke="currentColor" stroke-width="3"/>
+            <line x1="-13" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="3"/>
+            <line x1="-6" y1="14" x2="6" y2="14" stroke="currentColor" stroke-width="3"/>
+          </g>
+        </defs>
+
+        <!-- ========== ΕΙΣΟΔΟΣ A ========== -->
+        <text x="18" y="88" font-size="26" font-weight="700" fill="#1d2433">A</text>
+        <text x="62" y="62" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
+        <polyline class="wire" id="wA_src" points="62,80 100,80"/>
+        <circle cx="62" cy="80" r="5" fill="#fff" stroke="#e8411f" stroke-width="3"/>
+        <polyline class="wire" id="wA_node" points="150,80 350,80 350,200 400,200"/>
+        <polyline class="wire" id="wA_pd" points="220,80 220,105"/>
+        <polyline class="comp" points="220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165"/>
+        <polyline class="wire" id="wA_gnd" points="220,165 220,190"/>
+        <use href="#gnd" x="220" y="190"/>
+        <circle cx="220" cy="80" r="6" fill="#1d2433"/>
+        <text class="lbl" x="240" y="120">R1</text>
+        <text class="lbl" x="240" y="137" id="r1v">10 kΩ</text>
+        <text class="itag" id="iAin" x="358" y="145"></text>
+        <polyline class="flow off" id="fAin" points="400,200 350,200 350,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
+        <text class="vtag" id="vA" x="232" y="70">0,0 V</text>
+        <text class="itag" id="iA" x="240" y="158"></text>
+        <!-- flow A: +5V → S1 → R1 → GND -->
+        <polyline class="flow off" id="fA" points="62,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
+        <!-- switch S1 -->
+        <g id="swA" class="sw" tabindex="0" role="switch" aria-label="Διακόπτης S1, είσοδος A">
+          <rect class="hit" x="84" y="38" width="84" height="62" rx="8" fill="transparent" stroke="none"/>
+          <line class="lever" x1="100" y1="80" x2="145" y2="55" stroke="#e8411f" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="100" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+          <circle cx="150" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
+          <text class="lbl" x="125" y="112" text-anchor="middle">S1</text>
         </g>
-      </defs>
 
-      <!-- ========== ΕΙΣΟΔΟΣ A ========== -->
-      <text x="18" y="88" font-size="26" font-weight="700" fill="#1d2433">A</text>
-      <text x="62" y="62" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
-      <polyline class="wire" id="wA_src" points="62,80 100,80"/>
-      <circle cx="62" cy="80" r="5" fill="#fff" stroke="#e8411f" stroke-width="3"/>
-      <polyline class="wire" id="wA_node" points="150,80 350,80 350,200 400,200"/>
-      <polyline class="wire" id="wA_pd" points="220,80 220,105"/>
-      <polyline class="comp" points="220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165"/>
-      <polyline class="wire" id="wA_gnd" points="220,165 220,190"/>
-      <use href="#gnd" x="220" y="190"/>
-      <circle cx="220" cy="80" r="6" fill="#1d2433"/>
-      <text class="lbl" x="240" y="120">R1</text>
-      <text class="lbl" x="240" y="137" id="r1v">10 kΩ</text>
-      <text class="itag" id="iAin" x="358" y="145"></text>
-      <polyline class="flow off" id="fAin" points="400,200 350,200 350,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
-      <text class="vtag" id="vA" x="232" y="70">0,0 V</text>
-      <text class="itag" id="iA" x="240" y="158"></text>
-      <!-- flow A: +5V → S1 → R1 → GND -->
-      <polyline class="flow off" id="fA" points="62,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
-      <!-- switch S1 -->
-      <g id="swA" class="sw" tabindex="0" role="switch" aria-label="Διακόπτης S1, είσοδος A">
-        <rect class="hit" x="84" y="38" width="84" height="62" rx="8" fill="transparent" stroke="none"/>
-        <line class="lever" x1="100" y1="80" x2="145" y2="55" stroke="#e8411f" stroke-width="5" stroke-linecap="round"/>
-        <circle cx="100" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
-        <circle cx="150" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
-        <text class="lbl" x="125" y="112" text-anchor="middle">S1</text>
-      </g>
-
-      <!-- ========== ΕΙΣΟΔΟΣ B ========== -->
+        <!-- ========== ΕΙΣΟΔΟΣ B ========== -->
       <text x="18" y="278" font-size="26" font-weight="700" fill="#1d2433">B</text>
       <text x="62" y="252" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
       <polyline class="wire" id="wB_src" points="62,270 100,270"/>
@@ -184,57 +222,45 @@
       <text x="370" y="193" font-size="13" text-anchor="end" fill="#5b6475">A</text>
       <text x="370" y="257" font-size="13" text-anchor="end" fill="#5b6475">B</text>
       <text id="chip" x="440" y="285" font-size="14" font-weight="700" text-anchor="middle" fill="#1d2433">U1: 74HC08</text>
-      <text id="gNote1" x="440" y="306" font-size="14" text-anchor="middle" fill="#5b6475">CMOS είσοδοι:</text>
-      <text id="gNote2" x="440" y="323" font-size="14" text-anchor="middle" fill="#5b6475">ρεύμα ≈ 0</text>
+        <text id="gNote1" x="440" y="306" font-size="14" text-anchor="middle" fill="#5b6475">CMOS είσοδοι:</text>
+        <text id="gNote2" x="440" y="323" font-size="14" text-anchor="middle" fill="#5b6475">ρεύμα ≈ 0</text>
 
-      <!-- ========== ΕΞΟΔΟΣ ========== -->
-      <polyline class="wire" id="wY" points="494,220 580,220"/>
-      <circle cx="540" cy="220" r="6" fill="#1d2433"/>
-      <text x="540" y="246" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">Y</text>
-      <text class="vtag" id="vY" x="505" y="206">0,0 V</text>
-      <polyline class="comp" points="580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220"/>
-      <text class="lbl" x="620" y="198" text-anchor="middle">R3  220 Ω</text>
-      <polyline class="wire" id="wL" points="660,220 740,220 740,252"/>
-      <text class="vtag" id="vL" x="672" y="246">0,0 V</text>
+        <!-- ========== ΕΞΟΔΟΣ ========== -->
+        <polyline class="wire" id="wY" points="494,220 580,220"/>
+        <circle cx="540" cy="220" r="6" fill="#1d2433"/>
+        <text x="540" y="246" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">Y</text>
+        <text class="vtag" id="vY" x="505" y="206">0,0 V</text>
+        <polyline class="comp" points="580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220"/>
+        <text class="lbl" x="620" y="198" text-anchor="middle">R3  220 Ω</text>
+        <polyline class="wire" id="wL" points="660,220 740,220 740,252"/>
+        <text class="vtag" id="vL" x="672" y="246">0,0 V</text>
 
-      <!-- LED -->
-      <circle id="halo" cx="740" cy="270" r="0" fill="url(#glow)"/>
-      <path id="ledTri" d="M720,252 L760,252 L740,286 Z" fill="#f2d4cc" stroke="#1d2433" stroke-width="3" stroke-linejoin="round"/>
-      <line x1="720" y1="287" x2="760" y2="287" stroke="#1d2433" stroke-width="3"/>
-      <g id="rays" stroke="#e8411f" stroke-width="2.5" opacity="0">
-        <line x1="766" y1="258" x2="788" y2="244" marker-end="url(#arr)"/>
-        <line x1="768" y1="272" x2="792" y2="260" marker-end="url(#arr)"/>
-      </g>
-      <text class="lbl" x="772" y="300">LED1</text>
-      <text class="itag" id="iL" x="756" y="330"></text>
-      <polyline class="wire" id="wL_gnd" points="740,287 740,380"/>
-      <use href="#gnd" x="740" y="380"/>
-      <!-- flow output: Y → R3 → LED → GND -->
-      <polyline class="flow off" id="fY" points="494,220 580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220 740,220 740,380"/>
-    </svg>
+        <!-- LED -->
+        <circle id="halo" cx="740" cy="270" r="0" fill="url(#glow)"/>
+        <path id="ledTri" d="M720,252 L760,252 L740,286 Z" fill="#f2d4cc" stroke="#1d2433" stroke-width="3" stroke-linejoin="round"/>
+        <line x1="720" y1="287" x2="760" y2="287" stroke="#1d2433" stroke-width="3"/>
+        <g id="rays" stroke="#e8411f" stroke-width="2.5" opacity="0">
+          <line x1="766" y1="258" x2="788" y2="244" marker-end="url(#arr)"/>
+          <line x1="768" y1="272" x2="792" y2="260" marker-end="url(#arr)"/>
+        </g>
+        <text class="lbl" x="772" y="300">LED1</text>
+        <text class="itag" id="iL" x="756" y="330"></text>
+        <polyline class="wire" id="wL_gnd" points="740,287 740,380"/>
+        <use href="#gnd" x="740" y="380"/>
+        <!-- flow output: Y → R3 → LED → GND -->
+        <polyline class="flow off" id="fY" points="494,220 580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220 740,220 740,380"/>
+      </svg>
 
-    <div class="controls">
-      <button id="btnA" type="button">Είσοδος A:<span class="v">0</span></button>
-      <button id="btnB" type="button">Είσοδος B:<span class="v">0</span></button>
+      <div class="controls">
+        <button id="btnA" type="button">Είσοδος A:<span class="v">0</span></button>
+        <button id="btnB" type="button">Είσοδος B:<span class="v">0</span></button>
       <label class="chk"><input type="checkbox" id="showFlow" checked> Εμφάνιση ροής ρεύματος</label>
-    </div>
-    <p class="status" id="status"></p>
-  </div>
-
-  <div class="card">
-    <div class="legend">
-      <h2 style="margin:0">Χρονοδιάγραμμα (τελευταία 10 s)</h2>
-      <div class="controls" style="margin:0">
-        <button id="btnAuto" type="button">▶ Αυτόματη ακολουθία</button>
-        <button id="btnPause" type="button">⏸ Παύση</button>
-        <button id="btnClear" type="button">Καθαρισμός</button>
       </div>
+      <p class="status" id="status"></p>
     </div>
-    <canvas id="timing" aria-label="Χρονοδιάγραμμα των σημάτων A, B και Y"></canvas>
-    <p class="note" style="margin-top:8px">Η <b>αυτόματη ακολουθία</b> περνά από όλους τους συνδυασμούς 00 → 01 → 10 → 11 κάθε 1 s. Παρατήρησε ότι το Y γίνεται 0 μόνο όταν A και B είναι ταυτόχρονα 1.</p>
-  </div>
 
-  <div class="grid">
+    </div>
+    <div class="colR">
     <div class="card">
       <h2>Πίνακας αληθείας</h2>
       <div class="eq">Y = <span class="ov">A · B</span></div>
@@ -249,11 +275,24 @@
       </table>
     </div>
     <div class="card">
-      <h2>Πώς λειτουργεί</h2>
+      <div class="legend">
+        <h2 style="margin:0">Χρονοδιάγραμμα (10 s)</h2>
+        <div class="controls" style="margin:0">
+          <button id="btnAuto" type="button">▶ Αυτόματη ακολουθία</button>
+          <button id="btnPause" type="button">⏸ Παύση</button>
+          <button id="btnClear" type="button">Καθαρισμός</button>
+        </div>
+      </div>
+      <canvas id="timing" aria-label="Χρονοδιάγραμμα των σημάτων A, B και Y"></canvas>
+    </div>
+
+    <details class="card how">
+      <summary>Πώς λειτουργεί</summary>
       <p class="note">Η πύλη <b>NAND</b> (NOT-AND) δίνει το αντίθετο αποτέλεσμα από την AND: η έξοδος είναι <b>0</b> μόνο όταν <b>όλες</b> οι είσοδοι είναι 1. Σε κάθε άλλη περίπτωση η έξοδος είναι 1.</p>
             <p class="note" id="expIn"></p>
-      <p class="note" id="expLvl"></p>
       <p class="note" id="expOut"></p>
+      <p class="note">Η <b>αυτόματη ακολουθία</b> περνά από όλους τους συνδυασμούς 00 → 01 → 10 → 11 κάθε 1 s. Παρατήρησε ότι το Y γίνεται 0 μόνο όταν A και B είναι ταυτόχρονα 1.</p>
+    </details>
     </div>
   </div>
 </div>
@@ -294,14 +333,14 @@
   };
   var EXP = {
     "cmos": {
-      "inp": "<b>Είσοδοι:</b> όταν ο διακόπτης κλείνει, η είσοδος συνδέεται στα +5 V (λογικό 1). Όταν ανοίγει, η αντίσταση <b>pull-down 10 kΩ</b> «τραβά» την είσοδο στα 0 V (λογικό 0), ώστε να μη μένει αιωρούμενη. Οι είσοδοι CMOS δεν τραβούν σχεδόν καθόλου ρεύμα, γι' αυτό μπορεί να συνδεθεί μεγάλη αντίσταση. Με κλειστό διακόπτη περνά από την pull-down ρεύμα 5 V / 10 kΩ = 0,5 mA.",
-      "lvl": "<b>Λογικά επίπεδα εισόδου (74HC00 στα 5 V):</b> λογικό 0 κάτω από ≈ 1,5 V, λογικό 1 πάνω από ≈ 3,5 V.",
-      "out": "<b>Έξοδος:</b> όταν Y = 1 (≈ 5 V), το ρεύμα περνά από την R3 = 220 Ω και το LED. Με τάση ορθής πόλωσης LED ≈ 2 V: I = (5 V − 2 V) / 220 Ω ≈ 13,6 mA. Η αντίσταση περιορίζει το ρεύμα ώστε να μην καταστραφεί το LED."
+      "inp": "<b>Είσοδοι:</b> με κλειστό διακόπτη η είσοδος παίρνει +5 V (λογικό 1). Με ανοιχτό διακόπτη η αντίσταση <b>pull-down 10 kΩ</b> τη συνδέει στο GND (λογικό 0), ώστε να μη μένει «αιωρούμενη».",
+      "lvl": "",
+      "out": "<b>Έξοδος:</b> όταν Y = 1 το LED ανάβει. Η αντίσταση 220 Ω περιορίζει το ρεύμα (≈ 13,6 mA), ώστε να μην καταστραφεί το LED."
     },
     "ttl": {
-      "inp": "<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (έως 0,4 mA για το 74LS00, τυπικά ≈ 0,3 mA). Αυτό το ρεύμα περνά από την pull-down προς το GND και δημιουργεί τάση πάνω της. Με <b>1 kΩ</b>: 0,3 mA × 1 kΩ ≈ 0,3 V, κάτω από τα 0,8 V, άρα η είσοδος διαβάζεται 0. Με 10 kΩ η τάση θα ανέβαινε πάνω από 0,8 V και η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη! Με κλειστό διακόπτη περνούν 5 V / 1 kΩ ≈ 5,0 mA.",
-      "lvl": "<b>Λογικά επίπεδα εισόδου TTL:</b> λογικό 0 κάτω από 0,8 V (V<sub>IL</sub>), λογικό 1 πάνω από 2,0 V (V<sub>IH</sub>). Ανάμεσα η κατάσταση είναι απροσδιόριστη.",
-      "out": "<b>Έξοδος:</b> η έξοδος TTL στο 1 δεν φτάνει τα 5 V και δίνει λίγο ρεύμα. Με φορτίο το LED η τάση εξόδου πέφτει περίπου στα 3,0 V: I ≈ (3,0 V − 2 V) / 220 Ω ≈ 4,5 mA. Γι' αυτό το LED ανάβει <b>πιο αμυδρά</b> από ό,τι με CMOS. Στο 0 η έξοδος είναι ≈ 0,2 V."
+      "inp": "<b>Είσοδοι:</b> οι είσοδοι TTL, όταν είναι στο 0, <b>βγάζουν ρεύμα</b> (≈ 0,3 mA). Γι' αυτό η pull-down πρέπει να είναι μικρή (<b>1 kΩ</b>), ώστε η τάση της εισόδου να μένει κάτω από 0,8 V και να διαβάζεται 0. Με 10 kΩ η πύλη θα έβλεπε <b>1</b> ακόμη και με ανοιχτό διακόπτη!",
+      "lvl": "",
+      "out": "<b>Έξοδος:</b> η έξοδος TTL στο 1 δίνει περίπου 3,0 V, γι' αυτό το LED ανάβει <b>πιο αμυδρά</b> (≈ 4,5 mA) από ό,τι με CMOS."
     }
   };
 
@@ -318,6 +357,7 @@
   }
   function $(id){ return document.getElementById(id); }
   function wire(id, v){ $(id).setAttribute('stroke', vColor(v)); }
+  function ltag(id, b){ var t=$(id); t.textContent = b; t.style.fontSize = '22px'; t.setAttribute('fill', b ? '#e8411f' : '#5b6475'); }
   function vtag(id, v){ var t=$(id); t.textContent = fmtV(v); t.setAttribute('fill', v >= 1 ? vColor(Math.max(v,2.5)) : '#5b6475'); }
   function flow(id, I){
     var el = $(id);
@@ -357,7 +397,7 @@
     // wire('wB_pd', VB); wire('wB_gnd', 0);
     wire('wY', VY); wire('wL', VLED); wire('wL_gnd', 0);
 
-    vtag('vA', VA); if (NIN === 2) vtag('vB', VB); vtag('vY', VY); vtag('vL', VLED);
+    ltag('vA', A); if (NIN === 2) ltag('vB', B); ltag('vY', Y);
     $('iA').textContent = IA ? '↓ ' + fmtI(IA) : '';
     if (NIN === 2) $('iB').textContent = IB ? '↓ ' + fmtI(IB) : '';
     $('iL').textContent = IL ? '↓ ' + fmtI(IL) : '';
@@ -382,7 +422,7 @@
     $('famCMOS').classList.toggle('sel', family === 'cmos');
     $('famTTL').classList.toggle('sel', family === 'ttl');
     var E = EXP[family];
-    $('expIn').innerHTML = E.inp; $('expLvl').innerHTML = E.lvl;
+    $('expIn').innerHTML = E.inp; 
     $('expOut').innerHTML = E.out;
 
     document.querySelector('#btnA .v').textContent = A;
