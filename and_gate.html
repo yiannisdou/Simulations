@@ -28,9 +28,9 @@
   .flow.off{display:none}
   .noflow .flow{display:none}
   @keyframes flow{to{stroke-dashoffset:-18.1}}
-  .vtag{font-size:16px;font-weight:700}
+  .vtag{font-size:20px;font-weight:700}
   .itag{font-size:15px;font-weight:700;fill:#1d4ed8}
-  .lbl{font-size:15px;fill:#1d2433}
+  .lbl{font-size:19px;fill:#1d2433}
   .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   button{font:inherit;font-size:1rem;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
   button:hover{background:#f0f3f8}
@@ -97,7 +97,12 @@
     .sub{margin:0 0 10px;font-size:.95rem}
     .layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(340px,1fr);gap:14px;align-items:start}
     .card{padding:12px 14px;margin-bottom:12px}
-    #circuitCard svg{max-height:calc(100vh - 285px)}
+    #circuitCard svg{max-height:calc(100vh - 292px)}
+    .layout{align-items:stretch;margin-bottom:12px}
+    .colL, .colR{display:flex;flex-direction:column;min-width:0}
+    .colL > .card{flex:1;margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between}
+    .colR > .card:last-child{flex:1;margin-bottom:0;display:flex;flex-direction:column}
+    .colR canvas{flex:1 1 0;height:0;min-height:110px}
     .seg{margin-bottom:2px}
     .famnote{margin-bottom:0}
     .controls{margin-top:4px}
@@ -124,6 +129,8 @@
     .card{margin-bottom:8px;padding:10px 12px}
   }
   .itag, #vL, #gNote1, #gNote2{display:none}
+  #btnAuto{min-width:13.2em}
+  #btnPause{min-width:7.6em}
   .legend{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
 </style>
 </head>
@@ -134,7 +141,7 @@
     <h1>Προσομοίωση λογικής πύλης AND</h1>
     <button type="button" id="btnTheme" aria-pressed="false">🌙 Σκούρο θέμα</button>
   </div>
-  <p class="sub">Κάνε κλικ στους διακόπτες <b>S1</b> (είσοδος A) και <b>S2</b> (είσοδος B) ή πάτησε τα πλήκτρα <kbd>A</kbd> και <kbd>B</kbd>. Παρατήρησε τις τάσεις, το ρεύμα (μπλε κουκκίδες) και το LED στην έξοδο Y.</p>
+  <p class="sub">Κάνε κλικ στους διακόπτες <b>S1</b> (είσοδος A) και <b>S2</b> (είσοδος B) ή πάτησε τα πλήκτρα <kbd>A</kbd> και <kbd>B</kbd>. Παρατήρησε τις λογικές καταστάσεις, τη ροή του ρεύματος (μπλε κουκκίδες) και το LED στην έξοδο Y.</p>
 
   <div class="layout">
     <div class="colL">
@@ -144,7 +151,7 @@
         <button type="button" id="famTTL">TTL (74LS08)</button>
       </div>
       <p class="famnote" id="famNote"></p>
-      <svg viewBox="0 35 840 378" role="img" aria-label="Κύκλωμα πύλης AND με διακόπτες εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
+      <svg viewBox="0 96 840 342" role="img" aria-label="Κύκλωμα πύλης AND με διακόπτες εισόδου, αντιστάσεις pull-down και LED στην έξοδο με αντίσταση 220 Ω">
         <defs>
           <radialGradient id="glow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#ff5a2a" stop-opacity=".8"/>
@@ -162,21 +169,22 @@
         </defs>
 
         <!-- ========== ΕΙΣΟΔΟΣ A ========== -->
-        <text x="18" y="88" font-size="26" font-weight="700" fill="#1d2433">A</text>
-        <text x="62" y="62" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
+      <g transform="translate(0,55)">
+        <text x="14" y="90" font-size="32" font-weight="700" fill="#1d2433">A</text>
+        <text x="62" y="60" font-size="18" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
         <polyline class="wire" id="wA_src" points="62,80 100,80"/>
         <circle cx="62" cy="80" r="5" fill="#fff" stroke="#e8411f" stroke-width="3"/>
-        <polyline class="wire" id="wA_node" points="150,80 350,80 350,200 400,200"/>
+        <polyline class="wire" id="wA_node" points="150,80 350,80 350,145 400,145"/>
         <polyline class="wire" id="wA_pd" points="220,80 220,105"/>
         <polyline class="comp" points="220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165"/>
         <polyline class="wire" id="wA_gnd" points="220,165 220,190"/>
         <use href="#gnd" x="220" y="190"/>
         <circle cx="220" cy="80" r="6" fill="#1d2433"/>
-        <text class="lbl" x="240" y="120">R1</text>
-        <text class="lbl" x="240" y="137" id="r1v">10 kΩ</text>
+        <text class="lbl" x="240" y="118">R1</text>
+        <text class="lbl" x="240" y="140" id="r1v">10 kΩ</text>
         <text class="itag" id="iAin" x="358" y="145"></text>
-        <polyline class="flow off" id="fAin" points="400,200 350,200 350,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
-        <text class="vtag" id="vA" x="232" y="70">0,0 V</text>
+        <polyline class="flow off" id="fAin" points="400,145 350,145 350,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
+        <text class="vtag" id="vA" x="232" y="68">0,0 V</text>
         <text class="itag" id="iA" x="240" y="158"></text>
         <!-- flow A: +5V → S1 → R1 → GND -->
         <polyline class="flow off" id="fA" points="62,80 220,80 220,105 231,110 209,120 231,130 209,140 231,150 209,160 220,165 220,190"/>
@@ -186,25 +194,27 @@
           <line class="lever" x1="100" y1="80" x2="145" y2="55" stroke="#e8411f" stroke-width="5" stroke-linecap="round"/>
           <circle cx="100" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
           <circle cx="150" cy="80" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
-          <text class="lbl" x="125" y="112" text-anchor="middle">S1</text>
+          <text class="lbl" x="125" y="114" text-anchor="middle">S1</text>
         </g>
 
-        <!-- ========== ΕΙΣΟΔΟΣ B ========== -->
-      <text x="18" y="278" font-size="26" font-weight="700" fill="#1d2433">B</text>
-      <text x="62" y="252" font-size="15" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
+        </g>
+      <!-- ========== ΕΙΣΟΔΟΣ B ========== -->
+      <g transform="translate(0,35)">
+      <text x="14" y="280" font-size="32" font-weight="700" fill="#1d2433">B</text>
+      <text x="62" y="250" font-size="18" font-weight="700" text-anchor="middle" fill="#e8411f">+5 V</text>
       <polyline class="wire" id="wB_src" points="62,270 100,270"/>
       <circle cx="62" cy="270" r="5" fill="#fff" stroke="#e8411f" stroke-width="3"/>
-      <polyline class="wire" id="wB_node" points="150,270 350,270 350,240 400,240"/>
+      <polyline class="wire" id="wB_node" points="150,270 350,270 350,205 400,205"/>
       <polyline class="wire" id="wB_pd" points="220,270 220,295"/>
       <polyline class="comp" points="220,295 231,300 209,310 231,320 209,330 231,340 209,350 220,355"/>
       <polyline class="wire" id="wB_gnd" points="220,355 220,380"/>
       <use href="#gnd" x="220" y="380"/>
       <circle cx="220" cy="270" r="6" fill="#1d2433"/>
-      <text class="lbl" x="240" y="310">R2</text>
-      <text class="lbl" x="240" y="327" id="r2v">10 kΩ</text>
+      <text class="lbl" x="240" y="308">R2</text>
+      <text class="lbl" x="240" y="330" id="r2v">10 kΩ</text>
       <text class="itag" id="iBin" x="282" y="292"></text>
-      <polyline class="flow off" id="fBin" points="400,240 350,240 350,270 220,270 220,295 231,300 209,310 231,320 209,330 231,340 209,350 220,355 220,380"/>
-      <text class="vtag" id="vB" x="232" y="260">0,0 V</text>
+      <polyline class="flow off" id="fBin" points="400,205 350,205 350,270 220,270 220,295 231,300 209,310 231,320 209,330 231,340 209,350 220,355 220,380"/>
+      <text class="vtag" id="vB" x="232" y="258">0,0 V</text>
       <text class="itag" id="iB" x="240" y="348"></text>
       <polyline class="flow off" id="fB" points="62,270 220,270 220,295 231,300 209,310 231,320 209,330 231,340 209,350 220,355 220,380"/>
       <g id="swB" class="sw" tabindex="0" role="switch" aria-label="Διακόπτης S2, είσοδος B">
@@ -212,23 +222,24 @@
         <line class="lever" x1="100" y1="270" x2="145" y2="245" stroke="#e8411f" stroke-width="5" stroke-linecap="round"/>
         <circle cx="100" cy="270" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
         <circle cx="150" cy="270" r="5" fill="#fff" stroke="#1d2433" stroke-width="2.5"/>
-        <text class="lbl" x="125" y="302" text-anchor="middle">S2</text>
+        <text class="lbl" x="125" y="304" text-anchor="middle">S2</text>
       </g>
 
+      </g>
       <!-- ========== ΠΥΛΗ AND ========== -->
       <path d="M400,178 L440,178 A42,42 0 0 1 440,262 L400,262 Z" fill="#fdfdfd" stroke="#1d2433" stroke-width="4"/>
       <text x="436" y="227" font-size="20" font-weight="700" text-anchor="middle" fill="#1d2433">AND</text>
-      <text x="370" y="193" font-size="13" text-anchor="end" fill="#5b6475">A</text>
-      <text x="370" y="257" font-size="13" text-anchor="end" fill="#5b6475">B</text>
-      <text id="chip" x="440" y="285" font-size="14" font-weight="700" text-anchor="middle" fill="#1d2433">U1: 74HC08</text>
+      <text x="372" y="193" font-size="16" text-anchor="end" fill="#5b6475">A</text>
+      <text x="372" y="260" font-size="16" text-anchor="end" fill="#5b6475">B</text>
+      <text id="chip" x="440" y="290" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">U1: 74HC08</text>
         <text id="gNote1" x="440" y="306" font-size="14" text-anchor="middle" fill="#5b6475">CMOS είσοδοι:</text>
         <text id="gNote2" x="440" y="323" font-size="14" text-anchor="middle" fill="#5b6475">ρεύμα ≈ 0</text>
 
         <!-- ========== ΕΞΟΔΟΣ ========== -->
         <polyline class="wire" id="wY" points="482,220 580,220"/>
         <circle cx="540" cy="220" r="6" fill="#1d2433"/>
-        <text x="540" y="246" font-size="18" font-weight="700" text-anchor="middle" fill="#1d2433">Y</text>
-        <text class="vtag" id="vY" x="505" y="206">0,0 V</text>
+        <text x="540" y="250" font-size="22" font-weight="700" text-anchor="middle" fill="#1d2433">Y</text>
+        <text class="vtag" id="vY" x="508" y="204">0,0 V</text>
         <polyline class="comp" points="580,220 585,209 595,231 605,209 615,231 625,209 635,231 645,209 655,231 660,220"/>
         <text class="lbl" x="620" y="198" text-anchor="middle">R3  220 Ω</text>
         <polyline class="wire" id="wL" points="660,220 740,220 740,252"/>
@@ -285,6 +296,8 @@
       <canvas id="timing" aria-label="Χρονοδιάγραμμα των σημάτων A, B και Y"></canvas>
     </div>
 
+    </div>
+  </div>
     <details class="card how">
       <summary>Πώς λειτουργεί</summary>
       <p class="note">Η πύλη <b>AND</b> δίνει έξοδο <b>1</b> μόνο όταν <b>όλες</b> οι είσοδοι είναι 1. Αρκεί μία είσοδος να είναι 0 για να γίνει η έξοδος 0.</p>
@@ -292,8 +305,6 @@
       <p class="note" id="expOut"></p>
       <p class="note">Η <b>αυτόματη ακολουθία</b> περνά από όλους τους συνδυασμούς 00 → 01 → 10 → 11 κάθε 1 s. Παρατήρησε ότι το Y γίνεται 1 μόνο όταν A και B είναι ταυτόχρονα 1.</p>
     </details>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -356,7 +367,7 @@
   }
   function $(id){ return document.getElementById(id); }
   function wire(id, v){ $(id).setAttribute('stroke', vColor(v)); }
-  function ltag(id, b){ var t=$(id); t.textContent = b; t.style.fontSize = '22px'; t.setAttribute('fill', b ? '#e8411f' : '#5b6475'); }
+  function ltag(id, b){ var t=$(id); t.textContent = b; t.style.fontSize = '28px'; t.setAttribute('fill', b ? '#e8411f' : '#5b6475'); }
   function vtag(id, v){ var t=$(id); t.textContent = fmtV(v); t.setAttribute('fill', v >= 1 ? vColor(Math.max(v,2.5)) : '#5b6475'); }
   function flow(id, I){
     var el = $(id);
@@ -454,6 +465,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   window.addEventListener('resize', resize);
+  try { new ResizeObserver(resize).observe(cv); } catch(e){}
 
   function drawTiming(){
     var w = cv.clientWidth, h = cv.clientHeight;
