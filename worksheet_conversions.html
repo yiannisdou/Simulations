@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Μετατροπές αριθμητικών συστημάτων</title>
+<title>Φύλλο εργασίας: Μετατροπές αριθμητικών συστημάτων</title>
 <style>
 :root{
   --bg:#f4f6fa; --panel:#ffffff; --text:#1d2433; --muted:#5b6475; --line:#d5dbe5;
@@ -17,8 +17,8 @@ body.dark{
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.4}
-.wrap{max-width:920px;margin:0 auto;padding:0 16px 40px}
-.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--line)}
+.wrap{max-width:980px;margin:0 auto;padding:8px 16px;height:100vh;display:flex;flex-direction:column;gap:8px}
+.top{padding:0 0 6px;border-bottom:1px solid var(--line)}
 .toprow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 h1{font-size:23px;margin:0;flex:1;min-width:260px;line-height:1.2}
 a.back{color:var(--accent);text-decoration:none;font-size:15px}
@@ -29,17 +29,35 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff;fo
 body.dark button.primary{color:#0d1420}
 #themeBtn{min-width:150px}
 .prog{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:15px;color:var(--muted)}
-.bar{flex:1;height:10px;background:var(--chip);border-radius:6px;overflow:hidden}
-.bar div{height:100%;width:0;background:var(--accent);transition:width .3s}
+.dots{flex:1;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.dot{width:30px;height:30px;min-width:0;padding:0;border-radius:50%;border:2px solid var(--line);background:var(--panel);font-size:14px;font-weight:bold;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.half{background:#d99a00;border-color:#d99a00;color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.dot.cur{outline:3px solid var(--accent);outline-offset:1px}
+.dot.flag{width:auto;padding:0 10px;border-radius:15px}
+#stage{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
+#stage .q,#stage .intro,#stage .final{display:none;margin:auto 0;width:100%}
+#stage .cur{display:block!important}
+.nav{display:flex;align-items:center;gap:10px;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px}
+.nav button{min-width:170px;font-size:17px;padding:8px 16px}
+.nav .mid{color:var(--muted);font-size:15px;text-align:center}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(31,95,191,.55)}50%{box-shadow:0 0 0 7px rgba(31,95,191,0)}}
+.pulse{animation:pulse 1.3s infinite}
+.q .qt{font-size:20px}
+.start{text-align:center;margin-top:12px}
+.start button{font-size:18px;padding:10px 26px}
+.left{margin-top:8px}
+.left button{margin:3px}
 .scoreTop b{color:var(--text);font-size:17px}
-.intro{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:14px 0}
+.intro{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
 .intro p{margin:4px 0}
 .who{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
 .who label{display:flex;align-items:center;gap:6px;font-weight:bold;font-size:15px}
 .who input{font-family:inherit;font-size:16px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}
 .remind{background:var(--accent-soft);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:15px}
 .remind ul{margin:4px 0 0 18px;padding:0}
-.q{scroll-margin-top:110px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
+.q{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:14px 18px}
 .q.done-ok{border-left-color:var(--ok)}
 .q.done-bad{border-left-color:var(--bad)}
 .qh{display:flex;gap:10px;align-items:baseline}
@@ -64,13 +82,13 @@ sub{font-size:.65em}
 input.ans,select.ans{font-family:inherit;font-size:19px;font-weight:bold;padding:4px 8px;border:2px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);text-align:center}
 input.ans{width:150px;letter-spacing:1px}
 input.ans.wide{width:230px}
-input.ans.cell{width:64px;font-size:17px;padding:3px 4px}
+input.ans.cell{width:64px;font-size:17px;padding:1px 4px}
 input.ans:focus,select.ans:focus{outline:none;border-color:var(--accent)}
 .ans.right{border-color:var(--ok);background:var(--ok-soft)}
 .ans.wrong{border-color:var(--bad);background:var(--bad-soft)}
 .line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:20px;margin:4px 0}
 table.g{border-collapse:collapse;margin:4px 0 8px}
-table.g td,table.g th{border:1px solid var(--line);padding:4px 8px;text-align:center;min-width:56px}
+table.g td,table.g th{border:1px solid var(--line);padding:2px 8px;text-align:center;min-width:56px}
 table.g th{background:var(--chip);color:var(--muted);font-size:15px}
 table.g td.given{font-weight:bold;font-size:19px}
 .match{display:grid;grid-template-columns:repeat(6,auto);gap:8px 14px;justify-content:start}
@@ -94,15 +112,15 @@ table.g td.given{font-weight:bold;font-size:19px}
 .expl{margin:8px 0 0 40px;padding:8px 12px;border-radius:8px;background:var(--chip);display:none;font-size:16px}
 .expl.show{display:block}
 .expl b{color:var(--accent)}
-.final{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:16px;margin:18px 0;text-align:center;display:none}
-.final.show{display:block}
+.final{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:18px;text-align:center}
 .final .big{font-size:46px;font-weight:bold;color:var(--accent)}
 .final .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
-.foot{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-@media (max-width:640px){ .qb,.actions,.fb,.expl{margin-left:0} .match{grid-template-columns:repeat(3,auto)} }
+@media (max-width:640px){ .nav button{min-width:0}  .qb,.actions,.fb,.expl{margin-left:0} .match{grid-template-columns:repeat(3,auto)} }
 @media print{
   body,body.dark{background:#fff;color:#000;--panel:#fff;--bg:#fff;--text:#000;--muted:#444;--line:#999;--chip:#f2f2f2;--accent:#000;--accent-soft:#f2f2f2;--ok:#000;--ok-soft:#fff;--bad:#000;--bad-soft:#fff}
-  .top{position:static} button,.actions,.foot,a.back,#themeBtn{display:none!important}
+  .wrap{height:auto;display:block} #stage{overflow:visible;display:block} #stage .q,#stage .intro,#stage .final{display:block!important;margin:10px 0}
+  #stage .final{display:none!important} .nav,.dots,.start{display:none!important}
+  button,.actions,a.back,#themeBtn{display:none!important}
   .q{break-inside:avoid;border-left-width:2px} .opt.sel,.tfb button.sel{display:inline-block!important}
   .expl{display:block!important}
 }
@@ -117,15 +135,15 @@ table.g td.given{font-weight:bold;font-size:19px}
       <button id="themeBtn">🌙 Σκούρο θέμα</button>
     </div>
     <div class="prog">
-      <span id="progTxt">0 από 12 ερωτήσεις</span>
-      <div class="bar"><div id="progBar"></div></div>
+      <div class="dots" id="dots"></div>
       <span class="scoreTop">Βαθμός: <b id="scoreTop">0</b> / 12</span>
     </div>
   </div>
 
-  <div class="intro">
+  <div id="stage">
+  <div class="intro cur" id="intro">
     <p><b>Δεκαδικό, δυαδικό και δεκαεξαδικό σύστημα</b> · Κεφάλαιο 2, ενότητες 2.1–2.3 και 2.5</p>
-    <p>Απαντήστε στις ερωτήσεις και πατήστε «Έλεγχος». Έχετε <b>2 προσπάθειες</b> σε κάθε ερώτηση: σωστό με την 1η = 1 μονάδα, με τη 2η = μισή μονάδα. Το 💡 δίνει βοήθεια χωρίς να χάνετε μονάδες.</p>
+    <p>Απαντήστε στις ερωτήσεις και πατήστε «Έλεγχος». Οι ερωτήσεις εμφανίζονται μία μία· προχωράτε με το «Επόμενη →». Έχετε <b>2 προσπάθειες</b> σε κάθε ερώτηση: σωστό με την 1η = 1 μονάδα, με τη 2η = μισή μονάδα. Το 💡 δίνει βοήθεια χωρίς να χάνετε μονάδες.</p>
     <div class="remind"><b>Θυμάμαι</b>
       <ul>
         <li>Δυαδικό (βάση 2): ψηφία 0, 1 · βάρη θέσεων 1, 2, 4, 8, 16, 32, 64, 128 …</li>
@@ -134,17 +152,20 @@ table.g td.given{font-weight:bold;font-size:19px}
         <li>Δυαδικό ↔ δεκαεξαδικό: κάθε δεκαεξαδικό ψηφίο = 4 bits (τετράδα), χωρίζουμε από τα δεξιά.</li>
       </ul>
     </div>
+    <div class="start"><button class="primary" id="startBtn">Ξεκινάμε →</button></div>
   </div>
 
-  <div id="qs"></div>
+  <div id="qs" style="display:contents"></div>
 
   <div class="final" id="final">
-    <div>Ολοκληρώσατε το φύλλο εργασίας!</div>
+    <div id="finalTitle">Ολοκληρώσατε το φύλλο εργασίας!</div>
     <div class="big" id="finalScore"></div>
     <div id="finalMsg"></div>
+    <div class="left" id="left"></div>
     <div class="btns"><button class="primary" id="printBtn">🖨 Εκτύπωση / αποθήκευση PDF</button><button id="restartBtn">↻ Από την αρχή</button></div>
   </div>
-  <div class="foot"><button id="restartBtn2">↻ Από την αρχή</button></div>
+  </div>
+  <div class="nav"><button id="prevBtn">← Προηγούμενη</button><span class="mid" id="navTxt"></span><button class="primary" id="nextBtn">Επόμενη →</button></div>
 </div>
 
 <script>
@@ -280,7 +301,7 @@ function render(){
 function drawLeds(i){ const q=QUESTIONS[i]; const d=$('q'+i);
   d.querySelectorAll('.led').forEach(l=>{ const on=(q.cur>>+l.dataset.b)&1; l.classList.toggle('on',!!on); l.querySelector('.bv').textContent=on; });
   const s=q.cur.toString(2).padStart(8,'0'); $('bitsTxt'+i).textContent=s.slice(0,4)+' '+s.slice(4); }
-function showFb(i,cls,html){ const f=$('q'+i).querySelector('.fb'); f.className='fb show '+cls; f.innerHTML=html; }
+function showFb(i,cls,html){ const f=$('q'+i).querySelector('.fb'); f.className='fb show '+cls; f.innerHTML=html; f.scrollIntoView({block:'nearest'}); }
 function updAtt(i){ const st=state[i], el=$('q'+i).querySelector('.att');
   el.textContent = st.done ? '' : st.tries===0 ? '2 προσπάθειες' : '1 προσπάθεια ακόμη'; }
 
@@ -320,21 +341,50 @@ function finishQ(i,ok){
   if(q.type==='tf') d.querySelectorAll('.tfb').forEach((g,j)=>g.querySelectorAll('button').forEach(b=>{ const v=b.dataset.v==='1';
     if(v===q.items[j][1]) b.classList.add('right'); else if(b.classList.contains('sel')) b.classList.add('wrong'); b.disabled=true; }));
   if(q.type==='bits') $('leds'+i).classList.add('locked');
-  // move focus to next open question
-  const nxt=state.findIndex((s,k)=>k>i&&!s.done);
-  if(nxt>=0){ const f=$('q'+nxt).querySelector('input.ans'); if(f) f.focus({preventScroll:true}); }
+  $('nextBtn').classList.add('pulse'); $('nextBtn').focus({preventScroll:true}); d.querySelector('.expl').scrollIntoView({block:'nearest'});
 }
 const fmt=x=>String(x).replace('.',',');
 function updProgress(){
   const done=state.filter(s=>s.done).length, pts=state.reduce((a,s)=>a+s.pts,0);
-  $('progTxt').textContent=`${done} από ${N} ερωτήσεις`; $('progBar').style.width=(100*done/N)+'%'; $('scoreTop').textContent=fmt(pts);
-  if(done===N){ $('final').classList.add('show'); $('finalScore').textContent=`${fmt(pts)} / ${N}`;
+  $('scoreTop').textContent=fmt(pts);
+  $('finalScore').textContent=`${fmt(pts)} / ${N}`;
+  const open=state.map((s,k)=>s.done?null:k).filter(k=>k!==null);
+  if(done===N){ $('finalTitle').textContent='Ολοκληρώσατε το φύλλο εργασίας!';
     const p=pts/N; $('finalMsg').textContent = p===1?'Τέλεια! 🏆':p>=.8?'Πολύ καλά! 👏':p>=.5?'Καλά! Δείτε ξανά τις λύσεις όπου κάνατε λάθος. 💪':'Χρειάζεται λίγη ακόμη εξάσκηση: δοκιμάστε τον μετατροπέα και την «Πρόκληση». 📘';
-    $('final').scrollIntoView({behavior:'smooth',block:'center'}); }
+    $('left').innerHTML=''; }
+  else { $('finalTitle').textContent=`Απαντήσατε ${done} από ${N} ερωτήσεις.`; $('finalMsg').textContent='Μένουν οι ερωτήσεις:';
+    $('left').innerHTML=open.map(k=>`<button onclick="go(${k+1})">${k+1}</button>`).join(''); }
+  drawDots();
 }
 function restart(){ if(state.some(s=>s.tries>0) && !confirm('Να σβηστούν όλες οι απαντήσεις;')) return;
-  state.forEach(s=>{ s.tries=0; s.done=false; s.pts=0; }); $('final').classList.remove('show'); render(); updProgress(); window.scrollTo(0,0); }
-$('restartBtn').onclick=restart; $('restartBtn2').onclick=restart;
+  state.forEach(s=>{ s.tries=0; s.done=false; s.pts=0; }); render(); updProgress(); go(0); go(0); }
+$('restartBtn').onclick=restart;
+// ---------------- navigation: step 0 = intro, 1..N = questions, N+1 = result ----------------
+let step=0;
+function go(n){
+  step=Math.max(0,Math.min(N+1,n));
+  $('intro').classList.toggle('cur',step===0); $('final').classList.toggle('cur',step===N+1);
+  QUESTIONS.forEach((q,i)=>$('q'+i).classList.toggle('cur',step===i+1));
+  $('stage').scrollTop=0;
+  $('prevBtn').disabled = step===0;
+  $('nextBtn').style.visibility = step===N+1 ? 'hidden' : 'visible';
+  $('nextBtn').textContent = step===0 ? 'Ξεκινάμε →' : step===N ? 'Αποτέλεσμα →' : 'Επόμενη →';
+  $('navTxt').textContent = step===0 ? 'Εισαγωγή' : step===N+1 ? 'Αποτέλεσμα' : `Ερώτηση ${step} από ${N}`;
+  const qd = step>=1 && step<=N && state[step-1].done;
+  $('nextBtn').classList.toggle('pulse', !!qd);
+  drawDots();
+  if(step>=1&&step<=N&&!state[step-1].done){ const f=$('q'+(step-1)).querySelector('input.ans'); if(f) f.focus({preventScroll:true}); }
+  else if(qd) $('nextBtn').focus({preventScroll:true});
+}
+function drawDots(){
+  let h=''; QUESTIONS.forEach((q,i)=>{ const s=state[i]; const c=!s.done?'':s.pts===1?'ok':s.pts>0?'half':'bad';
+    h+=`<button class="dot ${c}${step===i+1?' cur':''}" title="Ερώτηση ${i+1}" onclick="go(${i+1})">${i+1}</button>`; });
+  h+=`<button class="dot flag${step===N+1?' cur':''}" title="Αποτέλεσμα" onclick="go(${N+1})">🏁</button>`;
+  $('dots').innerHTML=h;
+}
+$('prevBtn').onclick=()=>go(step-1); $('nextBtn').onclick=()=>go(step+1); $('startBtn').onclick=()=>go(1);
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='BUTTON') return;
+  if(e.key==='ArrowRight') go(step+1); if(e.key==='ArrowLeft') go(step-1); });
 $('printBtn').onclick=()=>window.print();
 render(); updProgress();
 </script>
