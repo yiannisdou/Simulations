@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Κώδικας BCD</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --text:#1d2433; --muted:#5b6475; --line:#d5dbe5;
+  --accent:#1f5fbf; --accent-soft:#e3edfb; --one:#e8411f; --zero:#8a94a6;
+  --ok:#1e8e3e; --ok-soft:#e3f4e8; --bad:#c62828; --bad-soft:#fdeaea; --warn-soft:#fff4e0;
+  --chip:#eef1f6; --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+body.dark{
+  --bg:#121721; --panel:#1b2230; --text:#e6eaf2; --muted:#9aa4b6; --line:#2e3746;
+  --accent:#6ea8ff; --accent-soft:#22324d; --one:#ff6a4a; --zero:#6f7a8d;
+  --ok:#5fd17f; --ok-soft:#1c3324; --bad:#ff7b7b; --bad-soft:#3a2024; --warn-soft:#3a3020;
+  --chip:#263042; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:16px}
+.wrap{height:100vh;display:flex;flex-direction:column;padding:8px 16px 8px;max-width:1600px;margin:0 auto;gap:8px}
+header{display:flex;align-items:center;gap:14px}
+header .titles{flex:1;min-width:0}
+h1{font-size:24px;margin:0;line-height:1.15}
+.subtitle{color:var(--muted);font-size:15px;margin-top:2px}
+a.back{color:var(--accent);text-decoration:none;font-size:15px;white-space:nowrap}
+button{font-family:inherit;font-size:15px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:bold}
+body.dark button.primary{color:#0d1420}
+button:disabled{opacity:.45;cursor:default}
+#themeBtn{min-width:150px}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px 18px;font-size:16px;font-weight:bold;border-radius:8px 8px 0 0;border-bottom:none;min-width:150px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.dark .tab.active{color:#0d1420}
+main{flex:1;min-height:0;display:none;grid-template-columns:1.4fr 1fr;gap:12px}
+main.show{display:grid}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel h2 .hint{font-weight:normal;color:var(--muted);font-size:14px}
+sub{font-size:.62em}
+/* converter */
+.cards{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+.nc{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--bg)}
+.nc label{display:block;font-size:13px;color:var(--muted);font-weight:bold}
+.nc input{width:100%;font-family:inherit;font-size:24px;font-weight:bold;border:none;background:transparent;color:var(--text);padding:1px 0;outline:none;letter-spacing:1px}
+.nc.main{border-color:var(--accent);background:var(--accent-soft)}
+.nc.err{border-color:var(--bad);background:var(--bad-soft)}
+.nc .ex{font-size:12px;color:var(--muted);height:15px;overflow:hidden;white-space:nowrap}
+.nc.err .ex{color:var(--bad)}
+.blocks{flex:1;min-height:0;display:flex;gap:12px;justify-content:center;align-items:center}
+.blk{flex:1;max-width:250px;border:2px solid var(--line);border-radius:10px;padding:6px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg)}
+.blk.bad{border-color:var(--bad);background:var(--bad-soft)}
+.blk .dd{font-size:44px;font-weight:bold;color:var(--accent);line-height:1}
+.blk.bad .dd{color:var(--bad)}
+.blk .ddl{font-size:12px;color:var(--muted)}
+.blk .arrow{color:var(--muted);font-size:16px;line-height:1}
+.nib{display:flex;gap:4px;width:100%}
+.bit{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
+.bit .w{font-size:14px;color:var(--muted);font-weight:bold}
+.bit .b{width:100%;aspect-ratio:1/1;max-height:50px;border:2px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;color:var(--zero);background:var(--panel)}
+.bit.one .b{color:var(--one);border-color:var(--one);background:var(--bad-soft)}
+.blk .sum{font-size:14px;color:var(--muted);min-height:18px;text-align:center}
+.blk.bad .sum{color:var(--bad);font-weight:bold}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctrls button{min-width:84px}
+#countBtn{min-width:150px}
+.ctrls .lbl{color:var(--muted);font-size:15px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:none;border-radius:0;padding:4px 10px;min-width:38px}
+.seg button.on{background:var(--accent);color:#fff}
+body.dark .seg button.on{color:#0d1420}
+.status{font-size:15px;min-height:20px}
+.status.bad{color:var(--bad);font-weight:bold}
+/* right panel */
+.side{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px}
+table.t{border-collapse:collapse;font-size:15px}
+table.t td,table.t th{border:1px solid var(--line);padding:2px 8px;text-align:center}
+table.t th{background:var(--chip);font-weight:bold;color:var(--muted)}
+table.t tr.hl td{background:var(--accent-soft);font-weight:bold;color:var(--accent)}
+table.t tr.unused td{color:var(--zero)}
+table.t tr.unused.hlbad td{background:var(--bad-soft);color:var(--bad);font-weight:bold}
+.twocol{display:flex;gap:12px;align-items:flex-start;flex-wrap:nowrap}
+#tblUnused{width:auto}
+.note{color:var(--muted);font-size:14px;margin:0}
+.cmp{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg);font-size:15px}
+.cmp div{margin:2px 0}
+.cmp b{color:var(--accent)}
+/* challenge */
+.qcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;text-align:center;min-height:0}
+.qnum{color:var(--muted);font-size:15px}
+.qtext{font-size:22px}
+.qval{font-size:44px;font-weight:bold;color:var(--accent);letter-spacing:1px}
+.ansrow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+#answer{font-family:inherit;font-size:28px;font-weight:bold;width:360px;max-width:60vw;padding:6px 12px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);text-align:center;letter-spacing:1px}
+#answer:focus{outline:none;border-color:var(--accent)}
+#answer.ok{border-color:var(--ok);background:var(--ok-soft)}
+#answer.bad{border-color:var(--bad);background:var(--bad-soft)}
+.yn button{min-width:170px;font-size:20px;padding:10px 18px;font-weight:bold}
+.yn button.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.yn button.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.qbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.qbtns button{min-width:130px;font-size:16px;padding:8px 14px}
+.fb{min-height:52px;font-size:18px;padding:6px 14px;border-radius:8px;max-width:640px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.hint{background:var(--warn-soft);color:var(--text);font-size:16px}
+.settings{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:15px}
+.settings select{font-family:inherit;font-size:15px;padding:4px 6px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--text);width:100%}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{border:1px solid var(--line);border-radius:8px;text-align:center;padding:4px;background:var(--bg)}
+.sc .n{font-size:26px;font-weight:bold}
+.sc .l{font-size:13px;color:var(--muted)}
+.sc.ok .n{color:var(--ok)} .sc.bad .n{color:var(--bad)} .sc.st .n{color:var(--accent)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold}
+.dot.cur{border-color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.sol{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
+.sol p{margin:4px 0}
+.sol .empty{color:var(--muted)}
+.res{font-size:18px;font-weight:bold;margin-top:6px}
+.res b{color:var(--accent)}
+.badcell{background:var(--bad-soft);color:var(--bad);font-weight:bold}
+.final{font-size:20px}
+.final .big{font-size:52px;font-weight:bold;color:var(--accent)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 14px}
+details summary{cursor:pointer;font-weight:bold}
+details p{margin:6px 0;font-size:15px;line-height:1.4}
+@media (max-width:1000px){
+  .wrap{height:auto} main.show{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr} .side,.sol{overflow:visible} .blocks{flex-wrap:wrap}
+}
+@media (max-height:700px){
+  .blk .dd{font-size:36px} .bit .b{max-height:42px;font-size:22px} .qval{font-size:38px} .qcard{gap:10px}
+  table.t td,table.t th{padding:1px 8px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" id="backLink" href="index.html">← Όλες οι προσομοιώσεις</a>
+    <div class="titles">
+      <h1>Κώδικας BCD (8421)</h1>
+      <div class="subtitle">Κάθε δεκαδικό ψηφίο γράφεται χωριστά με 4 bits. Γράψτε έναν αριθμό ή πατήστε τα bits· στην «Πρόκληση» κάνετε εξάσκηση.</div>
+    </div>
+    <button id="themeBtn">🌙 Σκούρο θέμα</button>
+  </header>
+  <div class="tabs">
+    <button class="tab active" data-tab="conv">🔄 Μετατροπή</button>
+    <button class="tab" data-tab="chal">🎯 Πρόκληση</button>
+  </div>
+
+  <!-- ============ CONVERTER ============ -->
+  <main id="conv" class="show">
+    <section class="panel">
+      <div class="cards">
+        <div class="nc main" id="cDec"><label>Δεκαδικός αριθμός</label><input id="inDec" inputmode="numeric" autocomplete="off"><div class="ex" data-def="έως 4 ψηφία">έως 4 ψηφία</div></div>
+        <div class="nc" id="cBcd"><label>Κώδικας BCD</label><input id="inBcd" autocomplete="off"><div class="ex" data-def="τετράδες bits από 0000 έως 1001">τετράδες bits από 0000 έως 1001</div></div>
+      </div>
+      <h2>Ψηφίο προς ψηφίο <span class="hint">— πατήστε ένα bit για να το αλλάξετε</span></h2>
+      <div class="blocks" id="blocks"></div>
+      <div class="status" id="status"></div>
+      <div class="ctrls">
+        <span class="lbl">Ψηφία:</span>
+        <div class="seg" id="segN"><button data-n="1">1</button><button data-n="2">2</button><button data-n="3" class="on">3</button><button data-n="4">4</button></div>
+        <button id="decBtn">− 1</button><button id="incBtn">+ 1</button>
+        <button id="countBtn">▶ Αρίθμηση</button><button id="zeroBtn">Μηδενισμός</button>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Πίνακας κώδικα BCD</h2>
+      <div class="side">
+        <div class="twocol">
+          <table class="t" id="tblBcd"></table>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <table class="t" id="tblUnused"></table>
+            <p class="note">Ο BCD χρησιμοποιεί τους 10 από τους 16 συνδυασμούς των 4 bits. Οι 6 συνδυασμοί 1010–1111 δε χρησιμοποιούνται.</p>
+          </div>
+        </div>
+        <div class="cmp" id="cmp"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ CHALLENGE ============ -->
+  <main id="chal">
+    <section class="panel">
+      <div class="qcard" id="qcard">
+        <div class="qnum" id="qnum"></div>
+        <div class="qtext" id="qtext"></div>
+        <div class="qval" id="qval"></div>
+        <div class="ansrow" id="ansrow"><input id="answer" autocomplete="off" spellcheck="false" placeholder="απάντηση"></div>
+        <div class="ansrow yn" id="ynrow"><button id="yesBtn">✔ Έγκυρος</button><button id="noBtn">✘ Μη έγκυρος</button></div>
+        <div class="qbtns" id="qbtns">
+          <button class="primary" id="checkBtn">✔ Έλεγχος</button>
+          <button id="hintBtn">💡 Βοήθεια</button>
+          <button id="nextBtn" disabled>Επόμενη →</button>
+        </div>
+        <div class="fb" id="fb"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Ρυθμίσεις</h2>
+      <div class="settings">
+        <label for="selType">Είδος</label>
+        <select id="selType">
+          <option value="mix">Όλα μαζί (μικτό)</option>
+          <option value="d2b">Δεκαδικό → BCD</option>
+          <option value="b2d">BCD → δεκαδικό</option>
+          <option value="val">Έγκυρος ή μη έγκυρος BCD;</option>
+        </select>
+        <label for="selLvl">Δυσκολία</label>
+        <select id="selLvl">
+          <option value="e">Εύκολο (2 ψηφία)</option>
+          <option value="m" selected>Μέτριο (3 ψηφία)</option>
+          <option value="h">Δύσκολο (4 ψηφία)</option>
+        </select>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="score">
+        <div class="sc ok"><div class="n" id="scOk">0</div><div class="l">σωστές</div></div>
+        <div class="sc bad"><div class="n" id="scBad">0</div><div class="l">λάθος</div></div>
+        <div class="sc st"><div class="n" id="scSt">0</div><div class="l">σερί σωστών</div></div>
+      </div>
+      <h2>Λύση</h2>
+      <div class="sol" id="sol"><span class="empty">Η λύση βήμα βήμα εμφανίζεται εδώ, αφού απαντήσετε.</span></div>
+    </section>
+  </main>
+
+  <details>
+    <summary>Πώς λειτουργεί</summary>
+    <p><b>Τι είναι ο BCD.</b> Ο κώδικας BCD (Binary Coded Decimal, δυαδικά κωδικοποιημένο δεκαδικό) είναι κώδικας με βάρη 8 4 2 1. Κάθε δεκαδικό ψηφίο γράφεται <b>χωριστά</b> με μία τετράδα bits.</p>
+    <p><b>Μετατροπή.</b> Γράψτε στο ένα πεδίο και το άλλο ενημερώνεται. Στα πλαίσια «ψηφίο προς ψηφίο» πατήστε τα bits: πάνω από κάθε bit φαίνεται το βάρος του και κάτω το άθροισμα. Αν μια τετράδα γίνει μεγαλύτερη από 1001 (9), το πλαίσιο γίνεται κόκκινο, γιατί ο συνδυασμός αυτός δεν υπάρχει στον BCD.</p>
+    <p><b>BCD και δυαδικός.</b> Ο BCD δεν είναι αριθμητικό σύστημα. Μόνο για τα ψηφία 0–9 συμπίπτει με τον δυαδικό· για μεγαλύτερους αριθμούς η κωδικοποίηση BCD και η μετατροπή στο δυαδικό δίνουν διαφορετικό αποτέλεσμα (δείτε το πλαίσιο σύγκρισης).</p>
+    <p><b>Πρόκληση.</b> Γύροι των 10 ασκήσεων: μετατροπή δεκαδικού σε BCD, BCD σε δεκαδικό και αναγνώριση έγκυρου ή μη έγκυρου BCD. Τα κενά και τα μηδενικά στην αρχή δεν πειράζουν. Πατήστε «Έλεγχος» ή Enter· μετά από κάθε απάντηση εμφανίζεται η λύση.</p>
+  </details>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const clean=s=>s.replace(/\s+/g,'');
+const nib=d=>d.toString(2).padStart(4,'0');
+const toBCD=v=>String(v).split('').map(c=>nib(+c)).join(' ');
+const spaced=(s,n=4)=>{const o=[];for(let i=s.length;i>0;i-=n)o.unshift(s.slice(Math.max(0,i-n),i));return o.join(' ');};
+function nibblesOf(s){ const p=s.padStart(Math.ceil(s.length/4)*4,'0'); const g=[]; for(let i=0;i<p.length;i+=4) g.push(p.slice(i,i+4)); return g; }
+function fromBCD(s){ const g=nibblesOf(s); let o=''; for(const x of g){ const n=parseInt(x,2); if(n>9) return null; o+=n; } return parseInt(o,10); }
+
+// theme
+const themeBtn=$('themeBtn');
+function setTheme(dark){ document.body.classList.toggle('dark',dark); themeBtn.textContent=dark?'☀️ Φωτεινό θέμα':'🌙 Σκούρο θέμα';
+  try{localStorage.setItem('gateSimTheme',dark?'dark':'light')}catch(e){} $('backLink').href='index.html#'+(dark?'dark':'light'); }
+(function(){ let t; if(location.hash==='#dark') t=true; else if(location.hash==='#light') t=false;
+  else { try{ t=localStorage.getItem('gateSimTheme')==='dark'; }catch(e){ t=false; } } setTheme(!!t); })();
+themeBtn.onclick=()=>setTheme(!document.body.classList.contains('dark'));
+try{ if(window.self!==window.top) $('backLink').style.display='none'; }catch(e){ $('backLink').style.display='none'; }
+
+// tabs
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('main').forEach(m=>m.classList.toggle('show',m.id===t.dataset.tab));
+  if(t.dataset.tab==='chal'){ stopCount(); if(!Q) newRound(); setTimeout(()=>{ if(!$('answer').disabled) $('answer').focus(); },0); }
+});
+
+// ================= CONVERTER =================
+// state: array of nibbles (0..15), most significant first; values 10..15 are "invalid" states the student can create
+let nibs=[2,5,3], countTimer=null;
+const W=[8,4,2,1];
+const valid=()=>nibs.every(n=>n<=9);
+const valueOf=()=>parseInt(nibs.join(''),10);
+function setFromValue(v,n){ const s=String(v).padStart(n||nibs.length,'0'); nibs=s.split('').map(Number); }
+function render(except){
+  // segment buttons
+  document.querySelectorAll('#segN button').forEach(b=>b.classList.toggle('on',+b.dataset.n===nibs.length));
+  // blocks
+  const bl=$('blocks'); bl.innerHTML='';
+  nibs.forEach((n,i)=>{
+    const d=document.createElement('div'); d.className='blk'+(n>9?' bad':'');
+    const bits=W.map((w,k)=>{ const on=(n>>(3-k))&1; return `<div class="bit${on?' one':''}" data-i="${i}" data-k="${k}"><span class="w">${w}</span><span class="b">${on}</span></div>`; }).join('');
+    const parts=W.filter((w,k)=>(n>>(3-k))&1);
+    d.innerHTML=`<div class="ddl">δεκαδικό ψηφίο</div><div class="dd">${n>9?'✘':n}</div><div class="arrow">↕</div><div class="nib">${bits}</div>
+      <div class="sum">${n>9?`${nib(n)} = ${n} > 9 · δεν υπάρχει`:(parts.length?parts.join(' + ')+' = '+n:'0')}</div>`;
+    bl.appendChild(d);
+  });
+  bl.querySelectorAll('.bit').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i,k=+b.dataset.k; nibs[i]^=(1<<(3-k)); stopCount(); render(); });
+  // inputs
+  const ok=valid();
+  if(except!=='dec'){ $('inDec').value= ok? String(valueOf()).padStart(nibs.length,'0').replace(/^0+(?=\d)/,'') : '—';
+    setCard('cDec', ok?null:'ο κώδικας περιέχει μη έγκυρη τετράδα'); }
+  if(except!=='bcd'){ $('inBcd').value=nibs.map(nib).join(' '); setCard('cBcd', ok?null:'περιέχει τετράδα > 1001'); }
+  const st=$('status');
+  if(ok){ st.className='status'; st.innerHTML=`${valueOf()} → BCD: <b>${nibs.map(nib).join(' ')}</b> (${nibs.length} ψηφία × 4 bits = ${nibs.length*4} bits)`; }
+  else { st.className='status bad'; st.textContent='Μη έγκυρος κώδικας BCD: οι τετράδες 1010 έως 1111 δε χρησιμοποιούνται.'; }
+  renderTables(); renderCmp();
+}
+function setCard(id,err){ const c=$(id), ex=c.querySelector('.ex'); c.classList.toggle('err',!!err); ex.textContent=err||ex.dataset.def; }
+function renderTables(){
+  let h='<tr><th>Δεκαδικό ψηφίο</th><th>BCD 8421</th></tr>';
+  for(let d=0;d<10;d++) h+=`<tr class="${nibs.includes(d)?'hl':''}"><td>${d}</td><td>${nib(d)}</td></tr>`;
+  $('tblBcd').innerHTML=h;
+  let u='<tr><th colspan="2">Δε χρησιμοποιούνται</th></tr>';
+  for(let d=10;d<16;d++) u+=`<tr class="unused${nibs.includes(d)?' hlbad':''}"><td>${nib(d)}</td><td>(${d})</td></tr>`;
+  $('tblUnused').innerHTML=u;
+}
+function renderCmp(){
+  const c=$('cmp');
+  if(!valid()){ c.innerHTML='<b style="color:var(--bad)">Διορθώστε την κόκκινη τετράδα για να δείτε τη σύγκριση.</b>'; return; }
+  const v=valueOf(), bcd=toBCD(v), bin=v.toString(2);
+  c.innerHTML=`<div><b>BCD ≠ δυαδικός αριθμός</b> για τον ${v}:</div>
+    <div>Κωδικοποίηση BCD: <b>${bcd}</b> (${String(v).length*4} bits)</div>
+    <div>Μετατροπή στο δυαδικό: <b>${spaced(bin)}</b> (${bin.length} bits)</div>
+    <div class="note">${v<=9?'Για τα ψηφία 0–9 τα δύο συμπίπτουν.':'Για αριθμούς μεγαλύτερους από 9 είναι διαφορετικά.'}</div>`;
+}
+$('inDec').addEventListener('input',()=>{ const s=clean($('inDec').value);
+  if(s===''){ setCard('cDec','γράψτε έναν αριθμό'); return; }
+  if(!/^\d+$/.test(s)){ setCard('cDec','επιτρέπονται μόνο τα ψηφία 0–9'); return; }
+  const t=s.replace(/^0+(?=\d)/,''); if(t.length>4){ setCard('cDec','έως 4 ψηφία'); return; }
+  setCard('cDec',null); setFromValue(+t, t.length); render('dec'); });
+$('inBcd').addEventListener('input',()=>{ const s=clean($('inBcd').value);
+  if(s===''){ setCard('cBcd','γράψτε τετράδες bits'); return; }
+  if(!/^[01]+$/.test(s)){ setCard('cBcd','επιτρέπονται μόνο 0 και 1'); return; }
+  const g=nibblesOf(s); if(g.length>4){ setCard('cBcd','έως 4 τετράδες (16 bits)'); return; }
+  nibs=g.map(x=>parseInt(x,2)); render('bcd');
+  if(!valid()) setCard('cBcd','τετράδα > 1001: δεν υπάρχει στον BCD'); else setCard('cBcd',null); });
+['inDec','inBcd'].forEach(id=>{ $(id).addEventListener('blur',()=>render());
+  $(id).addEventListener('focus',()=>{ $('cDec').classList.toggle('main',id==='inDec'); $('cBcd').classList.toggle('main',id==='inBcd'); stopCount(); }); });
+document.querySelectorAll('#segN button').forEach(b=>b.onclick=()=>{ const n=+b.dataset.n;
+  if(n>nibs.length) nibs=Array(n-nibs.length).fill(0).concat(nibs); else nibs=nibs.slice(nibs.length-n); render(); });
+function step(d){ if(!valid()) nibs=nibs.map(n=>Math.min(n,9)); const m=Math.pow(10,nibs.length); setFromValue((valueOf()+d+m)%m, nibs.length); render(); }
+$('incBtn').onclick=()=>step(1); $('decBtn').onclick=()=>step(-1);
+$('zeroBtn').onclick=()=>{ stopCount(); nibs=nibs.map(()=>0); render(); };
+function stopCount(){ if(countTimer){ clearInterval(countTimer); countTimer=null; } $('countBtn').textContent='▶ Αρίθμηση'; }
+$('countBtn').onclick=()=>{ if(countTimer){ stopCount(); return; } $('countBtn').textContent='⏸ Παύση'; countTimer=setInterval(()=>step(1),800); };
+
+// ================= CHALLENGE =================
+const ROUND=10, DIGITS={e:2,m:3,h:4};
+let Q=null, qi=0, results=[], ok=0, bad=0, streak=0, answered=false;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function pick(){
+  const t=$('selType').value, n=DIGITS[$('selLvl').value];
+  const kind = t==='mix' ? ['d2b','b2d','val'][rnd(0,2)] : t;
+  const v = rnd(Math.pow(10,n-1), Math.pow(10,n)-1);
+  const q={kind,v,n};
+  if(kind==='val'){ q.nibs=String(v).split('').map(Number); q.valid=Math.random()<0.5;
+    if(!q.valid){ const k=rnd(0,n-1); q.nibs[k]=rnd(10,15); q.badIdx=k; } }
+  return q;
+}
+function newRound(){ qi=0; results=[]; ok=0; bad=0; streak=0; updScore(); nextQ(); }
+function nextQ(){
+  if(qi>=ROUND){ finalScreen(); return; }
+  Q=pick(); answered=false;
+  const inp=$('answer'); inp.value=''; inp.className=''; inp.disabled=false;
+  $('fb').className='fb'; $('fb').innerHTML='';
+  $('qnum').textContent=`Άσκηση ${qi+1} από ${ROUND}`;
+  const isVal=Q.kind==='val';
+  $('ansrow').style.display=isVal?'none':''; $('ynrow').style.display=isVal?'':'none';
+  ['yesBtn','noBtn'].forEach(id=>{ $(id).disabled=false; $(id).className=''; });
+  $('qbtns').style.display='';
+  $('checkBtn').style.display=isVal?'none':''; $('checkBtn').disabled=false;
+  $('hintBtn').disabled=false; $('nextBtn').disabled=true; $('nextBtn').textContent='Επόμενη →';
+  if(Q.kind==='d2b'){ $('qtext').innerHTML='Γράψτε τον δεκαδικό αριθμό σε <b>κώδικα BCD</b>'; $('qval').textContent=Q.v; inp.placeholder='π.χ. 0010 0101'; }
+  else if(Q.kind==='b2d'){ $('qtext').innerHTML='Ποιον <b>δεκαδικό</b> αριθμό παριστάνει ο κώδικας BCD;'; $('qval').textContent=toBCD(Q.v); inp.placeholder='δεκαδικός αριθμός'; }
+  else { $('qtext').innerHTML='Είναι <b>έγκυρος</b> κώδικας BCD;'; $('qval').textContent=Q.nibs.map(nib).join(' '); }
+  $('sol').innerHTML='<span class="empty">Η λύση βήμα βήμα εμφανίζεται εδώ, αφού απαντήσετε.</span>';
+  $('ansrow').style.display=isVal?'none':''; renderDots();
+  if(!isVal) inp.focus();
+}
+function finish(right, correctHTML){
+  answered=true; results.push(right); qi++;
+  if(right){ ok++; streak++; } else { bad++; streak=0; }
+  const fb=$('fb'); fb.className='fb '+(right?'ok':'bad');
+  fb.innerHTML= right ? (streak>=3?`✔ Σωστά! ${streak} σωστές στη σειρά 🔥`:'✔ Σωστά!') : `✘ Λάθος. ${correctHTML}`;
+  $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('nextBtn').disabled=false;
+  $('nextBtn').textContent= qi>=ROUND?'Αποτέλεσμα →':'Επόμενη →';
+  $('sol').innerHTML=solution(); updScore(); renderDots(); $('nextBtn').focus();
+}
+function check(){
+  if(answered||Q.kind==='val') return;
+  const s=clean($('answer').value), fb=$('fb');
+  if(!s){ fb.className='fb hint'; fb.textContent='Γράψτε πρώτα την απάντησή σας.'; return; }
+  if(Q.kind==='d2b'){
+    if(!/^[01]+$/.test(s)){ fb.className='fb hint'; fb.textContent='Ο κώδικας BCD γράφεται μόνο με 0 και 1.'; return; }
+    const g=fromBCD(s);
+    if(g===null){ fb.className='fb hint'; fb.textContent='Κάθε τετράδα BCD πρέπει να είναι από 0000 έως 1001. Ελέγξτε τις τετράδες σας.'; return; }
+    const right=g===Q.v; $('answer').className=right?'ok':'bad'; $('answer').disabled=true;
+    finish(right,`Η σωστή απάντηση είναι <b>${toBCD(Q.v)}</b>`);
+  } else {
+    if(!/^\d+$/.test(s)){ fb.className='fb hint'; fb.textContent='Γράψτε δεκαδικό αριθμό (ψηφία 0–9).'; return; }
+    const right=parseInt(s,10)===Q.v; $('answer').className=right?'ok':'bad'; $('answer').disabled=true;
+    finish(right,`Η σωστή απάντηση είναι <b>${Q.v}</b>`);
+  }
+}
+function answerValid(saysValid){
+  if(answered) return;
+  const right = saysValid===Q.valid;
+  $(saysValid?'yesBtn':'noBtn').className = right?'ok':'bad';
+  ['yesBtn','noBtn'].forEach(id=>$(id).disabled=true);
+  finish(right, Q.valid ? 'Ο κώδικας είναι <b>έγκυρος</b>: όλες οι τετράδες είναι από 0000 έως 1001.'
+                        : `Ο κώδικας <b>δεν είναι έγκυρος</b>: η τετράδα ${nib(Q.nibs[Q.badIdx])} (= ${Q.nibs[Q.badIdx]}) δεν υπάρχει στον BCD.`);
+}
+function solTable(nibsArr, decRow){
+  return `<table class="t"><tr><th>Τετράδα</th>${nibsArr.map(n=>`<td class="${n>9?'badcell':''}">${nib(n)}</td>`).join('')}</tr>
+    <tr><th>8·4·2·1</th>${nibsArr.map(n=>`<td class="${n>9?'badcell':''}">${n>9?n+' ✘':(W.filter((w,k)=>(n>>(3-k))&1).join('+')||'0')}</td>`).join('')}</tr>
+    <tr><th>Ψηφίο</th>${nibsArr.map(n=>`<td class="${n>9?'badcell':''}"><b>${n>9?'—':n}</b></td>`).join('')}</tr></table>`;
+}
+function solution(){
+  const ns=String(Q.v).split('').map(Number);
+  if(Q.kind==='d2b') return `<p>Κάθε δεκαδικό ψηφίο γράφεται <b>χωριστά</b> με 4 bits (βάρη 8 4 2 1):</p>${solTable(ns)}
+    <div class="res">${Q.v} → BCD: <b>${toBCD(Q.v)}</b></div>
+    <p class="note">Προσοχή: στο δυαδικό ο ${Q.v} είναι ${spaced(Q.v.toString(2))}, που είναι διαφορετικό.</p>`;
+  if(Q.kind==='b2d') return `<p>Χωρίζουμε σε τετράδες και κάθε τετράδα γίνεται ένα δεκαδικό ψηφίο:</p>${solTable(ns)}
+    <div class="res">BCD ${toBCD(Q.v)} → <b>${Q.v}</b></div>`;
+  return `<p>Ελέγχουμε κάθε τετράδα: πρέπει να είναι από 0000 (0) έως 1001 (9).</p>${solTable(Q.nibs)}
+    <div class="res">${Q.valid?'<b>Έγκυρος</b> κώδικας BCD → '+Q.v:`<b style="color:var(--bad)">Μη έγκυρος</b>: η τετράδα ${nib(Q.nibs[Q.badIdx])} = ${Q.nibs[Q.badIdx]} > 9`}</div>
+    <p class="note">Οι συνδυασμοί 1010, 1011, 1100, 1101, 1110 και 1111 δε χρησιμοποιούνται στον BCD.</p>`;
+}
+function hint(){ let t;
+  if(Q.kind==='d2b') t='Γράψτε κάθε ψηφίο χωριστά με 4 bits, π.χ. 7 = 0111 (4+2+1). Μην μετατρέψετε όλο τον αριθμό στο δυαδικό!';
+  else if(Q.kind==='b2d') t='Χωρίστε σε τετράδες από τα αριστερά· κάθε τετράδα είναι ένα δεκαδικό ψηφίο (βάρη 8 4 2 1).';
+  else t='Κοιτάξτε κάθε τετράδα χωριστά: αν κάποια είναι μεγαλύτερη από 1001 (9), ο κώδικας δεν είναι έγκυρος.';
+  $('fb').className='fb hint'; $('fb').innerHTML='💡 '+t; if(Q.kind!=='val') $('answer').focus(); }
+function renderDots(){ let h='';
+  for(let i=0;i<ROUND;i++){ const r=results[i]; h+=`<span class="dot${r===true?' ok':r===false?' bad':''}${i===results.length&&!answered?' cur':''}">${r===true?'✓':r===false?'✗':i+1}</span>`; }
+  $('dots').innerHTML=h; }
+function updScore(){ $('scOk').textContent=ok; $('scBad').textContent=bad; $('scSt').textContent=streak; }
+function finalScreen(){
+  const pct=ok/ROUND, msg=pct===1?'Τέλεια! Όλες σωστές! 🏆':pct>=.8?'Πολύ καλά! 👏':pct>=.5?'Καλά, συνεχίστε την εξάσκηση. 💪':'Δείτε ξανά τη μετατροπή ψηφίο προς ψηφίο και δοκιμάστε πάλι. 📘';
+  $('qnum').textContent='Τέλος γύρου'; $('qtext').innerHTML='';
+  $('qval').innerHTML=`<div class="final"><div class="big">${ok} / ${ROUND}</div>${msg}</div>`;
+  $('ansrow').style.display='none'; $('ynrow').style.display='none'; $('qbtns').style.display='none';
+  $('fb').className='fb'; $('fb').innerHTML='<button class="primary" id="againBtn" style="font-size:18px;padding:10px 24px">↻ Νέος γύρος</button>';
+  $('againBtn').onclick=newRound; $('againBtn').focus();
+}
+$('checkBtn').onclick=check; $('hintBtn').onclick=hint; $('nextBtn').onclick=nextQ;
+$('yesBtn').onclick=()=>answerValid(true); $('noBtn').onclick=()=>answerValid(false);
+$('answer').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); check(); } });
+$('nextBtn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); nextQ(); } });
+$('selType').onchange=newRound; $('selLvl').onchange=newRound;
+render();
+</script>
+</body>
+</html>

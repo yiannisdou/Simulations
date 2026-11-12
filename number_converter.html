@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Μετατροπέας αριθμητικών συστημάτων</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --text:#1d2433; --muted:#5b6475; --line:#d5dbe5;
+  --accent:#1f5fbf; --accent-soft:#e3edfb; --one:#e8411f; --zero:#8a94a6;
+  --ok:#1e8e3e; --ok-soft:#e3f4e8; --bad:#c62828; --bad-soft:#fdeaea; --warn-soft:#fff4e0;
+  --chip:#eef1f6; --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+body.dark{
+  --bg:#121721; --panel:#1b2230; --text:#e6eaf2; --muted:#9aa4b6; --line:#2e3746;
+  --accent:#6ea8ff; --accent-soft:#22324d; --one:#ff6a4a; --zero:#6f7a8d;
+  --ok:#5fd17f; --ok-soft:#1c3324; --bad:#ff7b7b; --bad-soft:#3a2024; --warn-soft:#3a3020;
+  --chip:#263042; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:16px}
+.wrap{height:100vh;display:flex;flex-direction:column;padding:8px 16px 8px;max-width:1600px;margin:0 auto;gap:8px}
+header{display:flex;align-items:center;gap:14px}
+header .titles{flex:1;min-width:0}
+h1{font-size:24px;margin:0;line-height:1.15}
+.subtitle{color:var(--muted);font-size:15px;margin-top:2px}
+a.back{color:var(--accent);text-decoration:none;font-size:15px;white-space:nowrap}
+button{font-family:inherit;font-size:15px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:bold}
+body.dark button.primary{color:#0d1420}
+button:disabled{opacity:.45;cursor:default}
+#themeBtn{min-width:150px}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px 18px;font-size:16px;font-weight:bold;border-radius:8px 8px 0 0;border-bottom:none;min-width:150px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.dark .tab.active{color:#0d1420}
+main{flex:1;min-height:0;display:none;grid-template-columns:1.4fr 1fr;gap:12px}
+main.show{display:grid}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel h2 .hint{font-weight:normal;color:var(--muted);font-size:14px}
+sub{font-size:.62em}
+/* ---------- converter ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nc{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--bg)}
+.nc label{display:block;font-size:13px;color:var(--muted);font-weight:bold}
+.nc input{width:100%;font-family:inherit;font-size:22px;font-weight:bold;border:none;background:transparent;color:var(--text);padding:1px 0;outline:none;letter-spacing:.5px}
+.nc.main{border-color:var(--accent);background:var(--accent-soft)}
+.nc.err{border-color:var(--bad);background:var(--bad-soft)}
+.nc .ex{font-size:12px;color:var(--muted);height:15px;overflow:hidden;white-space:nowrap}
+.nc.err .ex{color:var(--bad)}
+.bitsHead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:none;border-radius:0;padding:4px 12px;min-width:64px}
+.seg button.on{background:var(--accent);color:#fff}
+body.dark .seg button.on{color:#0d1420}
+.bits{display:flex;gap:4px;justify-content:center;flex:1;min-height:0;align-items:center}
+.bit{flex:1;max-width:84px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
+.bit .w{font-size:13px;color:var(--muted);white-space:nowrap}
+.bit .b{width:100%;aspect-ratio:1/1;max-height:76px;font-size:34px!important;border:2px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:var(--zero);background:var(--bg);transition:background .15s}
+.bit.one .b{color:var(--one);border-color:var(--one);background:var(--bad-soft)}
+.bit .c{font-size:13px;color:var(--one);height:16px;font-weight:bold}
+.bit.gap{margin-left:10px}
+.bit .pos{font-size:11px;color:var(--muted)}
+.groups{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;font-size:15px;margin-bottom:auto}
+.g .gb{font-size:18px!important}.g .gd{font-size:22px!important}.g{padding:3px 12px!important}
+.groups .lbl{color:var(--muted);font-weight:bold;font-size:14px}
+.grp{display:flex;gap:6px;flex-wrap:wrap}
+.g{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:6px;padding:1px 7px;background:var(--bg);min-width:44px}
+.g .gb{font-size:16px;letter-spacing:1px}
+.g .gb .pad{color:var(--zero);opacity:.6}
+.g .gd{font-size:18px;font-weight:bold;color:var(--accent)}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.ctrls button{min-width:84px}
+#countBtn{min-width:150px}
+.status{font-size:15px;color:var(--muted)}
+/* steps */
+.methods{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.methods .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.chip{padding:4px 12px;border-radius:16px;background:var(--chip);border:1px solid var(--line);font-size:14px}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.dark .chip.on{color:#0d1420}
+.steps{flex:1;min-height:0;overflow:auto;font-size:15px}
+.steps p{margin:4px 0}
+table.t{border-collapse:collapse;margin:4px 0;font-size:15px}
+table.t td,table.t th{border:1px solid var(--line);padding:3px 7px;text-align:center}
+table.t th{background:var(--chip);font-weight:bold;color:var(--muted)}
+table.t.small td,table.t.small th{padding:2px 4px;font-size:13px}
+table.t tr.hl td{background:var(--accent-soft);font-weight:bold}
+.res{font-size:18px;font-weight:bold;margin-top:6px}
+.res b{color:var(--accent)}
+.note{color:var(--muted);font-size:14px}
+.up{color:var(--accent);font-weight:bold}
+.flow{display:flex;flex-direction:column;gap:4px;margin:4px 0}
+.flowrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.flowrow .tag{min-width:118px;color:var(--muted);font-size:13px;font-weight:bold}
+.arrow{color:var(--muted);font-size:13px;padding-left:124px}
+/* ---------- challenge ---------- */
+.qcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;text-align:center;min-height:0}
+.qnum{color:var(--muted);font-size:15px}
+.qtext{font-size:22px}
+.qval{font-size:44px;font-weight:bold;color:var(--accent);letter-spacing:1px}
+.qval sub{color:var(--muted)}
+.ansrow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+#answer{font-family:inherit;font-size:28px;font-weight:bold;width:320px;max-width:60vw;padding:6px 12px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);text-align:center;letter-spacing:1px}
+#answer:focus{outline:none;border-color:var(--accent)}
+#answer.ok{border-color:var(--ok);background:var(--ok-soft)}
+#answer.bad{border-color:var(--bad);background:var(--bad-soft)}
+.ansbase{font-size:22px;color:var(--muted);font-weight:bold}
+.ansbase sub{font-size:20px}
+.qbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.qbtns button{min-width:130px;font-size:16px;padding:8px 14px}
+.fb{min-height:52px;font-size:18px;padding:6px 14px;border-radius:8px;max-width:640px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.hint{background:var(--warn-soft);color:var(--text);font-size:16px}
+.settings{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:15px}
+.settings select{font-family:inherit;font-size:15px;padding:4px 6px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--text);width:100%}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{border:1px solid var(--line);border-radius:8px;text-align:center;padding:4px;background:var(--bg)}
+.sc .n{font-size:26px;font-weight:bold}
+.sc .l{font-size:13px;color:var(--muted)}
+.sc.ok .n{color:var(--ok)} .sc.bad .n{color:var(--bad)} .sc.st .n{color:var(--accent)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold}
+.dot.cur{border-color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.sol{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
+.sol .empty{color:var(--muted)}
+.final{font-size:20px}
+.final .big{font-size:52px;font-weight:bold;color:var(--accent)}
+/* how it works */
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 14px}
+details summary{cursor:pointer;font-weight:bold}
+details p{margin:6px 0;font-size:15px;line-height:1.4}
+@media (max-width:1000px){
+  .wrap{height:auto}
+  main.show{grid-template-columns:1fr}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .steps,.sol{overflow:visible}
+}
+@media (max-height:700px){
+  .nc input{font-size:20px} .bit .b{max-height:46px;font-size:24px}
+  .qval{font-size:38px} .qcard{gap:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" id="backLink" href="index.html">← Όλες οι προσομοιώσεις</a>
+    <div class="titles">
+      <h1>Μετατροπέας αριθμητικών συστημάτων</h1>
+      <div class="subtitle">Γράψτε έναν αριθμό σε οποιοδήποτε πεδίο ή πατήστε τα bits. Στην «Πρόκληση» κάνετε εξάσκηση σε μετατροπές.</div>
+    </div>
+    <button id="themeBtn">🌙 Σκούρο θέμα</button>
+  </header>
+  <div class="tabs">
+    <button class="tab active" data-tab="conv">🔄 Μετατροπέας</button>
+    <button class="tab" data-tab="chal">🎯 Πρόκληση</button>
+  </div>
+
+  <!-- ===================== CONVERTER ===================== -->
+  <main id="conv" class="show">
+    <section class="panel">
+      <h2>Ο αριθμός σε όλα τα συστήματα <span class="hint">(ο ίδιος αριθμός, γραμμένος με διαφορετική βάση)</span></h2>
+      <div class="cards">
+        <div class="nc main" data-k="10"><label>Δεκαδικό (βάση 10)</label><input id="in10" inputmode="numeric" autocomplete="off"><div class="ex">ψηφία 0–9</div></div>
+        <div class="nc" data-k="2"><label>Δυαδικό (βάση 2)</label><input id="in2" autocomplete="off"><div class="ex">ψηφία 0, 1</div></div>
+        <div class="nc" data-k="16"><label>Δεκαεξαδικό (βάση 16)</label><input id="in16" autocomplete="off"><div class="ex">ψηφία 0–9, A–F</div></div>
+      </div>
+      <div class="bitsHead">
+        <h2>Δυαδικά ψηφία <span class="hint">— πατήστε ένα bit για να το αλλάξετε</span></h2>
+        <div class="seg"><button data-w="8" class="on">8 bits</button><button data-w="16">16 bits</button></div>
+      </div>
+      <div class="bits" id="bits"></div>
+      <div class="groups">
+        <div class="lbl">Τετράδες → δεκαεξαδικό</div><div class="grp" id="grp4"></div>
+      </div>
+      <div class="ctrls">
+        <button id="decBtn">− 1</button><button id="incBtn">+ 1</button>
+        <button id="countBtn">▶ Αρίθμηση</button><button id="zeroBtn">Μηδενισμός</button>
+        <span class="status" id="status"></span>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Βήματα μετατροπής</h2>
+      <div class="methods" id="methods">
+        <button class="chip on" data-m="w">Βάρη θέσεων → δεκαδικό</button>
+        <button class="chip" data-m="d">Διαδοχικές διαιρέσεις</button>
+        <button class="chip" data-m="g">Ομάδες bits</button>
+        <span class="sep"></span>
+        <button class="chip" data-b="2">βάση 2</button>
+        <button class="chip on" data-b="16">βάση 16</button>
+      </div>
+      <div class="steps" id="steps"></div>
+    </section>
+  </main>
+
+  <!-- ===================== CHALLENGE ===================== -->
+  <main id="chal">
+    <section class="panel">
+      <div class="qcard" id="qcard">
+        <div class="qnum" id="qnum"></div>
+        <div class="qtext" id="qtext"></div>
+        <div class="qval" id="qval"></div>
+        <div class="ansrow"><input id="answer" autocomplete="off" spellcheck="false" placeholder="απάντηση"><span class="ansbase" id="ansbase"></span></div>
+        <div class="qbtns">
+          <button class="primary" id="checkBtn">✔ Έλεγχος</button>
+          <button id="hintBtn">💡 Βοήθεια</button>
+          <button id="nextBtn" disabled>Επόμενη →</button>
+        </div>
+        <div class="fb" id="fb"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Ρυθμίσεις</h2>
+      <div class="settings">
+        <label for="selType">Είδος</label>
+        <select id="selType">
+          <option value="mix">Όλα μαζί (μικτό)</option>
+          <option value="d2">Δεκαδικό ↔ Δυαδικό</option>
+          <option value="d16">Δεκαδικό ↔ Δεκαεξαδικό</option>
+          <option value="grp">Δυαδικό ↔ Δεκαεξαδικό</option>
+        </select>
+        <label for="selLvl">Δυσκολία</label>
+        <select id="selLvl">
+          <option value="e">Εύκολο (αριθμοί έως 15)</option>
+          <option value="m" selected>Μέτριο (αριθμοί έως 255)</option>
+          <option value="h">Δύσκολο (αριθμοί έως 4095)</option>
+        </select>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="score">
+        <div class="sc ok"><div class="n" id="scOk">0</div><div class="l">σωστές</div></div>
+        <div class="sc bad"><div class="n" id="scBad">0</div><div class="l">λάθος</div></div>
+        <div class="sc st"><div class="n" id="scSt">0</div><div class="l">σερί σωστών</div></div>
+      </div>
+      <h2>Λύση</h2>
+      <div class="sol" id="sol"><span class="empty">Η λύση βήμα βήμα εμφανίζεται εδώ, αφού απαντήσετε.</span></div>
+    </section>
+  </main>
+
+  <details>
+    <summary>Πώς λειτουργεί</summary>
+    <p><b>Μετατροπέας.</b> Ο ίδιος αριθμός γράφεται σε κάθε σύστημα με διαφορετικά ψηφία. Γράψτε σε οποιοδήποτε πεδίο και τα υπόλοιπα ενημερώνονται αμέσως. Μπορείτε και να πατάτε τα bits: πάνω από κάθε bit φαίνεται το βάρος της θέσης του (δύναμη του 2) και κάτω η αξία που προσθέτει όταν είναι 1.</p>
+    <p><b>Ομάδες bits.</b> Χωρίζοντας τα bits από τα δεξιά σε τετράδες βρίσκουμε το δεκαεξαδικό: κάθε τετράδα είναι ένα δεκαεξαδικό ψηφίο. Τα αχνά μηδενικά είναι αυτά που προσθέτουμε αριστερά του MSB, χωρίς να αλλάζει η τιμή.</p>
+    <p><b>Βήματα μετατροπής.</b> Επιλέξτε μέθοδο και βάση: βάρη θέσεων (από μια βάση στο δεκαδικό), διαδοχικές διαιρέσεις (από το δεκαδικό σε μια βάση) ή ομάδες bits. Με το «▶ Αρίθμηση» παρατηρήστε ότι το LSB αλλάζει σε κάθε βήμα, το επόμενο bit κάθε δύο βήματα, το επόμενο κάθε τέσσερα κ.ο.κ.</p>
+    <p><b>Πρόκληση.</b> Γύροι των 10 ασκήσεων. Διαλέξτε είδος και δυσκολία, γράψτε την απάντηση (τα κενά και τα μηδενικά στην αρχή δεν πειράζουν) και πατήστε «Έλεγχος» ή Enter. Μετά από κάθε απάντηση εμφανίζεται η λύση βήμα βήμα.</p>
+  </details>
+</div>
+
+<script>
+'use strict';
+// ================= helpers =================
+const $ = id => document.getElementById(id);
+const NAME = {2:'δυαδικό',8:'οκταδικό',10:'δεκαδικό',16:'δεκαεξαδικό',bcd:'κώδικα BCD',gray:'κώδικα Gray'};
+const NAMEGEN = {2:'δυαδικού',8:'οκταδικού',10:'δεκαδικού',16:'δεκαεξαδικού'};
+const DIG = '0123456789ABCDEF';
+const VALID = {2:/^[01]+$/,8:/^[0-7]+$/,10:/^[0-9]+$/,16:/^[0-9A-F]+$/,bcd:/^[01]+$/,gray:/^[01]+$/};
+const sub = (n,b) => `(${n})<sub>${b}</sub>`;
+const clean = s => s.replace(/\s+/g,'').toUpperCase();
+const toBase = (v,b) => v.toString(b).toUpperCase();
+function spaced(s, n=4){ // group from the right
+  let out=[]; for(let i=s.length;i>0;i-=n) out.unshift(s.slice(Math.max(0,i-n),i)); return out.join(' ');
+}
+const toBCD = v => String(v).split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ');
+function fromBCD(s){ // s clean binary string; returns number or null
+  const p = s.padStart(Math.ceil(s.length/4)*4,'0'); let out='';
+  for(let i=0;i<p.length;i+=4){ const n=parseInt(p.slice(i,i+4),2); if(n>9) return null; out+=n; }
+  return parseInt(out,10);
+}
+const toGray = (v,w) => (v ^ (v>>1)).toString(2).padStart(w,'0');
+function fromGray(s){ let g=parseInt(s,2), b=g; while(g>>=1) b^=g; return b; }
+const digVal = c => DIG.indexOf(c);
+const digLabel = c => digVal(c)>9 ? `${c}(${digVal(c)})` : c;
+const pow = (b,k) => `${b}<sup>${k}</sup>`;
+
+// ================= theme =================
+const themeBtn=$('themeBtn');
+function setTheme(dark){ document.body.classList.toggle('dark',dark); themeBtn.textContent = dark?'☀️ Φωτεινό θέμα':'🌙 Σκούρο θέμα';
+  try{localStorage.setItem('gateSimTheme',dark?'dark':'light')}catch(e){}
+  const bl=$('backLink'); bl.href='index.html#'+(dark?'dark':'light'); }
+(function(){ let t=null; if(location.hash==='#dark') t=true; else if(location.hash==='#light') t=false;
+  else { try{ t = localStorage.getItem('gateSimTheme')==='dark'; }catch(e){ t=false; } }
+  setTheme(!!t); })();
+themeBtn.onclick=()=>setTheme(!document.body.classList.contains('dark'));
+try{ if(window.self!==window.top) $('backLink').style.display='none'; }catch(e){ $('backLink').style.display='none'; }
+
+// ================= tabs =================
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('main').forEach(m=>m.classList.toggle('show',m.id===t.dataset.tab));
+  if(t.dataset.tab==='chal'){ stopCount(); if(!Q) newRound(); setTimeout(()=>$('answer').focus(),0); }
+});
+
+// ================= step renderers (shared) =================
+function weightsHTML(v,b){
+  const s = toBase(v,b), n=s.length, small = n>8;
+  let pos='',dig='',wt='',pr=''; const terms=[];
+  for(let i=0;i<n;i++){ const k=n-1-i, d=digVal(s[i]), p=d*Math.pow(b,k);
+    pos+=`<td>${k}</td>`; dig+=`<td><b>${s[i]}</b></td>`; wt+=`<td>${pow(b,k)}</td>`;
+    pr+=`<td>${p}</td>`; if(d) terms.push(`${d}×${Math.pow(b,k)}`); }
+  const prodTerms = s.split('').map((c,i)=>digVal(c)*Math.pow(b,n-1-i)).filter(x=>x);
+  let h = `<p>Μετατροπή ${NAMEGEN[b]} σε δεκαδικό: κάθε ψηφίο × βάρος θέσης (δυνάμεις του ${b}).</p>`;
+  if(b===16 && /[A-F]/.test(s)) h+=`<p class="note">A=10, B=11, C=12, D=13, E=14, F=15</p>`;
+  h += `<table class="t${small?' small':''}"><tr><th>Θέση</th>${pos}</tr><tr><th>Ψηφίο</th>${dig}</tr><tr><th>Βάρος</th>${wt}</tr><tr><th>Ψηφίο × βάρος</th>${pr}</tr></table>`;
+  h += `<div class="res">${sub(b===2?spaced(s):s,b)} = ${prodTerms.length?prodTerms.join(' + '):'0'} = <b>${sub(v,10)}</b></div>`;
+  return h;
+}
+function divHTML(v,b){
+  let rows='', x=v; const rs=[];
+  if(x===0) rows=`<tr><td>0</td><td>÷ ${b}</td><td>0</td><td>0</td></tr>`;
+  while(x>0){ const q=Math.floor(x/b), r=x%b; rs.push(r);
+    rows+=`<tr><td>${x}</td><td>÷ ${b}</td><td>${q}</td><td><b>${r>9?r+' → '+DIG[r]:r}</b></td></tr>`; x=q; }
+  const res = toBase(v,b);
+  let h=`<p>Μετατροπή δεκαδικού σε ${NAME[b]}: διαιρούμε διαδοχικά με το ${b} μέχρι το πηλίκο να γίνει 0.</p>`;
+  h+=`<table class="t${rs.length>9?' small':''}"><tr><th>Διαιρετέος</th><th></th><th>Πηλίκο</th><th>Υπόλοιπο</th></tr>${rows}</table>`;
+  h+=`<p class="note"><span class="up">↑</span> Διαβάζουμε τα υπόλοιπα από κάτω προς τα πάνω: το πρώτο υπόλοιπο είναι το ${b===2?'LSB':'LSD'}.</p>`;
+  h+=`<div class="res">${sub(v,10)} = <b>${sub(b===2?spaced(res):res,b)}</b></div>`;
+  return h;
+}
+const gsize = b => b===8?3:4;
+function groupBoxes(groups, digits, pads){ // groups: bit strings; digits: labels; pads: number of padded zeros in first group
+  return groups.map((g,i)=>{ const p = i===0?pads:0;
+    return `<span class="g"><span class="gb">${p?`<span class="pad">${g.slice(0,p)}</span>`:''}${g.slice(p)}</span>${digits?`<span class="gd">${digits[i]}</span>`:''}</span>`; }).join('');
+}
+function splitGroups(bin,n){ const L=Math.ceil(bin.length/n)*n, p=bin.padStart(L,'0'); const gs=[]; for(let i=0;i<L;i+=n) gs.push(p.slice(i,i+n)); return {gs,pad:L-bin.length}; }
+function groupsHTML(v,from,to){
+  const bin=toBase(v,2);
+  if(from===2){ const n=gsize(to), {gs,pad}=splitGroups(bin,n), ds=gs.map(g=>DIG[parseInt(g,2)]);
+    return `<p>Χωρίζουμε τον δυαδικό σε ${n===3?'τριάδες':'τετράδες'} από τα δεξιά${pad?' και συμπληρώνουμε μηδενικά αριστερά του MSB':''}. Κάθε ομάδα γίνεται ένα ${NAME[to]} ψηφίο.</p>
+      <div class="flow"><div class="flowrow"><span class="tag">${n===3?'Τριάδες':'Τετράδες'} bits</span>${groupBoxes(gs,ds,pad)}</div></div>
+      <div class="res">${sub(spaced(bin),2)} = <b>${sub(toBase(v,to),to)}</b></div>`; }
+  if(to===2){ const n=gsize(from), s=toBase(v,from), gs=s.split('').map(c=>digVal(c).toString(2).padStart(n,'0'));
+    return `<p>Κάθε ${NAME[from]} ψηφίο γράφεται με ${n} bits.</p>
+      <div class="flow"><div class="flowrow"><span class="tag">${n} bits ανά ψηφίο</span>${groupBoxes(gs,s.split(''),0).replace(/<span class="gd">/g,'<span class="gd" style="order:-1">')}</div></div>
+      <div class="res">${sub(s,from)} = <b>${sub(spaced(bin),2)}</b></div><p class="note">Τα μηδενικά στην αρχή μπορούν να παραλειφθούν.</p>`; }
+  // 8 <-> 16 through binary
+  const n1=gsize(from), n2=gsize(to), s=toBase(v,from);
+  const g1=s.split('').map(c=>digVal(c).toString(2).padStart(n1,'0'));
+  const {gs,pad}=splitGroups(bin,n2), ds=gs.map(g=>DIG[parseInt(g,2)]);
+  return `<p>Περνάμε από το δυαδικό: κάθε ${NAME[from]} ψηφίο → ${n1} bits, και μετά ξαναχωρίζουμε σε ${n2===3?'τριάδες':'τετράδες'} από τα δεξιά.</p>
+    <div class="flow"><div class="flowrow"><span class="tag">${NAME[from]}</span>${groupBoxes(g1,s.split(''),0).replace(/<span class="gd">/g,'<span class="gd" style="order:-1">')}</div>
+    <div class="arrow">↓ ξαναχωρίζουμε</div>
+    <div class="flowrow"><span class="tag">${NAME[to]}</span>${groupBoxes(gs,ds,pad)}</div></div>
+    <div class="res">${sub(s,from)} = <b>${sub(toBase(v,to),to)}</b></div>`;
+}
+function bcdHTML(v,toCode){
+  const ds=String(v).split(''); const gs=ds.map(d=>(+d).toString(2).padStart(4,'0'));
+  let h = toCode ? `<p>Κάθε δεκαδικό ψηφίο γράφεται <b>χωριστά</b> με 4 bits (βάρη 8 4 2 1).</p>`
+                 : `<p>Χωρίζουμε σε τετράδες και κάθε τετράδα γίνεται ένα δεκαδικό ψηφίο (βάρη 8 4 2 1).</p>`;
+  h+=`<table class="t"><tr><th>Δεκαδικό ψηφίο</th>${ds.map(d=>`<td><b>${d}</b></td>`).join('')}</tr><tr><th>BCD</th>${gs.map(g=>`<td>${g}</td>`).join('')}</tr></table>`;
+  h+= toCode ? `<div class="res">${v} → BCD: <b>${gs.join(' ')}</b></div>` : `<div class="res">BCD ${gs.join(' ')} → <b>${v}</b></div>`;
+  h+=`<p class="note">Προσοχή: ο BCD δεν είναι μετατροπή σε δυαδικό. Π.χ. ${v} στο δυαδικό = ${spaced(toBase(v,2))}.</p>`;
+  return h;
+}
+function grayHTML(v){
+  let rows=''; for(let i=0;i<8;i++){ const a=i,b=i+8;
+    rows+=`<tr><td class="${a===v?'hl':''}">${a}</td><td>${a.toString(2).padStart(4,'0')}</td><td>${toGray(a,4)}</td><td>${b}</td><td>${b.toString(2).padStart(4,'0')}</td><td>${toGray(b,4)}</td></tr>`; }
+  let h=`<p>Ο κώδικας Gray (4 bits) για τους αριθμούς 0–15. Κάθε στήλη είναι κατοπτρική ως προς τη μέση της, και ανάμεσα σε δύο διαδοχικούς αριθμούς αλλάζει μόνο ένα bit.</p>`;
+  h+=`<table class="t small"><tr><th>Δεκ.</th><th>Δυαδικός</th><th>Gray</th><th>Δεκ.</th><th>Δυαδικός</th><th>Gray</th></tr>${rows}</table>`;
+  h+=`<div class="res">${v} → Gray: <b>${toGray(v,4)}</b></div>`;
+  return h.replace(`<td class="hl">${v}</td>`, `<td style="background:var(--accent-soft);font-weight:bold">${v}</td>`);
+}
+
+// ================= CONVERTER =================
+let value=178, width=8, method='w', mbase=16, countTimer=null;
+const inputs={10:$('in10'),2:$('in2'),16:$('in16')};
+const MAX=65535;
+function fmt(k,v){
+  switch(k){ case 10: return String(v); case 2: return spaced(v.toString(2).padStart(width,'0'));
+    case 8: return toBase(v,8); case 16: return toBase(v,16);
+    case 'bcd': return toBCD(v); case 'gray': return spaced(toGray(v,width)); }
+}
+function renderConverter(except){
+  if(value>255 && width===8) setWidth(16,true);
+  for(const k in inputs){ const key = isNaN(k)?k:+k; const card=inputs[k].parentElement;
+    if(key!==except){ inputs[k].value=fmt(key,value); card.classList.remove('err');
+      card.querySelector('.ex').textContent=card.querySelector('.ex').dataset.def; } }
+  // bits
+  const bc=$('bits'); bc.innerHTML='';
+  for(let i=width-1;i>=0;i--){ const on=(value>>i)&1; const d=document.createElement('div');
+    d.className='bit'+(on?' one':'')+((i%4===3 && i!==width-1)?' gap':'');
+    d.innerHTML=`<span class="w">2<sup>${i}</sup>=${2**i}</span><span class="b">${on}</span><span class="c">${on?'+'+(2**i):''}</span>`;
+    d.title = (i===width-1?'MSB · ':'')+(i===0?'LSB · ':'')+'θέση '+i;
+    d.onclick=()=>{ value ^= (1<<i); renderConverter(); };
+    bc.appendChild(d); }
+  const bin=value.toString(2);
+  const b=splitGroups(bin,4);
+  $('grp4').innerHTML=groupBoxes(b.gs,b.gs.map(g=>DIG[parseInt(g,2)]),b.pad)+`<span class="g" style="border:none;background:none"><span class="gb">&nbsp;</span><span class="gd">= ${sub(toBase(value,16),16)}</span></span>`;
+  $('status').innerHTML = `Τιμή: <b>${value}</b> · MSB = θέση ${width-1}, LSB = θέση 0`;
+  renderSteps();
+}
+document.querySelectorAll('.nc .ex').forEach(e=>e.dataset.def=e.textContent);
+function setWidth(w,silent){ width=w; document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',+b.dataset.w===w)); if(!silent) renderConverter(); }
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ const w=+b.dataset.w; if(w===8 && value>255) value&=255; setWidth(w); });
+for(const k in inputs){
+  const key=isNaN(k)?k:+k, inp=inputs[k], card=inp.parentElement, ex=card.querySelector('.ex');
+  inp.addEventListener('input',()=>{
+    const s=clean(inp.value);
+    const fail=msg=>{ card.classList.add('err'); ex.textContent=msg; };
+    if(s===''){ fail('γράψτε έναν αριθμό'); return; }
+    if(!VALID[key].test(s)){ fail(key===2||key==='bcd'||key==='gray'?'επιτρέπονται μόνο 0 και 1':key===8?'επιτρέπονται μόνο τα ψηφία 0–7':key===16?'επιτρέπονται 0–9 και A–F':'επιτρέπονται μόνο τα ψηφία 0–9'); return; }
+    let v;
+    if(key==='bcd'){ v=fromBCD(s); if(v===null){ fail('τετράδα > 1001: δεν υπάρχει στον BCD'); return; } }
+    else if(key==='gray') v=fromGray(s);
+    else v=parseInt(s,key);
+    if(v>MAX){ fail('μέγιστη τιμή 65535 (16 bits)'); return; }
+    value=v; card.classList.remove('err'); ex.textContent=ex.dataset.def; renderConverter(key);
+  });
+  inp.addEventListener('blur',()=>renderConverter());
+  inp.addEventListener('focus',()=>{ document.querySelectorAll('.nc').forEach(c=>c.classList.toggle('main',c===card)); stopCount(); });
+}
+$('incBtn').onclick=()=>{ value=(value+1)%((width===8?256:65536)); renderConverter(); };
+$('decBtn').onclick=()=>{ const m=(width===8?256:65536); value=(value-1+m)%m; renderConverter(); };
+$('zeroBtn').onclick=()=>{ stopCount(); value=0; renderConverter(); };
+function stopCount(){ if(countTimer){ clearInterval(countTimer); countTimer=null; } $('countBtn').textContent='▶ Αρίθμηση'; }
+$('countBtn').onclick=()=>{ if(countTimer){ stopCount(); return; }
+  $('countBtn').textContent='⏸ Παύση'; countTimer=setInterval(()=>$('incBtn').onclick(),800); };
+// methods
+document.querySelectorAll('#methods .chip').forEach(c=>c.onclick=()=>{
+  if(c.dataset.m){ method=c.dataset.m; } else { mbase=+c.dataset.b; }
+  if(method==='g' && mbase===2) mbase=16;
+  renderSteps(); });
+function renderSteps(){
+  document.querySelectorAll('#methods .chip').forEach(c=>{
+    if(c.dataset.m) c.classList.toggle('on',c.dataset.m===method);
+    else { c.classList.toggle('on',+c.dataset.b===mbase); c.disabled = (method==='g' && c.dataset.b==='2'); } });
+  let h='';
+  if(method==='w') h=weightsHTML(value,mbase);
+  else if(method==='d') h=divHTML(value,mbase);
+  else h=groupsHTML(value,2,mbase);
+  $('steps').innerHTML=h;
+}
+
+// ================= CHALLENGE =================
+const TYPES={
+  d2:[[10,2],[2,10]], d16:[[10,16],[16,10]], grp:[[2,16],[16,2]]
+};
+const RANGE={e:[2,15],m:[16,255],h:[256,4095]};
+const BCDR={e:[10,99],m:[100,999],h:[1000,9999]};
+const ROUND=10;
+let Q=null, qi=0, results=[], ok=0, bad=0, streak=0, answered=false, hinted=false;
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function pick(){
+  const t=$('selType').value, lvl=$('selLvl').value;
+  const pool = t==='mix' ? Object.values(TYPES).flat() : TYPES[t];
+  let from,to,v, tries=0;
+  do{ [from,to]=pool[rnd(0,pool.length-1)];
+    const r=RANGE[lvl]; v=rnd(r[0],r[1]);
+    tries++;
+  } while(Q && Q.v===v && Q.from===from && tries<20);
+  return {from,to,v};
+}
+function showVal(k,v){
+  switch(k){ case 2: return sub(spaced(toBase(v,2)),2); case 8: case 10: case 16: return sub(toBase(v,k),k);
+    case 'bcd': return `<span style="font-size:.8em">BCD: ${toBCD(v)}</span>`; }
+}
+function newRound(){ qi=0; results=[]; ok=0; bad=0; streak=0; updScore(); nextQ(); }
+function nextQ(){
+  if(qi>=ROUND){ finalScreen(); return; }
+  Q=pick(); answered=false; hinted=false;
+  const inp=$('answer'); inp.value=''; inp.className=''; inp.disabled=false;
+  $('fb').className='fb'; $('fb').innerHTML='';
+  $('qnum').textContent=`Άσκηση ${qi+1} από ${ROUND}`;
+  $('qtext').innerHTML=`Μετατρέψτε ${Q.from==='bcd'?'τον αριθμό BCD':'τον αριθμό'} στο${Q.to==='bcd'||Q.to==='gray'?'ν':''} <b>${NAME[Q.to]}</b>${Q.to==='gray'?' (4 bits)':''}`;
+  $('qval').innerHTML=showVal(Q.from,Q.v);
+  $('ansbase').innerHTML = (typeof Q.to==='number') ? `<sub>${Q.to}</sub>` : '';
+  inp.placeholder = Q.to===2||Q.to==='bcd'||Q.to==='gray' ? 'π.χ. 1011' : Q.to===16 ? 'π.χ. 2F' : 'απάντηση';
+  $('checkBtn').disabled=false; $('hintBtn').disabled=false; $('nextBtn').disabled=true;
+  $('sol').innerHTML='<span class="empty">Η λύση βήμα βήμα εμφανίζεται εδώ, αφού απαντήσετε.</span>';
+  renderDots(); $('qcard').querySelector('.ansrow').style.display=''; $('qcard').querySelector('.qbtns').style.display='';
+  inp.focus();
+}
+function correctText(){ const {to,v}=Q;
+  if(to==='bcd') return toBCD(v); if(to==='gray') return toGray(v,4); if(to===2) return spaced(toBase(v,2)); return toBase(v,to); }
+function check(){
+  if(answered) return;
+  const s=clean($('answer').value); const fb=$('fb');
+  if(!s){ fb.className='fb hint'; fb.textContent='Γράψτε πρώτα την απάντησή σας.'; return; }
+  const k=Q.to;
+  if(!VALID[k].test(s)){ fb.className='fb hint';
+    fb.textContent = k===2||k==='bcd'||k==='gray' ? 'Στην απάντηση επιτρέπονται μόνο τα ψηφία 0 και 1.' : k===8 ? 'Το οκταδικό έχει μόνο τα ψηφία 0–7.' : k===16 ? 'Το δεκαεξαδικό έχει τα ψηφία 0–9 και A–F.' : 'Το δεκαδικό έχει μόνο τα ψηφία 0–9.'; return; }
+  let given;
+  if(k==='bcd'){ given=fromBCD(s); if(given===null){ fb.className='fb hint'; fb.textContent='Κάθε τετράδα BCD πρέπει να είναι από 0000 έως 1001.'; return; } }
+  else if(k==='gray') { const g=s.replace(/^0+(?=.)/,''); given = g.length<=4 ? fromGray(g) : -1; }
+  else given=parseInt(s,k);
+  answered=true; const right = given===Q.v;
+  results.push(right); qi++;
+  if(right){ ok++; streak++; } else { bad++; streak=0; }
+  $('answer').className=right?'ok':'bad'; $('answer').disabled=true;
+  fb.className='fb '+(right?'ok':'bad');
+  fb.innerHTML = right ? (streak>=3?`✔ Σωστά! ${streak} σωστές στη σειρά 🔥`:'✔ Σωστά!')
+                       : `✘ Λάθος. Η σωστή απάντηση είναι <b>${(typeof k==='number')?sub(correctText(),k):correctText()}</b>`;
+  $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('nextBtn').disabled=false;
+  $('nextBtn').textContent = qi>=ROUND ? 'Αποτέλεσμα →' : 'Επόμενη →';
+  $('sol').innerHTML=solution(); updScore(); renderDots(); $('nextBtn').focus();
+}
+function solution(){ const {from,to,v}=Q;
+  if(to==='bcd') return bcdHTML(v,true); if(from==='bcd') return bcdHTML(v,false);
+  if(to==='gray') return grayHTML(v);
+  if(to===10) return weightsHTML(v,from); if(from===10) return divHTML(v,to);
+  return groupsHTML(v,from,to); }
+function hint(){ const {from,to}=Q; let t;
+  if(to==='bcd') t='Γράψτε κάθε δεκαδικό ψηφίο χωριστά με 4 bits (βάρη 8 4 2 1).';
+  else if(from==='bcd') t='Χωρίστε σε τετράδες· κάθε τετράδα είναι ένα δεκαδικό ψηφίο.';
+  else if(to==='gray') t='Θυμηθείτε τον κατοπτρικό πίνακα: 0→0000, 1→0001, 2→0011, 3→0010, 4→0110 … Στο 8 το MSB γίνεται 1 και τα υπόλοιπα «καθρεφτίζονται».';
+  else if(to===10) t=`Πολλαπλασιάστε κάθε ψηφίο με το βάρος της θέσης του (δυνάμεις του ${from}: ${[3,2,1,0].map(k=>Math.pow(from,k)).join(', ')} …) και προσθέστε.`;
+  else if(from===10) t=`Κάντε διαδοχικές διαιρέσεις με το ${to}. Τα υπόλοιπα, από κάτω προς τα πάνω, είναι τα ψηφία.${to===2?' Ή βρείτε ποιες δυνάμεις του 2 (128, 64, 32, 16, 8, 4, 2, 1) αθροίζουν τον αριθμό.':''}`;
+  else if(from===2) t=`Χωρίστε σε ${to===8?'τριάδες':'τετράδες'} από τα δεξιά· κάθε ομάδα γίνεται ένα ψηφίο.`;
+  else if(to===2) t=`Γράψτε κάθε ψηφίο με ${from===8?3:4} bits.`;
+  else t=`Περάστε από το δυαδικό: κάθε ψηφίο → ${from===8?3:4} bits, μετά χωρίστε σε ${to===8?'τριάδες':'τετράδες'} από τα δεξιά.`;
+  $('fb').className='fb hint'; $('fb').innerHTML='💡 '+t; hinted=true; $('answer').focus();
+}
+function renderDots(){ let h='';
+  for(let i=0;i<ROUND;i++){ const r=results[i]; h+=`<span class="dot${r===true?' ok':r===false?' bad':''}${i===results.length&&!answered?' cur':''}">${r===true?'✓':r===false?'✗':i+1}</span>`; }
+  $('dots').innerHTML=h; }
+function updScore(){ $('scOk').textContent=ok; $('scBad').textContent=bad; $('scSt').textContent=streak; }
+function finalScreen(){
+  const pct=ok/ROUND, msg = pct===1?'Τέλεια! Όλες σωστές! 🏆':pct>=.8?'Πολύ καλά! 👏':pct>=.5?'Καλά, συνεχίστε την εξάσκηση. 💪':'Δείτε ξανά τα βήματα στον μετατροπέα και δοκιμάστε πάλι. 📘';
+  $('qnum').textContent='Τέλος γύρου'; $('qtext').innerHTML='';
+  $('qval').innerHTML=`<div class="final"><div class="big">${ok} / ${ROUND}</div>${msg}</div>`;
+  $('qcard').querySelector('.ansrow').style.display='none';
+  $('fb').className='fb'; $('fb').innerHTML=`<button class="primary" id="againBtn" style="font-size:18px;padding:10px 24px">↻ Νέος γύρος</button>`;
+  $('againBtn').onclick=newRound; $('againBtn').focus();
+  $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('nextBtn').disabled=true; $('qcard').querySelector('.qbtns').style.display='none';
+}
+$('checkBtn').onclick=check; $('hintBtn').onclick=hint; $('nextBtn').onclick=nextQ;
+$('answer').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); answered?nextQ():check(); } });
+$('nextBtn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); nextQ(); } });
+$('selType').onchange=newRound; $('selLvl').onchange=newRound;
+
+renderConverter();
+</script>
+</body>
+</html>
