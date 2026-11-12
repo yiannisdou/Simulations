@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Φύλλο εργασίας: Μετατροπές αριθμητικών συστημάτων</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --text:#1d2433; --muted:#5b6475; --line:#d5dbe5;
+  --accent:#1f5fbf; --accent-soft:#e3edfb; --one:#e8411f; --zero:#8a94a6;
+  --ok:#1e8e3e; --ok-soft:#e3f4e8; --bad:#c62828; --bad-soft:#fdeaea; --warn-soft:#fff4e0; --chip:#eef1f6;
+}
+body.dark{
+  --bg:#121721; --panel:#1b2230; --text:#e6eaf2; --muted:#9aa4b6; --line:#2e3746;
+  --accent:#6ea8ff; --accent-soft:#22324d; --one:#ff6a4a; --zero:#6f7a8d;
+  --ok:#5fd17f; --ok-soft:#1c3324; --bad:#ff7b7b; --bad-soft:#3a2024; --warn-soft:#3a3020; --chip:#263042;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.4}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px 40px}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--line)}
+.toprow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:23px;margin:0;flex:1;min-width:260px;line-height:1.2}
+a.back{color:var(--accent);text-decoration:none;font-size:15px}
+button{font-family:inherit;font-size:16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:6px 14px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:bold}
+body.dark button.primary{color:#0d1420}
+#themeBtn{min-width:150px}
+.prog{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:15px;color:var(--muted)}
+.bar{flex:1;height:10px;background:var(--chip);border-radius:6px;overflow:hidden}
+.bar div{height:100%;width:0;background:var(--accent);transition:width .3s}
+.scoreTop b{color:var(--text);font-size:17px}
+.intro{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:14px 0}
+.intro p{margin:4px 0}
+.who{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.who label{display:flex;align-items:center;gap:6px;font-weight:bold;font-size:15px}
+.who input{font-family:inherit;font-size:16px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}
+.remind{background:var(--accent-soft);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:15px}
+.remind ul{margin:4px 0 0 18px;padding:0}
+.q{scroll-margin-top:110px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
+.q.done-ok{border-left-color:var(--ok)}
+.q.done-bad{border-left-color:var(--bad)}
+.qh{display:flex;gap:10px;align-items:baseline}
+.qn{background:var(--accent);color:#fff;border-radius:50%;min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px}
+body.dark .qn{color:#0d1420}
+.qt{font-size:18px;flex:1}
+.qtype{font-size:13px;color:var(--muted);white-space:nowrap}
+.qb{margin:10px 0 6px 40px}
+sub{font-size:.65em}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;padding:7px 12px}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:bold}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.tf{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+.tf .st{padding:4px 0}
+.tfb{display:flex;gap:6px}
+.tfb button{min-width:80px}
+.tfb button.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:bold}
+.tfb button.right{border-color:var(--ok);background:var(--ok-soft)}
+.tfb button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+input.ans,select.ans{font-family:inherit;font-size:19px;font-weight:bold;padding:4px 8px;border:2px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);text-align:center}
+input.ans{width:150px;letter-spacing:1px}
+input.ans.wide{width:230px}
+input.ans.cell{width:64px;font-size:17px;padding:3px 4px}
+input.ans:focus,select.ans:focus{outline:none;border-color:var(--accent)}
+.ans.right{border-color:var(--ok);background:var(--ok-soft)}
+.ans.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:20px;margin:4px 0}
+table.g{border-collapse:collapse;margin:4px 0 8px}
+table.g td,table.g th{border:1px solid var(--line);padding:4px 8px;text-align:center;min-width:56px}
+table.g th{background:var(--chip);color:var(--muted);font-size:15px}
+table.g td.given{font-weight:bold;font-size:19px}
+.match{display:grid;grid-template-columns:repeat(6,auto);gap:8px 14px;justify-content:start}
+.match .m{display:flex;align-items:center;gap:6px;font-size:22px;font-weight:bold}
+.leds{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.led{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;user-select:none}
+.led .lamp{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--chip)}
+.led.on .lamp{background:#ff4b2b;border-color:#c8321a;box-shadow:0 0 12px 3px rgba(255,75,43,.55)}
+.led .lb{font-size:13px;color:var(--muted)}
+.led .bv{font-size:18px;font-weight:bold;color:var(--zero)}
+.led.on .bv{color:var(--one)}
+.leds.locked .led{cursor:default}
+.actions{display:flex;gap:8px;margin:8px 0 0 40px;flex-wrap:wrap;align-items:center}
+.att{font-size:14px;color:var(--muted)}
+.fb{margin:8px 0 0 40px;padding:8px 12px;border-radius:8px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.hint{background:var(--warn-soft);color:var(--text)}
+.fb.info{background:var(--warn-soft);color:var(--text)}
+.expl{margin:8px 0 0 40px;padding:8px 12px;border-radius:8px;background:var(--chip);display:none;font-size:16px}
+.expl.show{display:block}
+.expl b{color:var(--accent)}
+.final{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:16px;margin:18px 0;text-align:center;display:none}
+.final.show{display:block}
+.final .big{font-size:46px;font-weight:bold;color:var(--accent)}
+.final .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.foot{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+@media (max-width:640px){ .qb,.actions,.fb,.expl{margin-left:0} .match{grid-template-columns:repeat(3,auto)} }
+@media print{
+  body,body.dark{background:#fff;color:#000;--panel:#fff;--bg:#fff;--text:#000;--muted:#444;--line:#999;--chip:#f2f2f2;--accent:#000;--accent-soft:#f2f2f2;--ok:#000;--ok-soft:#fff;--bad:#000;--bad-soft:#fff}
+  .top{position:static} button,.actions,.foot,a.back,#themeBtn{display:none!important}
+  .q{break-inside:avoid;border-left-width:2px} .opt.sel,.tfb button.sel{display:inline-block!important}
+  .expl{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="toprow">
+      <a class="back" id="backLink" href="index.html">← Όλες οι προσομοιώσεις</a>
+      <h1>Φύλλο εργασίας: Μετατροπές αριθμητικών συστημάτων</h1>
+      <button id="themeBtn">🌙 Σκούρο θέμα</button>
+    </div>
+    <div class="prog">
+      <span id="progTxt">0 από 12 ερωτήσεις</span>
+      <div class="bar"><div id="progBar"></div></div>
+      <span class="scoreTop">Βαθμός: <b id="scoreTop">0</b> / 12</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    <p><b>Δεκαδικό, δυαδικό και δεκαεξαδικό σύστημα</b> · Κεφάλαιο 2, ενότητες 2.1–2.3 και 2.5</p>
+    <p>Απαντήστε στις ερωτήσεις και πατήστε «Έλεγχος». Έχετε <b>2 προσπάθειες</b> σε κάθε ερώτηση: σωστό με την 1η = 1 μονάδα, με τη 2η = μισή μονάδα. Το 💡 δίνει βοήθεια χωρίς να χάνετε μονάδες.</p>
+    <div class="remind"><b>Θυμάμαι</b>
+      <ul>
+        <li>Δυαδικό (βάση 2): ψηφία 0, 1 · βάρη θέσεων 1, 2, 4, 8, 16, 32, 64, 128 …</li>
+        <li>Δεκαεξαδικό (βάση 16): ψηφία 0–9 και A=10, B=11, C=12, D=13, E=14, F=15 · βάρη 1, 16, 256 …</li>
+        <li>Δεκαδικό → άλλη βάση: διαδοχικές διαιρέσεις, τα υπόλοιπα από κάτω προς τα πάνω.</li>
+        <li>Δυαδικό ↔ δεκαεξαδικό: κάθε δεκαεξαδικό ψηφίο = 4 bits (τετράδα), χωρίζουμε από τα δεξιά.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="qs"></div>
+
+  <div class="final" id="final">
+    <div>Ολοκληρώσατε το φύλλο εργασίας!</div>
+    <div class="big" id="finalScore"></div>
+    <div id="finalMsg"></div>
+    <div class="btns"><button class="primary" id="printBtn">🖨 Εκτύπωση / αποθήκευση PDF</button><button id="restartBtn">↻ Από την αρχή</button></div>
+  </div>
+  <div class="foot"><button id="restartBtn2">↻ Από την αρχή</button></div>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const S=(n,b)=>`(${n})<sub>${b}</sub>`;
+const norm=s=>String(s).replace(/\s+/g,'').toUpperCase();
+const VALID={2:/^[01]+$/,10:/^[0-9]+$/,16:/^[0-9A-F]+$/};
+const BASENAME={2:'δυαδικό',10:'δεκαδικό',16:'δεκαεξαδικό'};
+// compare a typed answer in a base with an expected value (leading zeros allowed)
+function sameVal(s,base,expected){ return parseInt(s,base)===parseInt(expected,base); }
+
+// ---------------- theme ----------------
+function setTheme(d){ document.body.classList.toggle('dark',d); $('themeBtn').textContent=d?'☀️ Φωτεινό θέμα':'🌙 Σκούρο θέμα';
+  try{localStorage.setItem('gateSimTheme',d?'dark':'light')}catch(e){} $('backLink').href='index.html#'+(d?'dark':'light'); }
+(function(){ let t; if(location.hash==='#dark') t=true; else if(location.hash==='#light') t=false;
+  else { try{ t=localStorage.getItem('gateSimTheme')==='dark'; }catch(e){ t=false; } } setTheme(!!t); })();
+$('themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));
+try{ if(window.self!==window.top) $('backLink').style.display='none'; }catch(e){ $('backLink').style.display='none'; }
+
+// ---------------- questions ----------------
+// field: {base, a}  → an input whose value must equal a (in that base)
+const QUESTIONS=[
+ {type:'mc', kind:'Πολλαπλή επιλογή',
+  t:'Ποια ψηφία χρησιμοποιεί το δεκαεξαδικό σύστημα;',
+  opts:['0 έως 9','0 έως 15','0 έως 9 και A έως F','0 έως 9 και A έως G'], a:2,
+  hint:'Η βάση είναι 16, άρα χρειάζονται 16 διαφορετικά σύμβολα, το καθένα με ένα μόνο χαρακτήρα.',
+  ex:'Το δεκαεξαδικό έχει 16 ψηφία: <b>0–9 και A(10), B(11), C(12), D(13), E(14), F(15)</b>. Το «15» δεν είναι ψηφίο, γιατί γράφεται με δύο χαρακτήρες.'},
+ {type:'tf', kind:'Σωστό ή Λάθος',
+  t:'Χαρακτηρίστε κάθε πρόταση ως Σωστή ή Λάθος.',
+  items:[['Το LSB είναι το bit με τη μεγαλύτερη αξία.',false],
+         ['Με 4 bits μετράμε από το 0 μέχρι και το 15.',true],
+         ['Κάθε δεκαεξαδικό ψηφίο αντιστοιχεί σε 4 bits.',true],
+         [`Ο αριθμός ${S(10,16)} είναι ίσος με τον ${S(10,10)}.`,false]],
+  hint:'Το LSB είναι το τελευταίο bit δεξιά. Στο δεκαεξαδικό, η θέση του «1» στο 10 έχει βάρος 16.',
+  ex:'1. <b>Λάθος</b>: το LSB έχει τη <i>μικρότερη</i> αξία (βάρος 2<sup>0</sup>=1). 2. <b>Σωστό</b>: 2<sup>4</sup>=16 αριθμοί, από 0 έως 15. 3. <b>Σωστό</b>: 4 bits = 16 συνδυασμοί. 4. <b>Λάθος</b>: (10)<sub>16</sub> = 1×16 + 0 = 16.'},
+ {type:'grid', kind:'Συμπλήρωση πίνακα',
+  t:`Μετατρέψτε τον ${S(101101,2)} σε δεκαδικό. Συμπληρώστε τα βάρη των θέσεων και το αποτέλεσμα.`,
+  head:['Θέση','5','4','3','2','1','0'],
+  rows:[['Bit','1','0','1','1','0','1'],
+        ['Βάρος',{base:10,a:'32'},{base:10,a:'16'},{base:10,a:'8'},{base:10,a:'4'},{base:10,a:'2'},{base:10,a:'1'}]],
+  after:{pre:`${S(101101,2)} = (`, field:{base:10,a:'45'}, post:')<sub>10</sub>'},
+  hint:'Τα βάρη είναι δυνάμεις του 2, από δεξιά: 1, 2, 4, 8, 16, 32. Προσθέστε τα βάρη των θέσεων που έχουν 1.',
+  ex:'Βάρη: 32, 16, 8, 4, 2, 1. Bits με 1: θέσεις 5, 3, 2, 0 → <b>32 + 8 + 4 + 1 = 45</b>.'},
+ {type:'match', kind:'Αντιστοίχιση',
+  t:'Αντιστοιχίστε κάθε δεκαεξαδικό ψηφίο με τη δεκαδική του τιμή.',
+  letters:['C','A','F','D','B','E'],
+  hint:'Ξεκινάμε από το A = 10 και συνεχίζουμε με τη σειρά του αλφαβήτου.',
+  ex:'<b>A=10, B=11, C=12, D=13, E=14, F=15</b>.'},
+ {type:'grid', kind:'Συμπλήρωση πίνακα',
+  t:`Μετατρέψτε τον ${S(37,10)} σε δυαδικό με διαδοχικές διαιρέσεις δια 2.`,
+  head:['Διαιρετέος','Πηλίκο (÷ 2)','Υπόλοιπο'],
+  rows:[['37',{base:10,a:'18'},{base:10,a:'1'}],
+        [{base:10,a:'18'},{base:10,a:'9'},{base:10,a:'0'}],
+        [{base:10,a:'9'},{base:10,a:'4'},{base:10,a:'1'}],
+        [{base:10,a:'4'},{base:10,a:'2'},{base:10,a:'0'}],
+        [{base:10,a:'2'},{base:10,a:'1'},{base:10,a:'0'}],
+        [{base:10,a:'1'},{base:10,a:'0'},{base:10,a:'1'}]],
+  after:{pre:`${S(37,10)} = (`, field:{base:2,a:'100101'}, post:')<sub>2</sub>', wide:true},
+  hint:'Κάθε πηλίκο γίνεται ο επόμενος διαιρετέος. Σταματάμε όταν το πηλίκο γίνει 0. Τα υπόλοιπα διαβάζονται από κάτω προς τα πάνω.',
+  ex:'Υπόλοιπα από πάνω προς τα κάτω: 1, 0, 1, 0, 0, 1. Από κάτω προς τα πάνω: <b>100101</b>. Έλεγχος: 32 + 4 + 1 = 37.'},
+ {type:'input', kind:'Μετατροπή',
+  t:`Μετατρέψτε τον δεκαεξαδικό ${S('3C',16)} σε δεκαδικό.`,
+  pre:`${S('3C',16)} = (`, field:{base:10,a:'60'}, post:')<sub>10</sub>',
+  hint:'Το 3 βρίσκεται στη θέση με βάρος 16 και το C (=12) στη θέση με βάρος 1.',
+  ex:'3 × 16 + 12 × 1 = 48 + 12 = <b>60</b>.'},
+ {type:'input', kind:'Μετατροπή',
+  t:`Μετατρέψτε τον ${S(200,10)} σε δεκαεξαδικό.`,
+  pre:`${S(200,10)} = (`, field:{base:16,a:'C8'}, post:')<sub>16</sub>',
+  hint:'Διαιρέστε το 200 με το 16. Το πηλίκο και το υπόλοιπο είναι τα δύο ψηφία (θυμηθείτε: 12 = C).',
+  ex:'200 ÷ 16 = 12, υπόλοιπο 8 → 12 ÷ 16 = 0, υπόλοιπο 12 = C. Από κάτω προς τα πάνω: <b>C8</b>. Έλεγχος: 12 × 16 + 8 = 200.'},
+ {type:'grid', kind:'Ομάδες bits',
+  t:`Μετατρέψτε τον ${S('1101 0110',2)} σε δεκαεξαδικό. Γράψτε το ψηφίο κάθε τετράδας.`,
+  head:['Τετράδα bits','1101','0110'],
+  rows:[['Δεκαεξαδικό ψηφίο',{base:16,a:'D'},{base:16,a:'6'}]],
+  hint:'Με βάρη 8 4 2 1: 1101 = 8 + 4 + 1. Αν βγει πάνω από 9, γράψτε το γράμμα.',
+  ex:'1101 = 8+4+1 = 13 = D και 0110 = 4+2 = 6. Άρα <b>(D6)<sub>16</sub></b>.'},
+ {type:'input', kind:'Μετατροπή',
+  t:`Μετατρέψτε τον δεκαεξαδικό ${S('9E',16)} σε δυαδικό.`,
+  pre:`${S('9E',16)} = (`, field:{base:2,a:'10011110'}, post:')<sub>2</sub>', wide:true,
+  hint:'Γράψτε κάθε ψηφίο με 4 bits: 9 = 8 + 1, E = 14 = 8 + 4 + 2.',
+  ex:'9 → 1001 και E (14) → 1110. Άρα <b>1001 1110</b>.'},
+ {type:'mc', kind:'Πολλαπλή επιλογή',
+  t:'Ποιος από τους παρακάτω αριθμούς είναι ο <b>μεγαλύτερος</b>;',
+  opts:[S(11001,2), S('1A',16), S(24,10), S(10111,2)], a:1,
+  hint:'Μετατρέψτε όλους στο δεκαδικό και συγκρίνετε.',
+  ex:`${S(11001,2)} = 25 · <b>${S('1A',16)} = 26</b> · ${S(24,10)} = 24 · ${S(10111,2)} = 23.`},
+ {type:'bits', kind:'Εφαρμογή',
+  t:`Ένας μικροελεγκτής οδηγεί 8 LED (αναμμένο = 1). Πατήστε τα LED ώστε να δείχνουν τον αριθμό ${S('A5',16)}.`,
+  a:0xA5,
+  hint:'Μετατρέψτε κάθε δεκαεξαδικό ψηφίο σε 4 bits: A → ????, 5 → ????. Το LED7 είναι το MSB.',
+  ex:'A = 1010 και 5 = 0101, άρα <b>1010 0101</b>: ανάβουν τα LED 7, 5, 2 και 0. (Στο δεκαδικό: 165.)'},
+ {type:'input', kind:'Σκέψη',
+  t:'Πόσα bits χρειάζονται <b>τουλάχιστον</b> για να γράψουμε τον δεκαδικό αριθμό 300 στο δυαδικό;',
+  pre:'', field:{base:10,a:'9'}, post:' bits',
+  hint:'Με n bits φτάνουμε μέχρι το 2<sup>n</sup> − 1. Δοκιμάστε: 2<sup>8</sup> − 1 = 255. Φτάνει;',
+  ex:'Με 8 bits φτάνουμε μέχρι το 255 &lt; 300. Με <b>9 bits</b> φτάνουμε μέχρι το 2<sup>9</sup> − 1 = 511 ≥ 300.'}
+];
+const N=QUESTIONS.length;
+const state=QUESTIONS.map(()=>({tries:0,done:false,pts:0}));
+
+// ---------------- rendering ----------------
+function fieldHTML(f,id,cls){ return `<input class="ans ${cls||''}" id="${id}" autocomplete="off" spellcheck="false" data-base="${f.base}" data-a="${f.a}" placeholder="${f.base===10?'':'…'}">`; }
+function render(){
+  const box=$('qs'); box.innerHTML='';
+  QUESTIONS.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='q'; d.id='q'+i;
+    let body='';
+    if(q.type==='mc'){ body=`<div class="opts">${q.opts.map((o,j)=>`<button class="opt" data-j="${j}">${'αβγδ'[j]}) ${o}</button>`).join('')}</div>`; }
+    else if(q.type==='tf'){ body=`<div class="tf">${q.items.map((it,j)=>`<div class="st">${j+1}. ${it[0]}</div><div class="tfb" data-j="${j}"><button data-v="1">Σωστό</button><button data-v="0">Λάθος</button></div>`).join('')}</div>`; }
+    else if(q.type==='grid'){ let k=0;
+      body=`<table class="g"><tr>${q.head.map(h=>`<th>${h}</th>`).join('')}</tr>${q.rows.map(r=>`<tr>${r.map((c,j)=>typeof c==='string'?(j===0&&isNaN(c)?`<th>${c}</th>`:`<td class="given">${c}</td>`):`<td>${fieldHTML(c,`q${i}f${k++}`,'cell')}</td>`).join('')}</tr>`).join('')}</table>`;
+      if(q.after) body+=`<div class="line"><span>${q.after.pre}</span>${fieldHTML(q.after.field,`q${i}f${k++}`,q.after.wide?'wide':'')}<span>${q.after.post}</span></div>`; }
+    else if(q.type==='input'){ body=`<div class="line"><span>${q.pre}</span>${fieldHTML(q.field,`q${i}f0`,q.wide?'wide':'')}<span>${q.post}</span></div>`; }
+    else if(q.type==='match'){ body=`<div class="match">${q.letters.map((L,j)=>`<div class="m">${L} = <select class="ans" id="q${i}f${j}" data-a="${10+'ABCDEF'.indexOf(L)}"><option value="">–</option>${[10,11,12,13,14,15].map(v=>`<option>${v}</option>`).join('')}</select></div>`).join('')}</div>`; }
+    else if(q.type==='bits'){ body=`<div class="leds" id="leds${i}">${[7,6,5,4,3,2,1,0].map(b=>`<div class="led" data-b="${b}"><span class="lb">LED${b}</span><span class="lamp"></span><span class="bv">0</span></div>`).join('')}</div><div class="line" style="font-size:17px">Δυαδικό: <b id="bitsTxt${i}">0000 0000</b></div>`; }
+    d.innerHTML=`<div class="qh"><span class="qn">${i+1}</span><span class="qt">${q.t}</span><span class="qtype">${q.kind}</span></div>
+      <div class="qb">${body}</div>
+      <div class="actions"><button class="primary chk">✔ Έλεγχος</button><button class="hnt">💡 Βοήθεια</button><span class="att"></span></div>
+      <div class="fb"></div><div class="expl"><b>Λύση:</b> ${q.ex}</div>`;
+    box.appendChild(d);
+    // wiring
+    if(q.type==='mc') d.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ if(state[i].done) return; d.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===b)); });
+    if(q.type==='tf') d.querySelectorAll('.tfb button').forEach(b=>b.onclick=()=>{ if(state[i].done) return; b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b)); });
+    if(q.type==='bits'){ q.cur=0; d.querySelectorAll('.led').forEach(l=>l.onclick=()=>{ if(state[i].done) return; q.cur^=(1<<+l.dataset.b); drawLeds(i); }); }
+    d.querySelectorAll('input.ans').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); check(i); } }));
+    d.querySelectorAll('.ans').forEach(inp=>inp.addEventListener('input',()=>inp.classList.remove('right','wrong')));
+    d.querySelector('.chk').onclick=()=>check(i);
+    d.querySelector('.hnt').onclick=()=>{ if(state[i].done) return; showFb(i,'hint','💡 '+q.hint); };
+    updAtt(i);
+  });
+}
+function drawLeds(i){ const q=QUESTIONS[i]; const d=$('q'+i);
+  d.querySelectorAll('.led').forEach(l=>{ const on=(q.cur>>+l.dataset.b)&1; l.classList.toggle('on',!!on); l.querySelector('.bv').textContent=on; });
+  const s=q.cur.toString(2).padStart(8,'0'); $('bitsTxt'+i).textContent=s.slice(0,4)+' '+s.slice(4); }
+function showFb(i,cls,html){ const f=$('q'+i).querySelector('.fb'); f.className='fb show '+cls; f.innerHTML=html; }
+function updAtt(i){ const st=state[i], el=$('q'+i).querySelector('.att');
+  el.textContent = st.done ? '' : st.tries===0 ? '2 προσπάθειες' : '1 προσπάθεια ακόμη'; }
+
+// ---------------- checking ----------------
+function check(i){
+  const q=QUESTIONS[i], st=state[i], d=$('q'+i);
+  if(st.done) return;
+  let right;
+  if(q.type==='mc'){ const s=d.querySelector('.opt.sel'); if(!s){ showFb(i,'info','Επιλέξτε πρώτα μία απάντηση.'); return; }
+    right= +s.dataset.j===q.a; }
+  else if(q.type==='tf'){ const groups=[...d.querySelectorAll('.tfb')]; if(groups.some(g=>!g.querySelector('.sel'))){ showFb(i,'info','Απαντήστε σε όλες τις προτάσεις.'); return; }
+    right=true; groups.forEach((g,j)=>{ const v=g.querySelector('.sel').dataset.v==='1'; if(v!==q.items[j][1]) right=false; }); }
+  else if(q.type==='bits'){ right = q.cur===q.a; }
+  else { // inputs / selects
+    const fs=[...d.querySelectorAll('.ans')];
+    if(fs.some(f=>norm(f.value)==='')){ showFb(i,'info','Συμπληρώστε όλα τα κενά.'); return; }
+    for(const f of fs){ if(f.tagName==='INPUT'){ const b=+f.dataset.base; if(!VALID[b].test(norm(f.value))){ f.classList.add('wrong');
+      showFb(i,'info',`Το «${f.value}» δεν είναι ${BASENAME[b]} αριθμός. ${b===2?'Επιτρέπονται μόνο 0 και 1.':b===16?'Επιτρέπονται 0–9 και A–F.':'Επιτρέπονται μόνο τα ψηφία 0–9.'}`); return; } } }
+    right=true;
+    fs.forEach(f=>{ const ok = f.tagName==='SELECT' ? f.value===f.dataset.a : sameVal(norm(f.value),+f.dataset.base,f.dataset.a);
+      f.classList.toggle('right',ok); f.classList.toggle('wrong',!ok); if(!ok) right=false; });
+  }
+  st.tries++;
+  if(right){ st.done=true; st.pts = st.tries===1?1:0.5;
+    showFb(i,'ok', st.tries===1?'✔ Σωστά! (1 μονάδα)':'✔ Σωστά με τη 2η προσπάθεια! (½ μονάδα)'); finishQ(i,true); }
+  else if(st.tries<2){ showFb(i,'bad','✘ Δεν είναι σωστό. Ελέγξτε ξανά'+(q.type==='grid'||q.type==='match'?' τα κόκκινα κελιά':'')+' και δοκιμάστε πάλι (1 προσπάθεια ακόμη). Μπορείτε να πατήσετε 💡.'); }
+  else { st.done=true; st.pts=0; showFb(i,'bad','✘ Δεν είναι σωστό. Δείτε τη λύση παρακάτω.'); finishQ(i,false); }
+  updAtt(i); updProgress();
+}
+function finishQ(i,ok){
+  const q=QUESTIONS[i], d=$('q'+i);
+  d.classList.add(ok?'done-ok':'done-bad');
+  d.querySelector('.expl').classList.add('show');
+  d.querySelector('.chk').disabled=true; d.querySelector('.hnt').disabled=true;
+  d.querySelectorAll('.ans').forEach(f=>f.disabled=true);
+  if(q.type==='mc') d.querySelectorAll('.opt').forEach(b=>{ const j=+b.dataset.j; if(j===q.a) b.classList.add('right'); else if(b.classList.contains('sel')) b.classList.add('wrong'); b.disabled=true; });
+  if(q.type==='tf') d.querySelectorAll('.tfb').forEach((g,j)=>g.querySelectorAll('button').forEach(b=>{ const v=b.dataset.v==='1';
+    if(v===q.items[j][1]) b.classList.add('right'); else if(b.classList.contains('sel')) b.classList.add('wrong'); b.disabled=true; }));
+  if(q.type==='bits') $('leds'+i).classList.add('locked');
+  // move focus to next open question
+  const nxt=state.findIndex((s,k)=>k>i&&!s.done);
+  if(nxt>=0){ const f=$('q'+nxt).querySelector('input.ans'); if(f) f.focus({preventScroll:true}); }
+}
+const fmt=x=>String(x).replace('.',',');
+function updProgress(){
+  const done=state.filter(s=>s.done).length, pts=state.reduce((a,s)=>a+s.pts,0);
+  $('progTxt').textContent=`${done} από ${N} ερωτήσεις`; $('progBar').style.width=(100*done/N)+'%'; $('scoreTop').textContent=fmt(pts);
+  if(done===N){ $('final').classList.add('show'); $('finalScore').textContent=`${fmt(pts)} / ${N}`;
+    const p=pts/N; $('finalMsg').textContent = p===1?'Τέλεια! 🏆':p>=.8?'Πολύ καλά! 👏':p>=.5?'Καλά! Δείτε ξανά τις λύσεις όπου κάνατε λάθος. 💪':'Χρειάζεται λίγη ακόμη εξάσκηση: δοκιμάστε τον μετατροπέα και την «Πρόκληση». 📘';
+    $('final').scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+function restart(){ if(state.some(s=>s.tries>0) && !confirm('Να σβηστούν όλες οι απαντήσεις;')) return;
+  state.forEach(s=>{ s.tries=0; s.done=false; s.pts=0; }); $('final').classList.remove('show'); render(); updProgress(); window.scrollTo(0,0); }
+$('restartBtn').onclick=restart; $('restartBtn2').onclick=restart;
+$('printBtn').onclick=()=>window.print();
+render(); updProgress();
+</script>
+</body>
+</html>
