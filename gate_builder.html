@@ -76,6 +76,16 @@ main{flex:1;min-height:0;display:grid;grid-template-columns:118px 1fr 330px;gap:
 .wire{fill:none;stroke-width:3.2;stroke-linecap:round}
 .wire.v1{stroke:var(--one)} .wire.v0{stroke:var(--zero)} .wire.vn{stroke:var(--zero);stroke-dasharray:6 5}
 .wire.selw{stroke:var(--accent)!important;stroke-width:5}
+.wire{stroke-linejoin:round}
+.halo{fill:none;stroke:var(--panel);stroke-width:9;stroke-linejoin:round}
+.jdot.v1,.nodedot.v1{fill:var(--one)} .jdot.v0,.nodedot.v0,.jdot.vn{fill:var(--zero)} .nodedot.vn{fill:var(--panel)}
+.nodedot{stroke:var(--stroke);stroke-width:1.6}
+.nodehit{fill:transparent;cursor:crosshair}
+.sel .nodehit{cursor:move}
+.selring{fill:none;stroke:none}
+.sel .selring{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3}
+.wirehit.trunk{cursor:ew-resize}
+#wireBtn{min-width:190px}
 .wirehit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
 .tempwire{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:7 5}
 .swbox{fill:var(--chip);stroke:var(--stroke);stroke-width:2;cursor:pointer}
@@ -114,6 +124,7 @@ table.tt td.okc{color:var(--ok);font-weight:bold} table.tt td.badc{color:var(--b
 #exprs div{margin:2px 0;overflow-wrap:anywhere}
 #exprs .note{font-size:13px;color:var(--muted)}
 .ov{border-top:1.6px solid currentColor}
+.sym{font-family:"Cambria Math","Segoe UI Symbol","DejaVu Sans",serif;font-size:.95em}
 details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 14px}
 details summary{cursor:pointer;font-weight:bold}
 details p{margin:5px 0;font-size:15px;line-height:1.4}
@@ -134,6 +145,7 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
     <div class="seg"><button id="mFree" class="on">✏️ Ελεύθερη σχεδίαση</button><button id="mCh">🎯 Αποστολές</button></div>
     <select id="chSel" style="display:none"></select>
     <span class="spacer"></span>
+    <button id="wireBtn" title="Μορφή των αγωγών"></button>
     <button id="delBtn" title="Delete">🗑 Διαγραφή επιλεγμένου</button>
     <button id="clearBtn">⟲ Καθαρισμός</button>
     <button id="saveBtn" title="Αποθήκευση του κυκλώματος σε αρχείο">💾 Αποθήκευση</button>
@@ -149,7 +161,7 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
         <g id="wiresG"></g><g id="compsG"></g><path id="temp" class="tempwire" d="" style="display:none"/>
       </svg>
       <div id="msg"></div>
-      <div id="hintTip">Κλικ σε πύλη ή καλώδιο = επιλογή · Delete = διαγραφή · κλικ στον διακόπτη = 0/1</div>
+      <div id="hintTip">Κλικ = επιλογή · Delete = διαγραφή · κλικ στον διακόπτη = 0/1 · σύρετε το κάθετο τμήμα αγωγού για να το μετακινήσετε</div>
     </div>
     <div class="panel" id="side">
       <div id="chArea" style="display:none">
@@ -164,7 +176,8 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
   </main>
   <details>
     <summary>Πώς λειτουργεί</summary>
-    <p><b>Σχεδίαση.</b> Σύρετε μια πύλη από την αριστερή στήλη πάνω στον πίνακα (ή κάντε απλό κλικ πάνω της). Για να ενώσετε δύο ακροδέκτες, πατήστε σε έναν ακροδέκτη (κυκλάκι) και τραβήξτε μέχρι τον άλλο. Μια έξοδος μπορεί να οδηγεί πολλές εισόδους, αλλά κάθε είσοδος δέχεται ένα μόνο καλώδιο. Μετακινείτε ένα εξάρτημα σέρνοντάς το· το επιλέγετε με κλικ και το διαγράφετε με το Delete ή με το 🗑.</p>
+    <p><b>Σχεδίαση.</b> Σύρετε μια πύλη από την αριστερή στήλη πάνω στον πίνακα (ή κάντε απλό κλικ πάνω της). Για να ενώσετε δύο ακροδέκτες, πατήστε σε έναν ακροδέκτη (κυκλάκι) και τραβήξτε μέχρι τον άλλο. Μια έξοδος μπορεί να οδηγεί πολλές εισόδους (στις διακλαδώσεις μπαίνει τελεία), αλλά κάθε είσοδος δέχεται ένα μόνο καλώδιο. Το κάθετο τμήμα ενός αγωγού μετακινείται αν το σύρετε δεξιά ή αριστερά. Όπως στα σχηματικά: όπου υπάρχει τελεία οι αγωγοί ενώνονται, ενώ όπου δύο αγωγοί απλώς διασταυρώνονται (χωρίς τελεία) δεν συνδέονται. Με το κουμπί «Αγωγοί» αλλάζετε σε καμπύλους αγωγούς. Μετακινείτε ένα εξάρτημα σέρνοντάς το· το επιλέγετε με κλικ και το διαγράφετε με το Delete ή με το 🗑.</p>
+    <p><b>Κόμβοι.</b> Ο κόμβος είναι ένα σημείο σύνδεσης όπου ενώνονται έως 4 αγωγοί: ένας που τον τροφοδοτεί και έως τρεις που φεύγουν από αυτόν. Αν αφήσετε έναν κόμβο πάνω σε υπάρχον καλώδιο, το καλώδιο χωρίζεται στα δύο. Από έναν κόμβο ξεκινάτε καλώδιο τραβώντας τον· για να τον μετακινήσετε, κάντε πρώτα κλικ πάνω του (επιλογή) και μετά σύρετέ τον. Αν διαγράψετε έναν κόμβο, οι αγωγοί που έφευγαν από αυτόν συνδέονται απευθείας με την πηγή του.</p>
     <p><b>Λογικές καταστάσεις.</b> Κλικ σε έναν διακόπτη αλλάζει την είσοδο από 0 σε 1. Τα καλώδια με λογικό 1 φαίνονται κόκκινα και με 0 γκρι· τα διακεκομμένα καλώδια σημαίνουν ότι η τιμή είναι απροσδιόριστη, επειδή κάποια είσοδος πύλης έμεινε ασύνδετη. Το LED ανάβει όταν η έξοδος είναι 1.</p>
     <p><b>Πίνακας αληθείας και έκφραση.</b> Ο πίνακας υπολογίζεται για όλους τους συνδυασμούς των εισόδων και η τρέχουσα γραμμή φωτίζεται. Κάτω από τον πίνακα φαίνεται η λογική έκφραση κάθε εξόδου, γραμμένη όπως στο βιβλίο (· για AND, + για OR, γραμμή από πάνω για NOT, ⊕ για XOR, ⊙ για XNOR).</p>
     <p><b>Αποστολές.</b> Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τις πύλες που επιτρέπονται. Ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα· όταν ταιριάζουν όλες οι γραμμές, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
@@ -203,8 +216,9 @@ function gateShape(t){ // local coordinates, centre (0,0); pins at x=±50
     case 'XNOR': return two(-34)+`<path class="gbody" d="${OR_P}"/><path class="gline" d="M-42,-25 Q-30,0 -42,25"/>`+bub(34)+outL(40);
   }
 }
-const nIn=t=>t==='IN'?0:(t==='NOT'||t==='OUT')?1:2;
+const nIn=t=>t==='IN'?0:(t==='NOT'||t==='OUT'||t==='NODE')?1:2;
 function pinPos(c){
+  if(c.type==='NODE') return {ins:[{x:c.x,y:c.y}],out:{x:c.x,y:c.y}};
   if(c.type==='IN') return {ins:[],out:{x:c.x+50,y:c.y}};
   if(c.type==='OUT') return {ins:[{x:c.x-45,y:c.y}],out:null};
   if(c.type==='NOT') return {ins:[{x:c.x-50,y:c.y}],out:{x:c.x+50,y:c.y}};
@@ -214,7 +228,7 @@ function gateFn(t,v){
   if(v.some(x=>x===null||x===undefined)) return null;
   const [a,b]=v;
   switch(t){ case 'NOT': return a?0:1; case 'AND': return a&b; case 'OR': return a|b; case 'NAND': return (a&b)?0:1;
-    case 'NOR': return (a|b)?0:1; case 'XOR': return a^b; case 'XNOR': return (a^b)?0:1; case 'OUT': return a; }
+    case 'NOR': return (a|b)?0:1; case 'XOR': return a^b; case 'XNOR': return (a^b)?0:1; case 'OUT': case 'NODE': return a; }
 }
 
 // ---------------- challenges ----------------
@@ -269,7 +283,7 @@ function defaultLayout(){
 function addComp(type,x,y,extra){ const c={id:nextId++,type,x:snap(x),y:snap(y),...(extra||{})}; if(type==='IN'&&c.val===undefined) c.val=0; comps.push(c); return c; }
 function load(json){
   try{ const d=JSON.parse(json); if(!d||!Array.isArray(d.comps)||!Array.isArray(d.wires)) return false;
-    comps=d.comps.filter(c=>c&&typeof c.id==='number'&&(c.type==='IN'||c.type==='OUT'||ALLGATES.includes(c.type)));
+    comps=d.comps.filter(c=>c&&typeof c.id==='number'&&(c.type==='IN'||c.type==='OUT'||c.type==='NODE'||ALLGATES.includes(c.type)));
     const ids=new Set(comps.map(c=>c.id));
     wires=d.wires.filter(w=>w&&ids.has(w.from)&&ids.has(w.to)&&typeof w.pin==='number');
     nextId=Math.max(0,...comps.map(c=>c.id),...wires.map(w=>w.id||0))+1; wires.forEach(w=>{ if(!w.id) w.id=nextId++; });
@@ -320,33 +334,100 @@ function expr(id,depth){
   const wrap=(e,min)=>PREC[e.t]<min?{...e,h:'('+e.h+')'}:e;
   const join=(op,min)=>{ const a=args.map(e=>wrap(e,min)); return {h:a.map(e=>e.h).join(op),d:Math.max(...a.map(e=>e.d))}; };
   switch(c.type){
+    case 'NODE': return args[0];
     case 'NOT': return ov(args[0]);
     case 'AND': return {...join('·',2),t:'AND'};
     case 'OR': return {...join(' + ',1),t:'OR'};
     case 'NAND': return ov({...join('·',2),t:'AND'});
     case 'NOR': return ov({...join(' + ',1),t:'OR'});
-    case 'XOR': return {...join(' ⊕ ',2),t:'XOR'};
-    case 'XNOR': return {...join(' ⊙ ',2),t:'XNOR'};
+    case 'XOR': return {...join(' <span class="sym">⊕</span> ',2),t:'XOR'};
+    case 'XNOR': return {...join(' <span class="sym">⊙</span> ',2),t:'XNOR'};
   }
 }
 
 // ---------------- drawing ----------------
-let tempWire=null;
+let tempWire=null, lastRoutes={};
+let wireStyle=store.get('gateBuilderWires')==='curve'?'curve':'orth';
+function updWireBtn(){ $('wireBtn').textContent = wireStyle==='orth' ? 'Αγωγοί: ┐ ορθογώνιοι' : 'Αγωγοί: ∿ καμπύλοι'; }
+const pd=pts=>'M'+pts.map(p=>p.x+','+p.y).join(' L');
+function bezierPts(a,b){ const dx=Math.max(30,Math.abs(b.x-a.x)/2), P=[];
+  for(let i=0;i<=16;i++){ const t=i/16, u=1-t;
+    P.push({x:u*u*u*a.x+3*u*u*t*(a.x+dx)+3*u*t*t*(b.x-dx)+t*t*t*b.x, y:u*u*u*a.y+3*u*u*t*a.y+3*u*t*t*b.y+t*t*t*b.y}); }
+  return P; }
+function orthTemp(a,b){ const mx=a.x+(b.x-a.x)/2; return `M${a.x},${a.y} H${mx} V${b.y} H${b.x}`; }
+function computeRoutes(){
+  const R={}, dots=[], groups={}, usedV=[];
+  const usedH=[];
+  const vsegs=pts=>{ for(let i=0;i<pts.length-1;i++){ const a=pts[i], b=pts[i+1];
+    if(a.x===b.x&&a.y!==b.y) usedV.push({x:a.x,y1:Math.min(a.y,b.y),y2:Math.max(a.y,b.y)});
+    if(a.y===b.y&&a.x!==b.x) usedH.push({y:a.y,x1:Math.min(a.x,b.x),x2:Math.max(a.x,b.x)}); } };
+  wires.forEach(w=>{ if(byId(w.from)&&byId(w.to)) (groups[w.from]=groups[w.from]||[]).push(w); });
+  const order=Object.keys(groups).sort((a,b)=>pinPos(byId(+a)).out.x-pinPos(byId(+b)).out.x||(+a)-(+b));
+  for(const fid of order){
+    const src=byId(+fid), s=pinPos(src).out, ws=groups[fid];
+    const tg=ws.map(w=>{ const tc=byId(w.to); return {w,tc,t:pinPos(tc).ins[w.pin]}; });
+    if(wireStyle==='curve'){ tg.forEach(({w,t})=>{ R[w.id]={d:wirePath(s,t),pts:bezierPts(s,t)}; }); continue; }
+    const back=t=>{ if(Math.abs(t.x-s.x)<1) return [s,t];
+      const my=Math.abs(s.y-t.y)>60?snap((s.y+t.y)/2):Math.max(s.y,t.y)+50;
+      return [s,{x:s.x+20,y:s.y},{x:s.x+20,y:my},{x:t.x-20,y:my},{x:t.x-20,y:t.y},t]; };
+    if(src.type==='NODE'){ // from a node: go vertically first, then horizontally (bus style)
+      tg.forEach(({w,t})=>{ const pts=(t.x>=s.x)?[s,{x:s.x,y:t.y},t]:back(t); R[w.id]={pts,d:pd(pts)}; vsegs(pts); }); continue; }
+    const toNode=tg.filter(o=>o.tc.type==='NODE'&&o.t.x-s.x>=10);
+    toNode.forEach(({w,t})=>{ const pts=[s,{x:t.x,y:s.y},t]; R[w.id]={pts,d:pd(pts)}; vsegs(pts); });
+    const rest=tg.filter(o=>!toNode.includes(o));
+    const fwd=rest.filter(o=>o.t.x-s.x>=20), bk=rest.filter(o=>o.t.x-s.x<20);
+    if(fwd.length){
+      const minTx=Math.min(...fwd.map(o=>o.t.x)), lo=s.x+10, hi=minTx-10;
+      let mx=(typeof src.mxo==='number')?s.x+src.mxo:s.x+Math.max(10,snap((minTx-s.x)/2));
+      mx=Math.min(Math.max(mx,lo),hi);
+      { // keep trunks of different signals apart, so that they never look connected
+        const ys0=[s.y,...fwd.map(o=>o.t.y)], y1=Math.min(...ys0), y2=Math.max(...ys0);
+        const hitV0=x=>y2>y1&&usedV.some(v=>Math.abs(v.x-x)<18&&v.y1<=y2+4&&y1<=v.y2+4);
+        const hs=x=>[{y:s.y,x1:s.x,x2:x},...fwd.map(o=>({y:o.t.y,x1:x,x2:o.t.x}))];
+        const hitH=x=>hs(x).some(h=>usedH.some(u=>Math.abs(u.y-h.y)<9&&h.x1<u.x2-2&&u.x1<h.x2-2));
+        const hitV=x=>hitV0(x)||hitH(x);
+        if(hitV(mx)){ for(let k=1;k<=8;k++){ const c1=mx-20*k, c2=mx+20*k;
+          if(c1>=lo&&!hitV(c1)){ mx=c1; break; } if(c2<=hi&&!hitV(c2)){ mx=c2; break; } } }
+        if(y2>y1) usedV.push({x:mx,y1,y2});
+        hs(mx).forEach(h=>usedH.push(h));
+      }
+      fwd.forEach(({w,t})=>{ const pts=[s,{x:mx,y:s.y},{x:mx,y:t.y},t]; R[w.id]={pts,d:pd(pts),trunk:{src:src.id,lo,hi,sx:s.x}}; });
+      if(fwd.length>=2){ const ys=[s.y,...fwd.map(o=>o.t.y)], mn=Math.min(...ys), mX=Math.max(...ys);
+        [...new Set(ys)].forEach(y=>{ const deg=(y===s.y?1:0)+fwd.filter(o=>o.t.y===y).length+(mX>mn?((y===mn||y===mX)?1:2):0);
+          if(deg>=3) dots.push({x:mx,y,src:src.id}); }); }
+    }
+    bk.forEach(({w,t})=>{ const pts=back(t); R[w.id]={pts,d:pd(pts)}; vsegs(pts); });
+  }
+  return {R,dots};
+}
+function distToRoute(p,pts){ let best=1e9;
+  for(let i=0;i<pts.length-1;i++){ const a=pts[i], b=pts[i+1], dx=b.x-a.x, dy=b.y-a.y, L=dx*dx+dy*dy;
+    let t=L?((p.x-a.x)*dx+(p.y-a.y)*dy)/L:0; t=Math.max(0,Math.min(1,t)); const q={x:a.x+t*dx,y:a.y+t*dy}, d=Math.hypot(p.x-q.x,p.y-q.y);
+    if(d<best){ best=d; best_q=q; } }
+  return {d:best,q:best_q}; }
+let best_q=null;
 function wirePath(a,b){ const dx=Math.max(30,Math.abs(b.x-a.x)/2); return `M${a.x},${a.y} C${a.x+dx},${a.y} ${b.x-dx},${b.y} ${b.x},${b.y}`; }
 function redraw(){
   const sim=simulate(null), V=sim.val;
   // wires
-  let wh='';
-  wires.forEach(w=>{ const a=byId(w.from), b=byId(w.to); if(!a||!b) return;
-    const p=wirePath(pinPos(a).out,pinPos(b).ins[w.pin]); const v=V[w.from];
-    const cls=v===1?'v1':v===0?'v0':'vn';
-    wh+=`<path class="wire ${cls}${sel&&sel.type==='wire'&&sel.id===w.id?' selw':''}" d="${p}"/><path class="wirehit" data-wire="${w.id}" d="${p}"/>`; });
+  let wh=''; const RT=computeRoutes(); lastRoutes=RT.R;
+  // each signal (net) is drawn with a thin background-coloured halo first, so that crossing or
+  // nearly overlapping wires of different signals stay visibly separate (no dot = no connection)
+  const nets={}; wires.forEach(w=>{ if(RT.R[w.id]) (nets[w.from]=nets[w.from]||[]).push(w); });
+  Object.keys(nets).forEach(f=>{ const ws=nets[f], v=V[+f], cls=v===1?'v1':v===0?'v0':'vn';
+    ws.forEach(w=>wh+=`<path class="halo" d="${RT.R[w.id].d}"/>`);
+    ws.forEach(w=>wh+=`<path class="wire ${cls}${sel&&sel.type==='wire'&&sel.id===w.id?' selw':''}" d="${RT.R[w.id].d}"/>`); });
+  RT.dots.forEach(p=>{ const v=V[p.src]; wh+=`<circle class="jdot ${v===1?'v1':v===0?'v0':'vn'}" cx="${p.x}" cy="${p.y}" r="4.5"/>`; });
+  wires.forEach(w=>{ const r=RT.R[w.id]; if(!r) return; wh+=`<path class="wirehit${r.trunk?' trunk':''}" data-wire="${w.id}" d="${r.d}"/>`; });
   $('wiresG').innerHTML=wh;
   // components
   let ch='';
   comps.forEach(c=>{
     const isSel=sel&&sel.type==='comp'&&sel.id===c.id; const pp=pinPos(c);
     let body='';
+    if(c.type==='NODE'){ const v=V[c.id];
+      ch+=`<g transform="translate(${c.x},${c.y})" class="${isSel?'sel':''}"><circle class="nodedot ${v===1?'v1':v===0?'v0':'vn'}" r="6"/><circle class="selring" r="12"/><circle class="nodehit" r="12" data-node="${c.id}"/></g>`;
+      return; }
     if(c.type==='IN'){ const v=c.val;
       body=`<rect class="hitbox" x="-34" y="-24" width="70" height="48" data-comp="${c.id}"/>
         <text class="lbl" x="-20" y="0" data-comp="${c.id}" style="cursor:move">${c.label}</text>
@@ -415,6 +496,7 @@ function renderTable(){
 // ---------------- palette ----------------
 function iconSVG(t){
   if(t==='IN') return `<svg viewBox="-40 -26 96 52"><rect class="swbox" x="-30" y="-18" width="36" height="36" rx="7"/><text class="swval v1" x="-12" y="1">1</text><line class="lead" x1="6" y1="0" x2="40" y2="0"/></svg>`;
+  if(t==='NODE') return `<svg viewBox="-48 -26 96 52"><line class="lead" x1="-30" y1="0" x2="30" y2="0"/><line class="lead" x1="0" y1="0" x2="0" y2="22"/><line class="lead" x1="0" y1="0" x2="0" y2="-22"/><circle class="nodedot v1" r="6"/></svg>`;
   if(t==='OUT') return `<svg viewBox="-56 -26 96 52"><line class="lead" x1="-45" y1="0" x2="-17" y2="0"/><circle class="led v1" cx="0" cy="0" r="16" style="filter:none"/></svg>`;
   return `<svg viewBox="-54 -28 108 56">${gateShape(t)}</svg>`;
 }
@@ -422,6 +504,7 @@ function buildPalette(){
   const p=$('palette'); let h='<div class="ph">Πύλες</div>';
   const allowed=mode==='ch'?CH[chIdx].gates:ALLGATES;
   ALLGATES.filter(t=>allowed.includes(t)).forEach(t=>h+=`<div class="pi" data-type="${t}">${iconSVG(t)}<span>${t}</span></div>`);
+  h+=`<div class="pi" data-type="NODE" title="Σημείο σύνδεσης έως 4 αγωγών">${iconSVG('NODE')}<span>Κόμβος</span></div>`;
   if(mode==='free') h+='<div class="ph">Είσοδος / έξοδος</div>'+`<div class="pirow"><div class="pi" data-type="IN">${iconSVG('IN')}<span>Διακ.</span></div><div class="pi" data-type="OUT">${iconSVG('OUT')}<span>LED</span></div></div>`;
   else h+=`<div class="ph" style="font-weight:normal;margin-top:6px">Μόνο οι πύλες της αποστολής${CH[chIdx].max?`<br>(το πολύ ${CH[chIdx].max})`:''}</div>`;
   p.innerHTML=h;
@@ -444,6 +527,14 @@ function flash(t){ showMsg('bad',t); clearTimeout(flashT); flashT=setTimeout(()=
 function placeNew(type,x,y){
   if(!canAdd(type)) return;
   const {w,h}=canvasSize(); x=Math.min(Math.max(x,60),w-60); y=Math.min(Math.max(y,50),h-50);
+  if(type==='NODE'){ // dropped on a wire? split it
+    let hit=null, hq=null, hd=11;
+    wires.forEach(w=>{ const r=lastRoutes[w.id]; if(!r) return; const m=distToRoute({x,y},r.pts); if(m.d<hd){ hd=m.d; hit=w; hq=m.q; } });
+    if(hit){ const n={id:nextId++,type:'NODE',x:Math.round(hq.x),y:Math.round(hq.y)}; comps.push(n);
+      wires=wires.filter(w=>w!==hit);
+      wires.push({id:nextId++,from:hit.from,to:n.id,pin:0}); wires.push({id:nextId++,from:n.id,to:hit.to,pin:hit.pin});
+      sel={type:'comp',id:n.id}; redraw(); return; }
+  }
   const c=addComp(type,x,y,(type==='IN'||type==='OUT')?{label:nextLabel(type)}:{});
   sel={type:'comp',id:c.id}; redraw();
 }
@@ -466,10 +557,15 @@ cv.addEventListener('pointerdown',ev=>{
   if(t.dataset.pin){ const [id,k,dir]=t.dataset.pin.split(':'); ev.preventDefault();
     drag={kind:'wire',id:+id,pin:+k,dir,start:dir==='out'?pinPos(byId(+id)).out:pinPos(byId(+id)).ins[+k]};
     cv.setPointerCapture(ev.pointerId); return; }
+  if(t.dataset.node){ const c=byId(+t.dataset.node); ev.preventDefault(); cv.setPointerCapture(ev.pointerId);
+    if(sel&&sel.type==='comp'&&sel.id===c.id){ drag={kind:'move',id:c.id,dx:p.x-c.x,dy:p.y-c.y,sx:p.x,sy:p.y,moved:false,node:true}; return; }
+    drag={kind:'wire',id:c.id,pin:0,dir:'node',start:{x:c.x,y:c.y},sx:p.x,sy:p.y,moved:false}; return; }
   if(t.dataset.toggle){ drag={kind:'toggle',id:+t.dataset.toggle}; return; }
   if(t.dataset.comp){ const c=byId(+t.dataset.comp); sel={type:'comp',id:c.id};
     drag={kind:'move',id:c.id,dx:p.x-c.x,dy:p.y-c.y,sx:p.x,sy:p.y,moved:false}; cv.setPointerCapture(ev.pointerId); redraw(); return; }
-  if(t.dataset.wire){ sel={type:'wire',id:+t.dataset.wire}; redraw(); return; }
+  if(t.dataset.wire){ const wid=+t.dataset.wire; sel={type:'wire',id:wid}; const r=lastRoutes[wid];
+    if(r&&r.trunk){ drag={kind:'trunk',...r.trunk,px:p.x,moved:false}; cv.setPointerCapture(ev.pointerId); }
+    redraw(); return; }
   sel=null; redraw();
 });
 window.addEventListener('pointermove',ev=>{
@@ -477,9 +573,13 @@ window.addEventListener('pointermove',ev=>{
   if(drag.kind==='new'){ moveGhost(ev); if(Math.hypot(ev.clientX-drag.sx,ev.clientY-drag.sy)>4) drag.moved=true; return; }
   const p=pt(ev);
   if(drag.kind==='move'){ const c=byId(drag.id); if(Math.hypot(p.x-drag.sx,p.y-drag.sy)>3) drag.moved=true;
-    const {w,h}=canvasSize(); c.x=snap(Math.min(Math.max(p.x-drag.dx,50),w-50)); c.y=snap(Math.min(Math.max(p.y-drag.dy,45),h-45)); redraw(); }
-  if(drag.kind==='wire'){ const tw=$('temp'); tw.style.display='';
-    tw.setAttribute('d', drag.dir==='out'?wirePath(drag.start,p):wirePath(p,drag.start));
+    const {w,h}=canvasSize(), m=drag.node?15:50; c.x=snap(Math.min(Math.max(p.x-drag.dx,m),w-m)); c.y=snap(Math.min(Math.max(p.y-drag.dy,drag.node?15:45),h-(drag.node?15:45))); redraw(); }
+  if(drag.kind==='trunk'){ if(Math.abs(p.x-drag.px)>3) drag.moved=true;
+    if(drag.moved){ const c=byId(drag.src); if(c){ c.mxo=Math.min(Math.max(snap(p.x),drag.lo),drag.hi)-drag.sx; redraw(); } } }
+  if(drag.kind==='wire'){ if(Math.hypot(p.x-drag.sx,p.y-drag.sy)>4) drag.moved=true;
+    const tw=$('temp'); tw.style.display='';
+    const fwd=drag.dir!=='in', f=wireStyle==='orth'?orthTemp:wirePath;
+    tw.setAttribute('d', fwd?f(drag.start,p):f(p,drag.start));
     document.querySelectorAll('.pin.hot').forEach(e=>e.classList.remove('hot'));
     const el=document.elementFromPoint(ev.clientX,ev.clientY); if(el&&el.dataset&&el.dataset.pin&&el.nextElementSibling) el.nextElementSibling.classList.add('hot'); }
 });
@@ -490,22 +590,42 @@ window.addEventListener('pointerup',ev=>{
     else if(!d.moved){ const s=freeSpot(); placeNew(d.type,s.x,s.y); }
     return; }
   if(d.kind==='toggle'){ const c=byId(d.id); if(c){ c.val=c.val?0:1; redraw(); } return; }
-  if(d.kind==='move'){ return; }
+  if(d.kind==='move'||d.kind==='trunk'){ return; }
   if(d.kind==='wire'){ $('temp').style.display='none';
+    if(d.dir==='node'&&!d.moved){ sel={type:'comp',id:d.id}; redraw(); return; } // click on a node = select it
     const el=document.elementFromPoint(ev.clientX,ev.clientY);
-    if(el&&el.dataset&&el.dataset.pin){ const [id2,k2,dir2]=el.dataset.pin.split(':');
-      if(dir2===d.dir){ flash(d.dir==='out'?'Ενώστε μια έξοδο με μια είσοδο (όχι δύο εξόδους μεταξύ τους).':'Ενώστε μια είσοδο με μια έξοδο (όχι δύο εισόδους μεταξύ τους).'); redraw(); return; }
-      const from=d.dir==='out'?d.id:+id2, to=d.dir==='out'?+id2:d.id, pin=d.dir==='out'?+k2:d.pin;
-      if(from===to){ flash('Μια πύλη δεν μπορεί να συνδεθεί με τον εαυτό της.'); redraw(); return; }
-      wires=wires.filter(w=>!(w.to===to&&w.pin===pin)); // one wire per input
-      wires.push({id:nextId++,from,to,pin}); sel=null;
-    }
+    let b=null;
+    if(el&&el.dataset&&el.dataset.pin){ const [id2,k2,dir2]=el.dataset.pin.split(':'); b={id:+id2,k:+k2,dir:dir2}; }
+    else if(el&&el.dataset&&el.dataset.node) b={id:+el.dataset.node,k:0,dir:'node'};
+    if(b){ const err=connect({id:d.id,k:d.pin,dir:d.dir},b); if(err){ flash(err); redraw(); return; } sel=null; }
     redraw(); }
 });
+const MAXNODE=4;
+const nodeDeg=id=>wires.filter(w=>w.from===id||w.to===id).length;
+function connect(a,b){ // returns an error message or null
+  if(a.id===b.id) return 'Ένα εξάρτημα δεν μπορεί να συνδεθεί με τον εαυτό του.';
+  if(a.dir==='out'&&b.dir==='out') return 'Ενώστε μια έξοδο με μια είσοδο (όχι δύο εξόδους μεταξύ τους).';
+  if(a.dir==='in'&&b.dir==='in') return 'Ενώστε μια είσοδο με μια έξοδο (όχι δύο εισόδους μεταξύ τους).';
+  const hasDrv=id=>wires.some(w=>w.to===id);
+  let from,to,pin;
+  if(a.dir==='out'||b.dir==='out'){ const o=a.dir==='out'?a:b, x=o===a?b:a; from=o.id; to=x.id; pin=x.k; }
+  else if(a.dir==='in'||b.dir==='in'){ const i=a.dir==='in'?a:b, n=i===a?b:a; from=n.id; to=i.id; pin=i.k; }
+  else { if(hasDrv(a.id)&&hasDrv(b.id)) return 'Και οι δύο κόμβοι τροφοδοτούνται ήδη· ένας κόμβος έχει μία μόνο τροφοδοσία.';
+    if(hasDrv(b.id)&&!hasDrv(a.id)){ from=b.id; to=a.id; } else { from=a.id; to=b.id; } pin=0; }
+  if(wires.some(w=>w.from===from&&w.to===to&&w.pin===pin)) return null;
+  const toC=byId(to), fromC=byId(from);
+  if(toC.type==='NODE'&&hasDrv(to)) return 'Ο κόμβος τροφοδοτείται ήδη από άλλον αγωγό· ένας κόμβος έχει μία μόνο τροφοδοσία.';
+  if((toC.type==='NODE'&&nodeDeg(to)>=MAXNODE)||(fromC.type==='NODE'&&nodeDeg(from)>=MAXNODE)) return `Σε έναν κόμβο ενώνονται το πολύ ${MAXNODE} αγωγοί.`;
+  if(toC.type!=='NODE') wires=wires.filter(w=>!(w.to===to&&w.pin===pin)); // one wire per gate input
+  wires.push({id:nextId++,from,to,pin});
+  return null;
+}
 function deleteSel(){
   if(!sel) return;
   if(sel.type==='wire') wires=wires.filter(w=>w.id!==sel.id);
   else { const c=byId(sel.id); if(!c) return; if(c.fixed){ flash('Οι είσοδοι και οι έξοδοι της αποστολής δεν διαγράφονται.'); return; }
+    if(c.type==='NODE'){ const drv=wires.find(w=>w.to===c.id); // keep the circuit: outgoing wires go straight to the node's source
+      if(drv) wires.filter(w=>w.from===c.id).forEach(w=>{ w.from=drv.from; }); }
     comps=comps.filter(x=>x.id!==c.id); wires=wires.filter(w=>w.from!==c.id&&w.to!==c.id); }
   sel=null; redraw();
 }
@@ -515,6 +635,8 @@ document.addEventListener('keydown',ev=>{
   if(ev.key==='Escape'){ sel=null; redraw(); }
 });
 $('delBtn').onclick=deleteSel;
+$('wireBtn').onclick=()=>{ wireStyle=wireStyle==='orth'?'curve':'orth'; store.set('gateBuilderWires',wireStyle); updWireBtn(); redraw(); };
+updWireBtn();
 $('clearBtn').onclick=()=>{ if(comps.some(c=>ALLGATES.includes(c.type))&&!confirm('Να σβηστεί όλο το κύκλωμα;')) return; defaultLayout(); showResult(null); redraw(); };
 
 // ---------------- save / open ----------------
