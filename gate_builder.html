@@ -144,6 +144,14 @@ table.tt td.okc{color:var(--ok);font-weight:bold} table.tt td.badc{color:var(--b
 details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 14px}
 details summary{cursor:pointer;font-weight:bold}
 details p{margin:5px 0;font-size:15px;line-height:1.4}
+/* the help opens as a floating window, so the drawing area never changes size */
+#helpBody{display:none}
+details[open] #helpBody{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(920px,92vw);max-height:84vh;overflow:auto;z-index:100;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 20px 14px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+#helpBody h3{margin:2px 0 6px;font-size:18px;display:flex;align-items:center}
+#helpBody h3 span{flex:1}
+#helpShade{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:99}
+details[open] #helpShade{display:block}
 @media (max-width:1000px){ .wrap{height:auto} main{grid-template-columns:100px 1fr;grid-template-rows:520px auto} #side{grid-column:1/3} }
 </style>
 </head>
@@ -196,6 +204,8 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
   </main>
   <details>
     <summary>Πώς λειτουργεί</summary>
+    <div id="helpShade"></div>
+    <div id="helpBody"><h3><span>Πώς λειτουργεί</span><button id="helpClose" title="Κλείσιμο (Esc)">✕</button></h3>
     <p><b>Σχεδίαση.</b> Σύρετε μια πύλη από την αριστερή στήλη πάνω στον πίνακα (ή κάντε απλό κλικ πάνω της). Για να ενώσετε δύο ακροδέκτες, πατήστε σε έναν ακροδέκτη (κυκλάκι) και τραβήξτε μέχρι τον άλλο. Μια έξοδος μπορεί να οδηγεί πολλές εισόδους (στις διακλαδώσεις μπαίνει τελεία), αλλά κάθε είσοδος δέχεται ένα μόνο καλώδιο. Το κάθετο τμήμα ενός αγωγού μετακινείται αν το σύρετε δεξιά ή αριστερά. Όπως στα σχηματικά: όπου υπάρχει τελεία οι αγωγοί ενώνονται, ενώ όπου δύο αγωγοί απλώς διασταυρώνονται (χωρίς τελεία) δεν συνδέονται. Με το κουμπί «Αγωγοί» αλλάζετε σε καμπύλους αγωγούς. Μετακινείτε ένα εξάρτημα σέρνοντάς το· το επιλέγετε με κλικ και το διαγράφετε με το Delete ή με το 🗑.</p>
     <p><b>Κόμβοι.</b> Ο κόμβος είναι ένα σημείο σύνδεσης όπου ενώνονται έως 4 αγωγοί: ένας που τον τροφοδοτεί και έως τρεις που φεύγουν από αυτόν. Αν αφήσετε έναν κόμβο πάνω σε υπάρχον καλώδιο (από την παλέτα ή μετακινώντας έναν ασύνδετο κόμβο), το καλώδιο χωρίζεται στα δύο. Από έναν κόμβο ξεκινάτε καλώδιο τραβώντας τον· για να τον μετακινήσετε, κάντε πρώτα κλικ πάνω του (επιλογή) και μετά σύρετέ τον. Αν διαγράψετε έναν κόμβο, οι αγωγοί που έφευγαν από αυτόν συνδέονται απευθείας με την πηγή του.</p>
     <p><b>Πύλες πολλών εισόδων και ονόματα.</b> Όταν επιλέξετε μια πύλη AND, OR, NAND ή NOR, κάτω αριστερά εμφανίζεται η επιλογή «Είσοδοι: 2 · 3 · 4» (στις αποστολές οι πύλες έχουν πάντα 2 εισόδους). Όταν επιλέξετε έναν διακόπτη ή ένα LED, μπορείτε να του δώσετε δικό σας όνομα (έως 8 γράμματα ή ψηφία), π.χ. «Πόρτα» ή «Συναγερμός».</p>
@@ -203,6 +213,7 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
     <p><b>Λογικές καταστάσεις.</b> Κλικ σε έναν διακόπτη αλλάζει την είσοδο από 0 σε 1. Τα καλώδια με λογικό 1 φαίνονται κόκκινα και με 0 γκρι· τα διακεκομμένα καλώδια σημαίνουν ότι η τιμή είναι απροσδιόριστη, επειδή κάποια είσοδος πύλης έμεινε ασύνδετη. Το LED ανάβει όταν η έξοδος είναι 1.</p>
     <p><b>Πίνακας αληθείας και έκφραση.</b> Ο πίνακας υπολογίζεται για όλους τους συνδυασμούς των εισόδων και η τρέχουσα γραμμή φωτίζεται. Κάτω από τον πίνακα φαίνεται η λογική έκφραση κάθε εξόδου, γραμμένη όπως στο βιβλίο (· για AND, + για OR, γραμμή από πάνω για NOT, ⊕ για XOR, ⊙ για XNOR).</p>
     <p><b>Αποστολές.</b> Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τις πύλες που επιτρέπονται. Ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα· όταν ταιριάζουν όλες οι γραμμές, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
+  </div>
   </details>
 </div>
 
@@ -298,11 +309,18 @@ function snapshot(){ return JSON.stringify({v:1,title,mode,ch:mode==='ch'?CH[chI
 function fileBase(){ const t=title.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim().slice(0,60);
   return t || (mode==='ch'?`κύκλωμα_αποστολή_${CH[chIdx].n}`:'κύκλωμα'); }
 function autosave(){ store.set(storageKey(),snapshot()); }
-function canvasSize(){ const r=$('cv').getBoundingClientRect(); return {w:Math.max(r.width,400),h:Math.max(r.height,300)}; }
+// When the drawing area becomes smaller than the circuit (smaller window, iframe), the whole drawing is
+// scaled down with the viewBox; the components keep their positions. canvasSize() is in drawing units.
+let zoom=1;
+function canvasSize(){ const r=$('cv').getBoundingClientRect(); return {w:Math.max(r.width,400)/zoom,h:Math.max(r.height,300)/zoom}; }
+function fitZoom(){ const r=$('cv').getBoundingClientRect(); if(!r.width||!r.height) return;
+  let mx=0,my=0; comps.forEach(c=>{ mx=Math.max(mx,c.x+60); my=Math.max(my,c.y+(MULTI.includes(c.type)?gateH(gateN(c))+30:60)); });
+  zoom=Math.min(1, r.width/Math.max(mx,1), r.height/Math.max(my,1)); zoom=Math.max(zoom,0.4);
+  $('cv').setAttribute('viewBox',`0 0 ${r.width/zoom} ${r.height/zoom}`); }
 const snap=v=>Math.round(v/10)*10;
 
 function defaultLayout(){
-  comps=[]; wires=[]; nextId=1; sel=null;
+  comps=[]; wires=[]; nextId=1; sel=null; zoom=1;
   const {w,h}=canvasSize();
   if(mode==='free'){
     addComp('IN',90,snap(h*0.35),{label:'A'}); addComp('IN',90,snap(h*0.6),{label:'B'});
@@ -311,7 +329,7 @@ function defaultLayout(){
     const c=CH[chIdx];
     c.ins.forEach((L,i)=>addComp('IN',90,snap(h*(i+1)/(c.ins.length+1)),{label:L,fixed:true}));
     c.outs.forEach((L,i)=>addComp('OUT',snap(w-80),snap(h*(i+1)/(c.outs.length+1)),{label:L,fixed:true}));
-  }
+  }  fitZoom();
 }
 // key = the original letter (A–D, Y–W): fixes the order in the truth table even after a rename
 function addComp(type,x,y,extra){ const c={id:nextId++,type,x:snap(x),y:snap(y),...(extra||{})}; if(type==='IN'&&c.val===undefined) c.val=0;
@@ -339,7 +357,7 @@ function enterMode(){
     const c=CH[chIdx]; const L=new Set(comps.filter(x=>x.fixed).map(x=>x.label));
     if(!c.ins.concat(c.outs).every(l=>L.has(l))) defaultLayout();
   }
-  buildPalette(); renderChCard(); fitToolbar(); propsKey=''; redraw(); resetHistory();
+  buildPalette(); renderChCard(); fitToolbar(); fitZoom(); propsKey=''; redraw(); resetHistory();
 }
 
 // ---------------- simulation ----------------
@@ -663,7 +681,8 @@ function freeSpot(){ const {w,h}=canvasSize(); const n=comps.filter(c=>ALLGATES.
 
 // ---------------- pointer interaction ----------------
 const cv=$('cv');
-function pt(ev){ const r=cv.getBoundingClientRect(); return {x:ev.clientX-r.left,y:ev.clientY-r.top}; }
+function pt(ev){ const m=cv.getScreenCTM(); if(!m){ const r=cv.getBoundingClientRect(); return {x:ev.clientX-r.left,y:ev.clientY-r.top}; }
+  const q=new DOMPoint(ev.clientX,ev.clientY).matrixTransform(m.inverse()); return {x:q.x,y:q.y}; }
 let drag=null;
 function startNew(ev,type){
   ev.preventDefault();
@@ -709,7 +728,7 @@ window.addEventListener('pointermove',ev=>{
 window.addEventListener('pointerup',ev=>{
   if(!drag) return; const d=drag; drag=null;
   if(d.kind==='new'){ d.ghost.remove(); const r=cv.getBoundingClientRect();
-    if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom) placeNew(d.type,ev.clientX-r.left,ev.clientY-r.top);
+    if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom) { const q=pt(ev); placeNew(d.type,q.x,q.y); }
     else if(!d.moved){ const s=freeSpot(); placeNew(d.type,s.x,s.y); }
     return; }
   if(d.kind==='toggle'){ const c=byId(d.id); if(c){ c.val=c.val?0:1; redraw(); } return; }
@@ -758,7 +777,7 @@ function deleteSel(){
 document.addEventListener('keydown',ev=>{
   if(ev.target.tagName==='INPUT'||ev.target.tagName==='SELECT') return;
   if(ev.key==='Delete'||ev.key==='Backspace'){ ev.preventDefault(); deleteSel(); }
-  if(ev.key==='Escape'){ sel=null; redraw(); }
+  if(ev.key==='Escape'){ const D=document.querySelector('details'); if(D.open){ D.open=false; return; } sel=null; redraw(); }
   if((ev.ctrlKey||ev.metaKey)&&!ev.altKey){ const k=ev.key.toLowerCase();
     if(k==='z'&&!ev.shiftKey){ ev.preventDefault(); undo(); }
     else if(k==='y'||(k==='z'&&ev.shiftKey)){ ev.preventDefault(); redo(); } }
@@ -849,7 +868,7 @@ $('fileIn').onchange=()=>{ const f=$('fileIn').files[0]; if(!f) return; const r=
   r.onload=()=>{ let d=null; try{ d=JSON.parse(r.result); }catch(e){}
     if(!d){ flash('Το αρχείο δεν είναι κύκλωμα αυτής της εφαρμογής.'); return; }
     if(d.mode==='ch'&&d.ch){ const k=CH.findIndex(c=>c.id===d.ch); if(k>=0){ mode='ch'; chIdx=k; $('chSel').value=k; } } else mode='free';
-    enterMode(); if(!load(r.result)) flash('Το αρχείο δεν είναι κύκλωμα αυτής της εφαρμογής.'); redraw(); };
+    enterMode(); if(!load(r.result)) flash('Το αρχείο δεν είναι κύκλωμα αυτής της εφαρμογής.'); fitZoom(); redraw(); };
   r.readAsText(f); $('fileIn').value=''; };
 
 // ---------------- challenges UI ----------------
@@ -878,7 +897,9 @@ $('mFree').onclick=()=>{ if(mode!=='free'){ mode='free'; enterMode(); } };
 $('mCh').onclick=()=>{ if(mode!=='ch'){ mode='ch'; enterMode(); } };
 
 // keep fixed outputs at the right edge when the canvas is resized
-new ResizeObserver(()=>{ fitToolbar(); const {w,h}=canvasSize(); comps.forEach(c=>{ c.x=Math.min(c.x,snap(w-50)); c.y=Math.min(c.y,snap(h-45)); }); redraw(); }).observe(cv);
+new ResizeObserver(()=>{ fitToolbar(); fitZoom(); redraw(); }).observe(cv);
+$('helpClose').onclick=()=>{ document.querySelector('details').open=false; };
+$('helpShade').onclick=()=>{ document.querySelector('details').open=false; };
 
 window.addEventListener('resize',fitToolbar);
 fillChSel(); enterMode();
