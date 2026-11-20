@@ -20,7 +20,7 @@ body.dark{
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:16px}
-.wrap{height:100vh;display:flex;flex-direction:column;padding:8px 16px 8px;max-width:1600px;margin:0 auto;gap:8px}
+.wrap{display:flex;flex-direction:column;padding:8px 16px 8px;max-width:1600px;margin:0 auto;gap:8px}
 header{display:flex;align-items:center;gap:14px}
 header .titles{flex:1;min-width:0}
 h1{font-size:24px;margin:0;line-height:1.15}
@@ -36,7 +36,7 @@ button:disabled{opacity:.45;cursor:default}
 .tab{padding:7px 18px;font-size:16px;font-weight:bold;border-radius:8px 8px 0 0;border-bottom:none;min-width:150px}
 .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 body.dark .tab.active{color:#0d1420}
-main{flex:1;min-height:0;display:none;grid-template-columns:1.4fr 1fr;gap:12px}
+main{display:none;grid-template-columns:1.4fr 1fr;gap:12px}
 main.show{display:grid}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:0}
 .panel h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -51,7 +51,7 @@ sub{font-size:.62em}
 .nc.err{border-color:var(--bad);background:var(--bad-soft)}
 .nc .ex{font-size:12px;color:var(--muted);height:15px;overflow:hidden;white-space:nowrap}
 .nc.err .ex{color:var(--bad)}
-.blocks{flex:1;min-height:0;display:flex;gap:12px;justify-content:center;align-items:center}
+.blocks{display:flex;gap:12px;justify-content:center;align-items:center;margin:2px 0}
 .blk{flex:1;max-width:250px;border:2px solid var(--line);border-radius:10px;padding:6px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg)}
 .blk.bad{border-color:var(--bad);background:var(--bad-soft)}
 .blk .dd{font-size:44px;font-weight:bold;color:var(--accent);line-height:1}
@@ -76,7 +76,7 @@ body.dark .seg button.on{color:#0d1420}
 .status{font-size:15px;min-height:20px}
 .status.bad{color:var(--bad);font-weight:bold}
 /* right panel */
-.side{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.side{flex:1 1 0;min-height:200px;overflow:auto;display:flex;flex-direction:column;gap:8px}
 table.t{border-collapse:collapse;font-size:15px}
 table.t td,table.t th{border:1px solid var(--line);padding:2px 8px;text-align:center}
 table.t th{background:var(--chip);font-weight:bold;color:var(--muted)}
@@ -85,12 +85,14 @@ table.t tr.unused td{color:var(--zero)}
 table.t tr.unused.hlbad td{background:var(--bad-soft);color:var(--bad);font-weight:bold}
 .twocol{display:flex;gap:12px;align-items:flex-start;flex-wrap:nowrap}
 #tblUnused{width:auto}
+#tblBcd td,#tblBcd th,#tblUnused td,#tblUnused th{padding:0 8px;font-size:14px;line-height:1.25}
+.cmp{padding:4px 10px!important}.cmp div{margin:1px 0!important}
 .note{color:var(--muted);font-size:14px;margin:0}
 .cmp{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg);font-size:15px}
 .cmp div{margin:2px 0}
 .cmp b{color:var(--accent)}
 /* challenge */
-.qcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;text-align:center;min-height:0}
+.qcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center;min-height:0;padding:10px 0}
 .qnum{color:var(--muted);font-size:15px}
 .qtext{font-size:22px}
 .qval{font-size:44px;font-weight:bold;color:var(--accent);letter-spacing:1px}
@@ -120,7 +122,7 @@ table.t tr.unused.hlbad td{background:var(--bad-soft);color:var(--bad);font-weig
 .dot.cur{border-color:var(--accent)}
 .dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
-.sol{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
+.sol{flex:1 1 0;min-height:150px;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
 .sol p{margin:4px 0}
 .sol .empty{color:var(--muted)}
 .res{font-size:18px;font-weight:bold;margin-top:6px}
