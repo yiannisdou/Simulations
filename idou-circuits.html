@@ -39,7 +39,11 @@ body.dark button.primary{color:#0d1420}
 body.dark .seg button.on{color:#0d1420}
 #chSel{min-width:290px;font-weight:bold}
 .spacer{flex:1}
-main{flex:1;min-height:0;display:grid;grid-template-columns:118px 1fr 330px;gap:10px}
+main{flex:1;min-height:0;display:grid;grid-template-columns:118px minmax(300px,1fr) 0 var(--sideW,330px);column-gap:5px;row-gap:10px}
+#palette{margin-right:5px}
+#splitter{position:relative;width:10px;margin-left:-5px;cursor:col-resize;z-index:3;border-radius:4px;align-self:stretch}
+#splitter:hover,#splitter.on{background:var(--accent-soft)}
+#splitter::after{content:'';position:absolute;left:3px;top:50%;width:4px;height:36px;margin-top:-18px;border-left:2px dotted var(--muted);opacity:.6}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;min-height:0}
 /* palette */
 #palette{padding:6px;display:flex;flex-direction:column;gap:5px;overflow:auto}
@@ -244,11 +248,12 @@ body.mk #mkShade,body.mk #mkDlg{display:block}
 #embTheme{display:none}
 body.embed header,body.embed .toolbar,body.embed details,body.embed #chArea,body.embed #result,body.embed .exsw,body.embed #titleIn{display:none!important}
 body.embed .wrap{padding:6px;height:100vh;box-sizing:border-box}
-body.embed main{grid-template-columns:1fr 300px}
-body.embed.noside main{grid-template-columns:1fr} body.embed.noside #side{display:none}
+body.embed main{grid-template-columns:minmax(200px,1fr) 0 var(--sideW,300px)}
+body.embed.noside main{grid-template-columns:1fr} body.embed.noside #side,body.embed.noside #splitter{display:none}
+body.embed:not(.noside) #splitter{display:block!important}
 body.embed .wrap{height:100vh!important} body.embed main{grid-template-rows:minmax(0,1fr)!important} body.embed #side{grid-column:auto!important}
 
-body.embed.edit main{grid-template-columns:118px 1fr 300px} body.embed.edit.noside main{grid-template-columns:118px 1fr}
+body.embed.edit main{grid-template-columns:118px minmax(200px,1fr) 0 var(--sideW,300px)} body.embed.edit.noside main{grid-template-columns:118px 1fr}
 body.embed:not(.edit) #palette{display:none}
 body.embed.edit .toolbar{display:flex!important} body.embed.edit .toolbar > *:not(#undoBtn):not(#redoBtn):not(#delBtn):not(#clearBtn):not(.spacer){display:none!important}
 body.embed #embTheme{display:block;position:absolute;right:8px;top:8px;z-index:5;padding:3px 8px;font-size:15px}
@@ -277,7 +282,7 @@ details[open] #helpBody{display:block;position:fixed;left:50%;top:50%;transform:
 #helpBody h3 span{flex:1}
 #helpShade{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:99}
 details[open] #helpShade{display:block}
-@media (max-width:1000px){ .wrap{height:auto} main{grid-template-columns:100px 1fr;grid-template-rows:520px auto} #side{grid-column:1/3} }
+@media (max-width:1000px){ .wrap{height:auto} main{grid-template-columns:100px 1fr;grid-template-rows:520px auto} #side{grid-column:1/3} #splitter{display:none} }
 h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
 </style>
 </head>
@@ -328,6 +333,7 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
       <div id="hintTip">Κλικ = επιλογή · Delete = διαγραφή · κλικ στον διακόπτη = 0/1 · σύρετε ένα τμήμα αγωγού (↔ κάθετο, ↕ οριζόντιο) για να το μετακινήσετε</div>
      </div>
     </div>
+    <div id="splitter" title="Σύρετε για να μεγαλώσει ή να μικρύνει ο χώρος σχεδίασης (διπλό κλικ: αρχικό μέγεθος)"></div>
     <div class="panel" id="side">
       <div id="chArea" style="display:none">
         <div id="chCard"></div>
@@ -1473,8 +1479,16 @@ function renderTable(){
   $('tt').querySelectorAll('tr[data-row]').forEach(tr=>tr.onclick=()=>{ const r=T.rows[+tr.dataset.row]; T.ins.forEach(c=>c.val=r.iv[c.label]); redraw(); });
   // expressions
   const src=srcMap(); let e='';
-  if(T.cycle) e='<div class="note">Η έκφραση δεν υπολογίζεται όταν υπάρχει βρόχος.</div>';
-  else if(comps.some(isE)) e='<div class="note">Με ηλεκτρικά στοιχεία (διακόπτες, αντιστάσεις, LED) η λογική έκφραση δεν γράφεται αυτόματα· ο πίνακας αληθείας προκύπτει από τις τάσεις.</div>';
+  if(EMB&&EMB.fxT&&!T.cycle&&T.outs.some(o=>EMB.fxT[o.label])){ const ins=T.ins.map(c=>c.label); // the expression written by the teacher
+    T.outs.forEach(o=>{ const p=parseExpr(String(EMB.fxT[o.label]||''),ins); e+=`<div><b>${o.label}</b> = ${p.err?'<span class="note">—</span>':astHTML(p.ast).h}</div>`; }); }
+  else if(T.cycle) e='<div class="note">Η έκφραση δεν υπολογίζεται όταν υπάρχει βρόχος.</div>';
+  else if(comps.some(isE)&&T.ins.length&&T.ins.length<=4){ // electrical parts: the function comes from the truth table (simplified sum of products)
+    const ins=T.ins.map(c=>c.label), n=ins.length;
+    T.outs.forEach((o,k)=>{ const vals=T.rows.map(r=>({m:ins.reduce((a,l)=>a*2+(r.iv[l]?1:0),0),v:r.ov[k]}));
+      if(vals.some(x=>x.v!==0&&x.v!==1)){ e+=`<div><b>${o.label}</b> = <span class="note">(απροσδιόριστη για κάποιους συνδυασμούς: «?» στον πίνακα)</span></div>`; return; }
+      const on=vals.filter(x=>x.v===1).map(x=>x.m); e+=`<div><b>${o.label}</b> = ${astHTML(sopAst(minSOP(on,n),ins)).h}</div>`; });
+    e+='<div class="note" style="line-height:1.3">Με ηλεκτρικά στοιχεία η έκφραση βγαίνει από τον πίνακα αληθείας, απλοποιημένη.</div>'; }
+  else if(comps.some(isE)) e='<div class="note">Με ηλεκτρικά στοιχεία η έκφραση βγαίνει από τον πίνακα αληθείας· βάλτε τουλάχιστον έναν διακόπτη.</div>';
   else T.outs.forEach(o=>{ const s=(src[o.id]||[])[0];
     e+=`<div><b>${o.label}</b> = ${s===undefined?'<span class="note">(το LED δεν έχει συνδεθεί)</span>':expr(s,0).h}</div>`; });
   $('exprs').innerHTML=e;
@@ -1734,7 +1748,8 @@ window.addEventListener('pointermove',ev=>{
   if(!drag) return;
   if(drag.kind==='new'){ moveGhost(ev); if(Math.hypot(ev.clientX-drag.sx,ev.clientY-drag.sy)>4) drag.moved=true; return; }
   const p=pt(ev);
-  if(drag.kind==='move'){ const c=byId(drag.id); if(Math.hypot(p.x-drag.sx,p.y-drag.sy)>3) drag.moved=true;
+  if(drag.kind==='move'){ const c=byId(drag.id); if(!drag.moved&&Math.hypot(p.x-drag.sx,p.y-drag.sy)>3){ drag.moved=true;
+      wires.forEach(w=>{ if((w.from===c.id||w.to===c.id)&&w.via) delete w.via; }); } // a hand-drawn corner would stay behind
     const {w,h}=canvasSize(), m=drag.node?15:50; c.x=snap(Math.min(Math.max(p.x-drag.dx,m),w-m)); const mh=drag.node?15:MEM.includes(c.type)?boxExt(c)-20:45; c.y=snap(Math.min(Math.max(p.y-drag.dy,mh),h-mh));
     if(wireStyle==='orth'&&!drag.node){ let best=0; wires.forEach(x=>{ if(x.from!==c.id&&x.to!==c.id) return; const A=epA(x), B=epB(x); if(!A||!B) return;
         const d=x.to===c.id?A.y-B.y:B.y-A.y; if(d&&Math.abs(d)<=10&&(!best||Math.abs(d)<Math.abs(best))) best=d; });
@@ -2199,6 +2214,16 @@ $('helpClose').onclick=()=>{ document.querySelector('details').open=false; };
 $('helpShade').onclick=()=>{ document.querySelector('details').open=false; };
 
 window.addEventListener('resize',fitToolbar);
+// the border between the drawing area and the side panel can be dragged
+(()=>{ const sp=$('splitter'), M=document.querySelector('main'), setW=w=>{ const r=M.getBoundingClientRect(), mx=Math.max(260,r.width*0.6);
+    w=Math.round(Math.max(EMB?200:260,Math.min(mx,w))); document.documentElement.style.setProperty('--sideW',w+'px'); return w; };
+  const saved=+store.get('gateBuilderSideW'); if(saved) setW(saved);
+  sp.onpointerdown=ev=>{ ev.preventDefault(); sp.setPointerCapture(ev.pointerId); sp.classList.add('on');
+    const mv=e=>{ const r=M.getBoundingClientRect(); setW(r.right-e.clientX-5); };
+    const up=e=>{ sp.classList.remove('on'); sp.releasePointerCapture(ev.pointerId); sp.removeEventListener('pointermove',mv); sp.removeEventListener('pointerup',up);
+      store.set('gateBuilderSideW',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sideW'))||330); };
+    sp.addEventListener('pointermove',mv); sp.addEventListener('pointerup',up); };
+  sp.ondblclick=()=>{ document.documentElement.style.removeProperty('--sideW'); store.set('gateBuilderSideW',''); }; })();
 // ---------------- teacher: managing the mission lists ----------------
 let ADM={g:'B',rows:null,msg:''};
 function admRowsFrom(cfg){ const R={B:[],C:[]}; applyCfg(cfg); // the current effective lists, then the hidden built-ins
@@ -2248,10 +2273,16 @@ function admRender(){ const B=$('mkBody'), g=ADM.g, R=ADM.rows[g], hasDraft=!!dr
 $('admBtn').onclick=admOpen;
 // ---------------- teacher: embedding the circuit in the website ----------------
 const SITEURL='https://yiannisdou.github.io/Simulations/idou-circuits.html';
-let EMBO={tt:true,fx:true,edit:false,h:520,slug:''};
+let EMBO={tt:true,fx:true,edit:false,h:520,slug:'',own:false,fxT:{}};
 const GRLAT={α:'a',ά:'a',β:'v',γ:'g',δ:'d',ε:'e',έ:'e',ζ:'z',η:'i',ή:'i',θ:'th',ι:'i',ί:'i',ϊ:'i',ΐ:'i',κ:'k',λ:'l',μ:'m',ν:'n',ξ:'x',ο:'o',ό:'o',π:'p',ρ:'r',σ:'s',ς:'s',τ:'t',υ:'y',ύ:'y',ϋ:'y',ΰ:'y',φ:'f',χ:'ch',ψ:'ps',ω:'o',ώ:'o'};
 const slugify=t=>String(t||'').toLowerCase().split('').map(ch=>GRLAT[ch]??ch).join('').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
-function embSnap(){ return JSON.stringify({v:1,title,mode:'free',comps:comps.map(({fixed,...c})=>c),wires}); }
+function embAuto(o){ // the expression the page would show: from the gates, or (with electrical parts) from the truth table
+  const src=srcMap(), s0=(src[o.id]||[])[0], a=!comps.some(isE)&&s0!==undefined?circAst(s0,0):null; if(a) return astText(a);
+  const T=truthTable(), ins=T.ins.map(c=>c.label), k=T.outs.indexOf(o); if(k<0||!ins.length||ins.length>4) return '';
+  const on=[]; for(const r of T.rows){ const v=r.ov[k]; if(v!==0&&v!==1) return ''; if(v) on.push(ins.reduce((a,l)=>a*2+(r.iv[l]?1:0),0)); } return astText(sopAst(minSOP(on,ins.length),ins)); }
+function embSnap(){ const d={v:1,title,mode:'free',comps:comps.map(({fixed,...c})=>c),wires};
+  if(EMBO.own&&EMBO.fx&&!isSeq()){ d.fx={}; outputsSorted().forEach(o=>{ const t=(EMBO.fxT[o.label]||'').trim(); if(t) d.fx[o.label]=t; }); }
+  return JSON.stringify(d); }
 function embRender(){ const B=$('mkBody'), base=location.protocol.startsWith('http')&&location.hostname.endsWith('github.io')?location.origin+location.pathname:SITEURL;
   if(!EMBO.slug) EMBO.slug=slugify(title)||'kyklwma';
   const seq=isSeq(), q='?embed=1'+((EMBO.tt||EMBO.fx)?'&show='+[EMBO.tt?'tt':'',EMBO.fx&&!seq?'fx':''].filter(Boolean).join(','):'')+(EMBO.edit?'&edit=1':'');
@@ -2262,7 +2293,10 @@ function embRender(){ const B=$('mkBody'), base=location.protocol.startsWith('ht
     <div><label style="display:inline;font-weight:normal"><input type="checkbox" id="eTT"${EMBO.tt?' checked':''}> ${seq?'Χρονικό διάγραμμα':'Πίνακας αληθείας'}</label> &nbsp;
     ${seq?'':`<label style="display:inline;font-weight:normal"><input type="checkbox" id="eFX"${EMBO.fx?' checked':''}> Λογική έκφραση</label> &nbsp;`}
     <label style="display:inline;font-weight:normal"><input type="checkbox" id="eED"${EMBO.edit?' checked':''}> Επιτρέπεται να αλλάξουν το κύκλωμα</label> &nbsp;
+    ${!seq&&EMBO.fx?`<br><label style="display:inline;font-weight:normal"><input type="checkbox" id="eOWN"${EMBO.own?' checked':''}> Γράφω εγώ τη λογική έκφραση</label>`:''}
     <label style="display:inline;font-weight:normal">Ύψος <input type="text" id="eH" value="${EMBO.h}" style="width:60px!important"> px</label></div>
+    ${!seq&&EMBO.fx&&EMBO.own?`<div class="small" style="margin-top:4px">Γράψτε την έκφραση όπως θέλετε να φαίνεται (¬ ή ' = NOT, · = AND, + = OR, ⊕ = XOR, ⊙ = XNOR). Ξεκινά από αυτή που βγάζει η σελίδα.</div>`+
+      outputsSorted().map(o=>`<div class="fxrow"><b>${escH(o.label)}</b> = <input type="text" class="fxin efx" data-out="${escH(o.label)}" spellcheck="false" value="${escH(EMBO.fxT[o.label]??embAuto(o))}"><div class="fxprev"></div></div>`).join(''):''}
     <label>Α) Γρήγορα: το κύκλωμα μέσα στον σύνδεσμο (${urlA.length} χαρακτήρες)</label>
     <textarea class="code" id="eA" rows="3" readonly>${escH(ifr(urlA))}</textarea>
     <div class="row" style="margin-top:4px"><button id="eCopyA" class="primary">📋 Αντιγραφή iframe</button><button id="ePrev">👁 Προεπισκόπηση</button></div>
@@ -2275,6 +2309,16 @@ function embRender(){ const B=$('mkBody'), base=location.protocol.startsWith('ht
   B.innerHTML=h;
   const upd=()=>{ EMBO.tt=$('eTT').checked; EMBO.fx=$('eFX')?$('eFX').checked:EMBO.fx; EMBO.edit=$('eED').checked; EMBO.h=Math.max(250,Math.min(1200,parseInt($('eH').value)||520)); embRender(); };
   ['eTT','eFX','eED'].forEach(id=>{ if($(id)) $(id).onchange=upd; }); $('eH').onchange=upd;
+  if($('eOWN')) $('eOWN').onchange=()=>{ EMBO.own=$('eOWN').checked; embRender(); };
+  { const T=truthTable(), ins=T.ins.map(c=>c.label);
+    B.querySelectorAll('.efx').forEach(inp=>{ const o=inp.dataset.out, k=T.outs.findIndex(c=>c.label===o);
+      if(EMBO.fxT[o]===undefined) EMBO.fxT[o]=inp.value;
+      const pv=()=>{ const P=inp.parentNode.querySelector('.fxprev'), p=parseExpr(inp.value,ins); if(!inp.value.trim()){ P.innerHTML='<span class="note">(κενό: θα φαίνεται η έκφραση της σελίδας)</span>'; return; }
+        if(p.err){ P.innerHTML=`<span style="color:var(--bad)">${escH(p.err)}</span>`; return; }
+        const bad=T.rows.filter(r=>{ const iv={}; ins.forEach(l=>iv[l]=r.iv[l]); const v=r.ov[k]; return (v===0||v===1)&&evalAst(p.ast,iv)!==v; }).length;
+        P.innerHTML=`${escH(o)} = ${astHTML(p.ast).h} ${bad?`<span style="color:var(--bad);font-size:13px">⚠ διαφέρει από το κύκλωμα σε ${bad} ${bad===1?'γραμμή':'γραμμές'}</span>`:'<span style="color:var(--ok);font-size:13px">✔ συμφωνεί με το κύκλωμα</span>'}`; };
+      pv(); inp.oninput=()=>{ EMBO.fxT[o]=inp.value; pv(); };
+      inp.onchange=()=>{ const a=$('eA').scrollTop; embRender(); $('eA').scrollTop=a; }; }); }
   $('eSlug').onchange=()=>{ EMBO.slug=slugify($('eSlug').value)||'kyklwma'; embRender(); };
   const copy=(ta)=>{ ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} if(navigator.clipboard) navigator.clipboard.writeText(ta.value).then(()=>flash('Αντιγράφηκε.'),()=>{}); else flash(ok?'Αντιγράφηκε.':'Πατήστε Ctrl+C.'); };
   $('eCopyA').onclick=()=>copy($('eA')); $('eCopyB').onclick=()=>copy($('eB'));
@@ -2282,7 +2326,7 @@ function embRender(){ const B=$('mkBody'), base=location.protocol.startsWith('ht
   $('eDl').onclick=()=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([embSnap()],{type:'application/json'})); a.download=EMBO.slug+'.json';
     document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); };
 }
-$('embBtn').onclick=()=>{ if(mode!=='free') return; if(!comps.length){ flash('Σχεδιάστε πρώτα ένα κύκλωμα.'); return; } EMBO.slug=''; $('mkTitleH').textContent='🔗 Ενσωμάτωση του κυκλώματος στην ιστοσελίδα'; document.body.classList.add('mk'); embRender(); };
+$('embBtn').onclick=()=>{ if(mode!=='free') return; if(!comps.length){ flash('Σχεδιάστε πρώτα ένα κύκλωμα.'); return; } EMBO.slug=''; EMBO.fxT={}; $('mkTitleH').textContent='🔗 Ενσωμάτωση του κυκλώματος στην ιστοσελίδα'; document.body.classList.add('mk'); embRender(); };
 // ---------------- embedded view ----------------
 function embedFit(){ if(!EMB||EMB.edit) { fitZoom(); return; } const r=cv.getBoundingClientRect(); if(!r.width||!r.height) return;
   let bb=null; [$('wiresG'),$('compsG')].forEach(g=>{ const b=g.getBBox(); if(!b.width&&!b.height) return; bb=bb?{x1:Math.min(bb.x1,b.x),y1:Math.min(bb.y1,b.y),x2:Math.max(bb.x2,b.x+b.width),y2:Math.max(bb.y2,b.y+b.height)}:{x1:b.x,y1:b.y,x2:b.x+b.width,y2:b.y+b.height}; });
@@ -2296,6 +2340,7 @@ if(EMB){ document.body.classList.add('embed'); if(EMB.edit) document.body.classL
   $('embTheme').textContent=document.body.classList.contains('dark')?'☀️':'🌙'; }
 fillChSel(); enterMode();
 if(EMB){ const show=(json)=>{ if(!json||!load(json)){ defaultLayout(); comps=[]; wires=[]; flash('Το κύκλωμα δεν βρέθηκε.'); }
+    else { try{ const d=JSON.parse(json); if(d.fx&&typeof d.fx==='object') EMB.fxT=d.fx; }catch(e){} }
     mode='free'; $('embTitle').textContent=title; EMB.orig=json; hist=[]; hpos=-1; commit(); redraw(); requestAnimationFrame(()=>{ embedFit(); }); };
   const mh=location.hash.match(/[#&]c=([\w-]+)/);
   if(mh){ let j=null; try{ j=b64d(mh[1]); }catch(e){} show(j); }
