@@ -2131,7 +2131,12 @@ $('mChC').onclick=()=>{ if(mode!=='ch'||grade!=='C'){ setGrade('C'); mode='ch'; 
 $('mChU').onclick=()=>{ if(CHU.length&&(mode!=='ch'||grade!=='U')){ setGrade('U'); mode='ch'; enterMode(); } };
 
 // keep fixed outputs at the right edge when the canvas is resized
-new ResizeObserver(()=>{ fitToolbar(); fitZoom(); redraw(); }).observe(cv);
+// resizing is handled in the next frame and only when the size really changed: changing the layout inside the
+// observer (toolbar, zoom) would otherwise start a loop that the browser reports as an error
+let roRaf=0, roSize='';
+new ResizeObserver(()=>{ cancelAnimationFrame(roRaf); roRaf=requestAnimationFrame(()=>{ const r=cv.getBoundingClientRect(), k=Math.round(r.width)+'x'+Math.round(r.height);
+  if(k===roSize) return; roSize=k; fitToolbar(); fitZoom(); redraw(); }); }).observe(cv);
+window.addEventListener('error',e=>{ if(/ResizeObserver loop/.test(e.message||'')){ e.stopImmediatePropagation(); e.preventDefault(); } });
 $('tankRun').onclick=()=>{ if(TK.run){ tankStop(); tankDraw(); return; } TK.run=true; $('tankRun').innerHTML='⏸ Παύση';
   if(TK.lvl>=100||TK.lvl<=0) TK.lvl=50; if(tankSensors()) redraw(); TK.timer=setInterval(tankTick,100); };
 $('tankReset').onclick=()=>{ TK.lvl=50; if(tankSensors()) redraw(); else tankDraw(); };
