@@ -241,6 +241,26 @@ details p{margin:5px 0;font-size:15px;line-height:1.4}
 #mkDlg{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,94vw);max-height:90vh;overflow:auto;z-index:100;
   background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.25);padding:10px 16px 14px;font-size:15px}
 body.mk #mkShade,body.mk #mkDlg{display:block}
+#embTheme{display:none}
+body.embed header,body.embed .toolbar,body.embed details,body.embed #chArea,body.embed #result,body.embed .exsw,body.embed #titleIn{display:none!important}
+body.embed .wrap{padding:6px;height:100vh;box-sizing:border-box}
+body.embed main{grid-template-columns:1fr 300px}
+body.embed.noside main{grid-template-columns:1fr} body.embed.noside #side{display:none}
+body.embed .wrap{height:100vh!important} body.embed main{grid-template-rows:minmax(0,1fr)!important} body.embed #side{grid-column:auto!important}
+
+body.embed.edit main{grid-template-columns:118px 1fr 300px} body.embed.edit.noside main{grid-template-columns:118px 1fr}
+body.embed:not(.edit) #palette{display:none}
+body.embed.edit .toolbar{display:flex!important} body.embed.edit .toolbar > *:not(#undoBtn):not(#redoBtn):not(#delBtn):not(#clearBtn):not(.spacer){display:none!important}
+body.embed #embTheme{display:block;position:absolute;right:8px;top:8px;z-index:5;padding:3px 8px;font-size:15px}
+body.embed:not(.notx) #ttH .exsw{display:none}
+body.embed.nofx #exprs{display:none!important}
+body.embed.nott #ttH,body.embed.nott #ttBox,body.embed.nott #tdArea{display:none!important}
+#embTitle{display:none} body.embed #embTitle{display:block;position:absolute;left:12px;top:8px;font-weight:bold;font-size:17px;color:var(--text);pointer-events:none;z-index:4}
+.admtabs{display:flex;gap:4px;margin-bottom:6px}.admtabs button.on{background:var(--accent);color:#fff}
+.admrow{display:flex;align-items:center;gap:6px;padding:3px 4px;border-bottom:1px solid var(--line);font-size:14.5px}
+.admrow.off{opacity:.5} .admrow .t{flex:1} .admrow button{padding:0 7px;font-size:13px}
+.admrow .tag{font-size:11.5px;background:var(--accent-soft);border-radius:5px;padding:0 5px;color:var(--muted)}
+#mkDlg textarea.code{font-family:Consolas,monospace;font-size:12.5px}
 #mkDlg h3{margin:2px 0 8px;font-size:18px;display:flex;align-items:center} #mkDlg h3 span{flex:1}
 #mkDlg label{display:block;font-weight:bold;margin:8px 0 2px}
 #mkDlg input[type=text],#mkDlg textarea{width:100%;box-sizing:border-box;font:inherit;font-size:15px;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}
@@ -279,6 +299,8 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <button id="wireBtn" title="Μορφή των αγωγών: ορθογώνιοι ή καμπύλοι"></button>
     <button id="delBtn" title="Διαγραφή επιλεγμένου (Delete)">🗑<span class="txt"> Διαγραφή</span></button>
     <button id="clearBtn" title="Σβήσιμο όλου του κυκλώματος">⟲<span class="txt"> Καθαρισμός</span></button>
+    <button id="admBtn" title="Διαχείριση των λιστών αποστολών Β΄ και Γ΄ (missions.json)" style="display:none">⚙<span class="txt"> Αποστολές</span></button>
+    <button id="embBtn" title="Κώδικας iframe για να μπει το κύκλωμα ως προσομοίωση στην ιστοσελίδα" style="display:none">🔗<span class="txt"> Ενσωμάτωση</span></button>
     <button id="mkBtn" title="Για εκπαιδευτικούς: φτιάξτε αποστολή από το κύκλωμα που σχεδιάσατε (η λύση σας γίνεται ο στόχος)">🎓<span class="txt"> Νέα αποστολή</span></button>
     <button id="pngBtn" title="Εικόνα του κυκλώματος με τον πίνακα αληθείας και τις εκφράσεις">🖼<span class="txt"> Εικόνα</span></button>
     <button id="saveBtn" title="Αποθήκευση του κυκλώματος σε αρχείο">💾<span class="txt"> Αποθήκευση</span></button>
@@ -286,17 +308,18 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <input type="file" id="fileIn" accept=".json,application/json" style="display:none">
   </div>
   <div id="mkShade"></div>
-  <div id="mkDlg"><h3><span>🎓 Νέα αποστολή από το κύκλωμά σας</span><button id="mkClose" title="Κλείσιμο">✕</button></h3><div id="mkBody"></div></div>
+  <div id="mkDlg"><h3><span id="mkTitleH">🎓 Νέα αποστολή από το κύκλωμά σας</span><button id="mkClose" title="Κλείσιμο">✕</button></h3><div id="mkBody"></div></div>
   <div id="recBar"><span id="recTxt"></span><button id="recStop" class="primary">⏹ Τέλος καταγραφής</button></div>
   <main>
     <div class="panel" id="palette"></div>
     <div class="panel" id="canvasBox">
-     <div id="drawArea">
+     <div id="drawArea"><button id="embTheme" title="Φωτεινό / σκούρο θέμα">🌙</button>
       <svg id="cv" xmlns="http://www.w3.org/2000/svg">
         <defs><pattern id="gridp" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1.2" style="fill:var(--grid)"/></pattern></defs>
         <rect id="bgRect" width="100%" height="100%" fill="url(#gridp)"/>
         <g id="tankG"></g><g id="wiresG"></g><g id="compsG"></g><path id="temp" class="tempwire" d="" style="display:none;pointer-events:none"/>
       </svg>
+      <div id="embTitle"></div>
       <input id="titleIn" maxlength="60" spellcheck="false" placeholder="✎ Τίτλος κυκλώματος" title="Ο τίτλος γίνεται όνομα αρχείου και μπαίνει στην εικόνα">
       <div id="props"></div>
      </div>
@@ -338,7 +361,8 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <p><b>Πίνακας αληθείας και έκφραση.</b> Ο πίνακας υπολογίζεται για όλους τους συνδυασμούς των εισόδων και η τρέχουσα γραμμή φωτίζεται. Κάτω από τον πίνακα φαίνεται η λογική έκφραση κάθε εξόδου, γραμμένη όπως στο βιβλίο (· για AND, + για OR, γραμμή από πάνω για NOT, ⊕ για XOR, ⊙ για XNOR).</p>
     <p><b>Άσκηση στην ελεύθερη σχεδίαση (✎).</b> Πάνω από τον πίνακα αληθείας διαλέγετε «Αυτόματα» ή «✎ Άσκηση». Στην άσκηση ο πίνακας δεν συμπληρώνεται μόνος του. ① Ο μαθητής δοκιμάζει τους συνδυασμούς με τους διακόπτες, συμπληρώνει τις εξόδους (κλικ: 0 → 1 → κενό) και πατά «Έλεγχος πίνακα»· τα λάθος κελιά γίνονται κόκκινα. ② Γράφει τη συνάρτηση εξόδου (· = AND, + = OR, ⊕ = XOR, ¬ ή ' = NOT) και τη βλέπει με τους συμβολισμούς του βιβλίου· κάθε ισοδύναμη μορφή δεκτή. ③ Μεταφέρει τον πίνακα στον χάρτη Karnaugh (2–4 εισόδων, με σειρά 00, 01, 11, 10), τον ελέγχει, και μετά κάνει ομάδες με τους άσσους (κλικ στα κελιά και «➕ Ομάδα»). Από τις ομάδες γράφεται αυτόματα η απλοποιημένη συνάρτηση, και η σελίδα λέει αν είναι η απλούστερη ή ποια ομάδα μπορεί να μεγαλώσει ή περισσεύει. Το «💡 Λύση» δείχνει την απλούστερη ομαδοποίηση.</p>
     <p><b>Αποστολές.</b> Υπάρχουν δύο ομάδες αποστολών. Οι <b>Αποστολές Β΄</b> είναι για τη Β΄ τάξη: λογικές πύλες και συνδυαστικά κυκλώματα (αθροιστές, συγκριτής, πολυπλέκτης, αποπολυπλέκτης, κωδικοποιητής, αποκωδικοποιητής). Οι <b>Αποστολές Γ΄</b> είναι για τη Γ΄ τάξη: μανταλωτές, flip-flop, καταχωρητές και απαριθμητές, με πρώτη την αντλία της δεξαμενής. Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τα εξαρτήματα που επιτρέπονται. Στη Β΄ ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα. Στη Γ΄, επειδή τα κυκλώματα έχουν μνήμη, ο πίνακας γίνεται «δοκιμή βήμα-βήμα»: ξεκινά με όλα στο 0, αλλάζει τις εισόδους με τη σειρά (↑ = θετικό μέτωπο του CLK) και συγκρίνει τις εξόδους σε κάθε βήμα· με κλικ σε μια γραμμή το κύκλωμα εκτελεί τα βήματα ως εκεί. Στην αποστολή της δεξαμενής η δεξαμενή φαίνεται δεξιά στον χώρο σχεδίασης: η έξοδος Y οδηγεί την αντλία και τα καλώδια των αισθητήρων SA, SB φτάνουν στους διακόπτες A, B. Με το ▶ η στάθμη ανεβαίνει και κατεβαίνει και οι αισθητήρες αλλάζουν μόνοι τους τους διακόπτες. Όταν ταιριάζουν όλα, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
-    <p><b>Αποστολές του εκπαιδευτικού (🎓).</b> Στην ελεύθερη σχεδίαση φτιάξτε τη λύση, με διακόπτες και LED με τα ονόματα που θέλετε, και πατήστε «🎓 Νέα αποστολή». Γράψτε τίτλο, εκφώνηση και, αν θέλετε, υπόδειξη. Σε συνδυαστικό κύκλωμα ο στόχος είναι ο πίνακας αληθείας της λύσης σας. Σε κύκλωμα με μνήμη πατήστε «⏺ Καταγραφή δοκιμής» και αλλάξτε τους διακόπτες με τη σειρά που θέλετε· κάθε αλλαγή γίνεται ένα βήμα της δοκιμής. Μετά πάρτε <b>σύνδεσμο</b> (για το e-class ή την ιστοσελίδα) ή <b>αρχείο αποστολής</b> (ανοίγει με το 📂). Ο μαθητής βλέπει μόνο τους διακόπτες και τα LED, και η αποστολή μένει στη λίστα «🎓 Εκπαιδευτικού» του υπολογιστή του.</p>
+    <p><b>Για τον εκπαιδευτικό.</b> Ανοίξτε τη σελίδα με <b>?διαχείριση</b> στο τέλος της διεύθυνσης (π.χ. …/idou-circuits.html?διαχείριση). Τότε εμφανίζονται τρία κουμπιά που οι μαθητές δεν βλέπουν: <b>🎓 Νέα αποστολή</b>, <b>🔗 Ενσωμάτωση</b> (κώδικας iframe για να μπει το κύκλωμα στην ιστοσελίδα, είτε μέσα στον σύνδεσμο είτε ως αρχείο στον φάκελο circuits του GitHub) και <b>⚙ Αποστολές</b> (απόκρυψη, σειρά και προσθήκη αποστολών στις λίστες Β΄ και Γ΄· οι αλλαγές ισχύουν για όλους όταν ανεβάσετε το missions.json στο GitHub, δίπλα στο idou-circuits.html).</p>
+    <p><b>Αποστολές του εκπαιδευτικού (🎓).</b> Στην ελεύθερη σχεδίαση (με ?διαχείριση) φτιάξτε τη λύση, με διακόπτες και LED με τα ονόματα που θέλετε, και πατήστε «🎓 Νέα αποστολή». Γράψτε τίτλο, εκφώνηση και, αν θέλετε, υπόδειξη. Σε συνδυαστικό κύκλωμα ο στόχος είναι ο πίνακας αληθείας της λύσης σας. Σε κύκλωμα με μνήμη πατήστε «⏺ Καταγραφή δοκιμής» και αλλάξτε τους διακόπτες με τη σειρά που θέλετε· κάθε αλλαγή γίνεται ένα βήμα της δοκιμής. Μετά πάρτε <b>σύνδεσμο</b> (για το e-class ή την ιστοσελίδα) ή <b>αρχείο αποστολής</b> (ανοίγει με το 📂). Ο μαθητής βλέπει μόνο τους διακόπτες και τα LED, και η αποστολή μένει στη λίστα «🎓 Εκπαιδευτικού» του υπολογιστή του.</p>
   </div>
   </details>
 </div>
@@ -354,7 +378,13 @@ function setTheme(d){ document.body.classList.toggle('dark',d); $('themeBtn').te
   else { try{ t=localStorage.getItem('gateSimTheme')==='dark'; }catch(e){ t=false; } } setTheme(!!t); })();
 $('themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));
 try{ if(window.self!==window.top) $('backLink').style.display='none'; }catch(e){ $('backLink').style.display='none'; }
-const store={ get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} } };
+// ?διαχείριση (or ?admin): the teacher's tools appear (new mission, embedding, managing the mission lists)
+// ?embed=1: only the circuit, for an iframe; show=tt,fx · edit=1 · c=circuits/file.json or #c=… in the address
+const QS=new URLSearchParams(location.search);
+const ADMIN=QS.has('διαχείριση')||QS.has('admin');
+const EMB=QS.has('embed')?{show:(QS.get('show')||'').split(',').filter(Boolean),edit:QS.get('edit')==='1',file:QS.get('c')}:null;
+const store={ get(k){ if(EMB&&k!=='gateSimTheme') return null; try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ if(EMB&&k!=='gateSimTheme') return; try{ localStorage.setItem(k,v); }catch(e){} } }; // an embedded circuit never touches the visitor's saved work
 
 // ---------------- gate definitions ----------------
 const ALLGATES=['NOT','AND','OR','NAND','NOR','XOR','XNOR'];
@@ -531,6 +561,23 @@ const CHC=[
   hint:'Δύο flip-flop T με κοινό CLK. Το Q0 αλλάζει σε κάθε μέτωπο: T0 = E. Το Q1 αλλάζει μόνο όταν Q0 = 1: T1 = E·Q0 (μία AND).'}
 ];
 CHB.forEach((c,i)=>c.n=i+1); CHC.forEach((c,i)=>c.n=i+1);
+// ---- the mission lists everybody sees come from missions.json next to the page (uploaded by the teacher to GitHub):
+// {t:'idou-missions',v:1,B:[id or mission,…],C:[…],hidden:[ids]}. Built-in missions not mentioned (e.g. new ones) are added at the end.
+const BUILTIN={B:CHB.slice(),C:CHC.slice()}, ALLBUILT=[...CHB,...CHC];
+let SERVERCFG=null, SERVERSTATE='…';
+const DRAFTKEY='gateBuilderMissionsDraft';
+function draftCfg(){ if(!ADMIN) return null; try{ return JSON.parse(store.get(DRAFTKEY)||'null'); }catch(e){ return null; } }
+function applyCfg(cfg){
+  const hidden=new Set(cfg&&Array.isArray(cfg.hidden)?cfg.hidden:[]), used=new Set();
+  ['B','C'].forEach(g=>{ const L=[], src=cfg&&Array.isArray(cfg[g])?cfg[g]:BUILTIN[g].map(m=>m.id);
+    src.forEach(e=>{ if(typeof e==='string'){ const m=ALLBUILT.find(x=>x.id===e); if(m&&!used.has(m.id)){ used.add(m.id); L.push(m); } }
+      else { const m=normMission(e); if(m&&!used.has(m.id)){ m.listed=true; used.add(m.id); L.push(m); } } });
+    BUILTIN[g].forEach(m=>{ if(!used.has(m.id)&&!hidden.has(m.id)&&!(cfg&&cfg.all)){ used.add(m.id); L.push(m); } });
+    const arr=g==='B'?CHB:CHC; arr.length=0; L.forEach((m,i)=>{ m.n=i+1; arr.push(m); }); }); }
+function refreshLists(){ const cur=mode==='ch'?CH[chIdx]&&CH[chIdx].id:null; applyCfg(draftCfg()||SERVERCFG);
+  if(grade!=='U'&&!CH.length){ grade=grade==='B'?'C':'B'; CH=grade==='C'?CHC:CHB; }
+  if(mode==='ch'&&grade!=='U'){ const k=CH.findIndex(c=>c.id===cur); if(k<0){ chIdx=0; if(!CH.length){ mode='free'; } enterMode(); return; } chIdx=k; }
+  fillChSel(); if(mode==='ch') renderChCard(); }
 const lastIdx={B:0,C:0,U:0};
 const partName=t=>MEMNAME[t]||t;
 function escH(t){ return String(t??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])).replace(/\n/g,'<br>'); }
@@ -626,7 +673,7 @@ function load(json){
 }
 function enterMode(){
   $('mFree').classList.toggle('on',mode==='free'); $('mChB').classList.toggle('on',mode==='ch'&&grade==='B'); $('mChC').classList.toggle('on',mode==='ch'&&grade==='C'); $('mChU').classList.toggle('on',mode==='ch'&&grade==='U');
-  $('mChU').style.display=CHU.length?'':'none'; $('mkBtn').style.display=mode==='free'?'':'none';
+  $('mChU').style.display=CHU.length?'':'none'; $('mkBtn').style.display=ADMIN&&mode==='free'?'':'none'; $('embBtn').style.display=ADMIN&&mode==='free'?'':'none'; $('admBtn').style.display=ADMIN?'':'none';
   fillChSel(); seqMsg='';
   $('chSel').style.display=mode==='ch'?'':'none'; $('chArea').style.display=mode==='ch'?'':'none';
   showResult(null);
@@ -1212,6 +1259,7 @@ function redraw(){
     : sc&&isE(sc) ? eHint(sc,sim)
     : sc&&sc.type==='NODE'
     ? `Επιλεγμένος κόμβος (${nodeDeg(sc.id)} από ${MAXNODE} αγωγοί): σύρετέ τον για να τον μετακινήσετε. Για νέο καλώδιο, κάντε κλικ σε κενό σημείο και μετά τραβήξτε από τον κόμβο.`
+    : EMB&&!EMB.edit ? 'Κλικ στους διακόπτες και στα μπουτόν: αλλάζουν οι είσοδοι του κυκλώματος.'
     : 'Κλικ = επιλογή · Delete = διαγραφή · κλικ στον διακόπτη = 0/1 · σύρετε ένα τμήμα αγωγού (↔ κάθετο, ↕ οριζόντιο) για να το μετακινήσετε';
   lastV=V; if(mode==='free'&&isSeq()) tdRecord(V,sim); else tdSamples=[]; tankDraw(); recCheck();
   renderTable(); autosave(); renderProps(); syncHint();
@@ -1497,7 +1545,7 @@ function renderExercise(T){
   else if(EX.tab==='fx'){
     h+=`<div class="note" style="line-height:1.3;margin:0">Γράψτε τη συνάρτηση εξόδου του κυκλώματος, όπως τη «διαβάζετε» από τις πύλες ή από τον πίνακα (π.χ. ¬A·B + A·¬B). · ή * = AND, + = OR, ⊕ = XOR, ¬ ή ' = NOT.</div>`;
     outs.forEach(o=>{ h+=`<div class="fxrow"><b>${escH(o)}</b> = <input type="text" class="fxin" data-out="${escH(o)}" spellcheck="false" autocomplete="off"><div class="fxprev"></div></div>`; });
-    h+=keysHTML(ins)+`<div class="exbar"><button class="primary" data-act="fxcheck">✔ Έλεγχος συνάρτησης</button></div>${msg('fx')}`; }
+    h+=keysHTML(ins)+`<div class="exbar"><button class="primary" data-act="fxcheck">✔ Έλεγχος συνάρτησης</button><button data-act="fxclear" title="Σβήνει τις συναρτήσεις που γράψατε">⟲ Καθαρισμός</button></div>${msg('fx')}`; }
   else {
     if(n<2){ h+='<div class="note">Ο χάρτης Karnaugh χρειάζεται 2 έως 4 εισόδους.</div>'; }
     else { const o=outs.includes(EX.kout)?EX.kout:outs[0], k=outs.indexOf(o), K=EX.km[o]=EX.km[o]||{cells:{},groups:[],ok:false}, L=kLayout(n);
@@ -1509,10 +1557,10 @@ function renderExercise(T){
           h+=`<td data-km="${m}" class="${v==='1'?'v1':''}${EXT.sel.includes(m)?' sel':''}${(EXT.msg.kmw||[]).includes(m)?' wrongc':''}"${sh?` style="box-shadow:${sh}"`:''}><span class="mi">${m}</span>${v==='0'||v==='1'?v:''}</td>`; }
         h+='</tr>'; }
       h+='</table>';
-      if(!K.ok) h+=`<div class="note" style="line-height:1.3;margin:0">Μεταφέρετε τον πίνακα αληθείας στον χάρτη (κλικ: 1 → 0 → κενό). Ο μικρός αριθμός σε κάθε κελί είναι ο αριθμός της γραμμής του πίνακα.</div><div class="exbar"><button class="primary" data-act="kmcheck">✔ Έλεγχος χάρτη</button></div>${msg('km')}`;
+      if(!K.ok) h+=`<div class="note" style="line-height:1.3;margin:0">Μεταφέρετε τον πίνακα αληθείας στον χάρτη (κλικ: 1 → 0 → κενό). Ο μικρός αριθμός σε κάθε κελί είναι ο αριθμός της γραμμής του πίνακα.</div><div class="exbar"><button class="primary" data-act="kmcheck">✔ Έλεγχος χάρτη</button><button data-act="kmclear" title="Σβήνει ό,τι γράψατε στον χάρτη">⟲ Καθαρισμός</button></div>${msg('km')}`;
       else { const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1), cov=new Set(K.groups.flat());
         h+=`<div class="note" style="line-height:1.3;margin:0">Ομαδοποιήστε τους άσσους: κλικ σε κελιά (1, 2, 4 ή 8 γειτονικά, και «γύρω» από τις άκρες) και «➕ Ομάδα».</div>
-          <div class="exbar"><button class="primary" data-act="gadd"${EXT.sel.length?'':' disabled'}>➕ Ομάδα</button><button data-act="gclr"${EXT.sel.length?'':' disabled'}>✖ Επιλογή</button><button data-act="gsol" title="Δείχνει την απλούστερη ομαδοποίηση">💡 Λύση</button></div>${msg('kg')}`;
+          <div class="exbar"><button class="primary" data-act="gadd"${EXT.sel.length?'':' disabled'}>➕ Ομάδα</button><button data-act="gclr"${EXT.sel.length?'':' disabled'}>✖ Επιλογή</button><button data-act="gsol" title="Δείχνει την απλούστερη ομαδοποίηση">💡 Λύση</button><button data-act="gdelall"${K.groups.length?'':' disabled'} title="Σβήνει όλες τις ομάδες· ο χάρτης μένει">⟲ Καθαρισμός ομάδων</button></div>${msg('kg')}`;
         if(K.groups.length) h+='<div class="glist">'+K.groups.map((g,i)=>{ const cu=cubeOf(g,n); return `<div><span class="gc" style="background:${GCOL[i%GCOL.length]}"></span>${astHTML(cubeTerm(cu,ins)).h} <span class="note">(${g.length} ${g.length===1?'κελί':'κελιά'})</span><button data-gdel="${i}" title="Αφαίρεση ομάδας">✕</button></div>`; }).join('')+'</div>';
         if(on.length===0) h+=`<div class="exmsg info">Η έξοδος είναι πάντα 0: <b>${escH(o)} = 0</b>.</div>`;
         else if(on.every(m=>cov.has(m))){ const ast=sopAst(K.groups.map(g=>cubeOf(g,n)),ins), best=minSOP(on,n), mine=K.groups.map(g=>cubeOf(g,n));
@@ -1539,6 +1587,7 @@ function renderExercise(T){
     EXT.msg.ttw=w; EXT.msg.tt=empty?['bad',`Συμπληρώστε όλα τα κελιά (λείπουν ${empty}).`]:w.length?['bad',`${w.length} ${w.length===1?'τιμή είναι λάθος':'τιμές είναι λάθος'} (σημειώνονται με κόκκινο). Δοκιμάστε ξανά αυτούς τους συνδυασμούς με τους διακόπτες.`]:['ok','🎉 Σωστός πίνακας αληθείας! Συνεχίστε στο ② Συνάρτηση.']; renderTable(); });
   act('ttclear',()=>{ EX.tt={}; delete EXT.msg.tt; delete EXT.msg.ttw; saveEX(); renderTable(); });
   if(EX.tab==='fx') fxBind(B,ins,o=>EX.ex[o],(o,v)=>{ EX.ex[o]=v; saveEX(); });
+  act('fxclear',()=>{ outs.forEach(o=>delete EX.ex[o]); delete EXT.msg.fx; saveEX(); exSig=''; renderTable(); });
   act('fxcheck',()=>{ if(!full){ EXT.msg.fx=['bad','Πρώτα ολοκληρώστε το κύκλωμα.']; renderTable(); return; } const errs=[];
     outs.forEach((o,k)=>{ const v=EX.ex[o]||''; if(!v.trim()){ errs.push(`Γράψτε τη συνάρτηση του ${escH(o)}.`); return; } const p=parseExpr(v,ins); if(p.err){ errs.push(`${escH(o)}: ${escH(p.err)}`); return; }
       const bad=T.rows.filter(r=>{ const iv={}; ins.forEach(l=>iv[l]=r.iv[l]); return evalAst(p.ast,iv)!==r.ov[k]; }).length;
@@ -1556,6 +1605,8 @@ function renderExercise(T){
       else EXT.msg.km=['bad',empty?`Συμπληρώστε όλα τα κελιά (λείπουν ${empty}).`:`${w.length} ${w.length===1?'κελί είναι λάθος':'κελιά είναι λάθος'} (κόκκινο). Προσέξτε τη σειρά 00, 01, 11, 10.`];
       saveEX(); renderTable(); });
     act('gclr',()=>{ EXT.sel=[]; renderTable(); });
+    act('kmclear',()=>{ K.cells={}; delete EXT.msg.km; delete EXT.msg.kmw; saveEX(); renderTable(); });
+    act('gdelall',()=>{ K.groups=[]; EXT.sel=[]; delete EXT.msg.kg; saveEX(); renderTable(); });
     act('gadd',()=>{ const cu=cubeOf(EXT.sel,n);
       if(!cu){ EXT.msg.kg=['bad',`Αυτά τα ${EXT.sel.length} κελιά δεν είναι ομάδα: μια ομάδα έχει 1, 2, 4 ή 8 κελιά που σχηματίζουν ορθογώνιο (και «γύρω» από τις άκρες του χάρτη).`]; renderTable(); return; }
       if(K.groups.some(g=>g.length===EXT.sel.length&&g.every(m=>EXT.sel.includes(m)))){ EXT.msg.kg=['bad','Αυτή η ομάδα υπάρχει ήδη.']; renderTable(); return; }
@@ -1660,6 +1711,7 @@ function startNew(ev,type){
 function moveGhost(ev){ drag.ghost.style.left=(ev.clientX-48)+'px'; drag.ghost.style.top=(ev.clientY-30)+'px'; }
 cv.addEventListener('pointerdown',ev=>{
   const t=ev.target, p=pt(ev);
+  if(EMB&&!EMB.edit&&!t.dataset.toggle&&!t.dataset.press) return;
   if(t.dataset.pin){ const [id,k,dir]=t.dataset.pin.split(':'); ev.preventDefault();
     const pq=pinPos(byId(+id)), sp=dir==='out'?pq.outs[+k]:dir==='io'?pq.ios[+k]:pq.ins[+k];
     drag={kind:'wire',id:+id,pin:+k,dir,start:{x:sp.x,y:sp.y},sx:p.x,sy:p.y,corners:[],tdirs:[],tdir:null};
@@ -1800,6 +1852,7 @@ function deleteSel(){
 }
 document.addEventListener('keydown',ev=>{
   if(ev.target.tagName==='INPUT'||ev.target.tagName==='SELECT'||ev.target.tagName==='TEXTAREA'||ev.target.isContentEditable) return;
+  if(EMB&&!EMB.edit) return;
   if(ev.key==='Delete'||ev.key==='Backspace'){ ev.preventDefault(); deleteSel(); }
   if((ev.key==='r'||ev.key==='R'||ev.key==='ρ'||ev.key==='Ρ')&&!ev.ctrlKey&&!ev.metaKey&&!ev.altKey){ rotateSel(); return; }
   if(ev.key==='Escape'&&document.body.classList.contains('mk')){ mkClose(); return; }
@@ -1816,7 +1869,7 @@ updWireBtn();
 // confirm() is often blocked inside an iframe (e.g. Google Sites), so we ask for a second click instead
 let clearArmed=null;
 function disarmClear(){ clearTimeout(clearArmed); clearArmed=null; $('clearBtn').innerHTML='⟲<span class="txt"> Καθαρισμός</span>'; $('clearBtn').classList.remove('primary'); }
-$('clearBtn').onclick=()=>{
+$('clearBtn').onclick=EMB?()=>{ if(EMB.orig) load(EMB.orig); else { comps=[]; wires=[]; } redraw(); }:()=>{
   const nonEmpty=comps.some(c=>!(c.type==='IN'||c.type==='OUT'))||wires.length>0;
   if(nonEmpty&&!clearArmed){ $('clearBtn').innerHTML='⚠ Ξανά για σβήσιμο'; $('clearBtn').classList.add('primary');
     clearArmed=setTimeout(disarmClear,3500); return; }
@@ -2059,7 +2112,7 @@ function mkRender(msg){ const B=$('mkBody'), P=mkProblems(), seq=isSeq(), ins=in
   else h+=`Το κύκλωμα έχει μνήμη, άρα ο στόχος είναι μια <b>δοκιμή βήμα-βήμα</b>. Πατήστε «Καταγραφή», αλλάξτε τους διακόπτες με τη σειρά που θέλετε (κάθε αλλαγή = ένα βήμα) και πατήστε «Τέλος». Η δοκιμή ξεκινά με όλους τους διακόπτες και τα flip-flop στο 0.<br>
       <b>${REC&&REC.steps.length>1?`Καταγράφηκαν ${REC.steps.length} βήματα.`:'Δεν έχει καταγραφεί δοκιμή.'}</b> <button id="mkRec">⏺ ${REC&&REC.steps.length>1?'Νέα καταγραφή':'Καταγραφή δοκιμής'}</button></div>`;
   if(msg) h+=msg;
-  h+=`<div class="row"><button class="primary" id="mkLink">🔗 Σύνδεσμος για τους μαθητές</button><button id="mkFile">💾 Αρχείο αποστολής</button><button id="mkTry">▶ Δοκιμή ως μαθητής</button></div>
+  h+=`<div class="row"><button class="primary" id="mkLink">🔗 Σύνδεσμος για τους μαθητές</button><button id="mkFile">💾 Αρχείο αποστολής</button><button id="mkTry">▶ Δοκιμή ως μαθητής</button><button id="mkLB" title="Μόνιμα στη λίστα της Β΄ (μετά «Λήψη missions.json» στη διαχείριση)">➕ Στη λίστα Β΄</button><button id="mkLC" title="Μόνιμα στη λίστα της Γ΄ (μετά «Λήψη missions.json» στη διαχείριση)">➕ Στη λίστα Γ΄</button></div>
     <div class="small" style="margin-top:8px">Ο σύνδεσμος ανοίγει τη σελίδα με την αποστολή έτοιμη (βάλτε τον στο e-class ή στην ιστοσελίδα). Το αρχείο ανοίγει με το 📂 Άνοιγμα. Η αποστολή μένει στη λίστα «🎓 Εκπαιδευτικού» στον υπολογιστή του μαθητή.</div>`;
   B.innerHTML=h;
   const sync=()=>{ MK.title=$('mkTitle').value; MK.text=$('mkText').value; MK.hint=$('mkHint').value; };
@@ -2079,8 +2132,10 @@ function mkRender(msg){ const B=$('mkBody'), P=mkProblems(), seq=isSeq(), ins=in
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'})); a.download=name;
     document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); };
   $('mkTry').onclick=()=>{ const m=get(); if(!m) return; mkClose(); autosave(); openMission(m); };
+  ['B','C'].forEach(g=>{ $('mkL'+g).onclick=()=>{ const m=get(); if(!m) return; ADM.rows=admRowsFrom(draftCfg()||SERVERCFG); admAdd(m,g); ADM.g=g;
+    ADM.msg=`Η «${escH(m.title)}» μπήκε στη λίστα ${g==='B'?'Β΄':'Γ΄'}. Πατήστε «Λήψη missions.json» και ανεβάστε το στο GitHub για να τη δουν όλοι.`; $('mkTitleH').textContent='⚙ Διαχείριση αποστολών'; admRender(); }; });
 }
-function mkOpen(){ if(mode!=='free') return; MK.fx={}; document.body.classList.add('mk'); mkRender(); }
+function mkOpen(){ if(mode!=='free') return; MK.fx={}; $('mkTitleH').textContent='🎓 Νέα αποστολή από το κύκλωμά σας'; document.body.classList.add('mk'); mkRender(); }
 function mkClose(){ document.body.classList.remove('mk'); }
 function recStart(){ mkClose(); tankStop();
   comps.forEach(c=>{ if(c.type==='IN') c.val=0; if(MEM.includes(c.type)){ c.q=0; delete c.bad; delete c.pclk; } }); prevV={};
@@ -2097,7 +2152,7 @@ function renderChCard(){ if(mode!=='ch') return; const c=CH[chIdx];
   const fxH=c.fx?'<div style="font-size:17px;margin:4px 0 2px">'+c.outs.map(o=>`<b>${escH(o)}</b> = ${astHTML(c.fx[o]).h}`).join('<br>')+'</div>':'';
   const tasks=c.tt&&c.custom?`<div style="margin-top:3px"><b>Ζητείται:</b> ${[c.needT?'πίνακας αληθείας':'',' κύκλωμα',c.needE?'συνάρτηση εξόδου':''].filter(Boolean).join(', ')}</div>`:'';
   $('chCard').innerHTML=`<div class="ct">Αποστολή ${c.n}: ${c.title}${doneSet().has(c.id)?' ✓':''}</div><div class="ctext">${c.text}${fxH}${tasks}</div>
-    <div class="cr">${c.custom?'Αποστολή εκπαιδευτικού':c.parts?'Εξαρτήματα: '+c.parts.map(partName).join(', '):'Πύλες: '+c.gates.join(', ')}${c.max?` · το πολύ ${c.max} πύλες`:''}${c.full?' · <a href="#" id="fullLink">📄 Πλήρης εκφώνηση</a>':''}${c.custom?' · <a href="#" id="rmLink" title="Η αποστολή φεύγει μόνο από αυτόν τον υπολογιστή">🗑 Αφαίρεση από τη λίστα</a>':''}</div>`;
+    <div class="cr">${c.custom?'Αποστολή εκπαιδευτικού':c.parts?'Εξαρτήματα: '+c.parts.map(partName).join(', '):'Πύλες: '+c.gates.join(', ')}${c.max?` · το πολύ ${c.max} πύλες`:''}${c.full?' · <a href="#" id="fullLink">📄 Πλήρης εκφώνηση</a>':''}${c.custom&&!c.listed?' · <a href="#" id="rmLink" title="Η αποστολή φεύγει μόνο από αυτόν τον υπολογιστή">🗑 Αφαίρεση από τη λίστα</a>':''}</div>`;
   const rl=$('rmLink'); if(rl) rl.onclick=ev=>{ ev.preventDefault(); if(rl.dataset.sure){ CHU.splice(chIdx,1); saveCustom(); if(!CHU.length){ grade='B'; CH=CHB; chIdx=0; mode='free'; } else { chIdx=Math.min(chIdx,CHU.length-1); } enterMode(); }
     else { rl.dataset.sure=1; rl.textContent='Σίγουρα; Κλικ ξανά για αφαίρεση'; setTimeout(()=>{ if(rl.isConnected){ delete rl.dataset.sure; rl.textContent='🗑 Αφαίρεση από τη λίστα'; } },3000); } };
   const fl=$('fullLink'); if(fl) fl.onclick=ev=>{ ev.preventDefault(); showResult('info',c.full); };
@@ -2135,7 +2190,7 @@ $('mChU').onclick=()=>{ if(CHU.length&&(mode!=='ch'||grade!=='U')){ setGrade('U'
 // observer (toolbar, zoom) would otherwise start a loop that the browser reports as an error
 let roRaf=0, roSize='';
 new ResizeObserver(()=>{ cancelAnimationFrame(roRaf); roRaf=requestAnimationFrame(()=>{ const r=cv.getBoundingClientRect(), k=Math.round(r.width)+'x'+Math.round(r.height);
-  if(k===roSize) return; roSize=k; fitToolbar(); fitZoom(); redraw(); }); }).observe(cv);
+  if(k===roSize) return; roSize=k; fitToolbar(); if(EMB) embedFit(); else fitZoom(); redraw(); }); }).observe(cv);
 window.addEventListener('error',e=>{ if(/ResizeObserver loop/.test(e.message||'')){ e.stopImmediatePropagation(); e.preventDefault(); } });
 $('tankRun').onclick=()=>{ if(TK.run){ tankStop(); tankDraw(); return; } TK.run=true; $('tankRun').innerHTML='⏸ Παύση';
   if(TK.lvl>=100||TK.lvl<=0) TK.lvl=50; if(tankSensors()) redraw(); TK.timer=setInterval(tankTick,100); };
@@ -2144,8 +2199,113 @@ $('helpClose').onclick=()=>{ document.querySelector('details').open=false; };
 $('helpShade').onclick=()=>{ document.querySelector('details').open=false; };
 
 window.addEventListener('resize',fitToolbar);
+// ---------------- teacher: managing the mission lists ----------------
+let ADM={g:'B',rows:null,msg:''};
+function admRowsFrom(cfg){ const R={B:[],C:[]}; applyCfg(cfg); // the current effective lists, then the hidden built-ins
+  ['B','C'].forEach(g=>{ (g==='B'?CHB:CHC).forEach(m=>R[g].push({id:m.id,raw:m.custom?m.raw:null,title:m.title,on:true}));
+    BUILTIN[g].forEach(m=>{ if(!R.B.some(r=>r.id===m.id)&&!R.C.some(r=>r.id===m.id)) R[g].push({id:m.id,raw:null,title:m.title,on:false}); }); });
+  return R; }
+function admCfg(){ const R=ADM.rows, cfg={t:'idou-missions',v:1,B:[],C:[],hidden:[]};
+  ['B','C'].forEach(g=>R[g].forEach(r=>{ if(r.on) cfg[g].push(r.raw||r.id); else if(!r.raw) cfg.hidden.push(r.id); })); return cfg; }
+function admSave(){ store.set(DRAFTKEY,JSON.stringify(admCfg())); refreshLists(); }
+function admOpen(){ ADM.rows=admRowsFrom(draftCfg()||SERVERCFG); ADM.msg=''; $('mkTitleH').textContent='⚙ Διαχείριση αποστολών'; document.body.classList.add('mk'); admRender(); }
+function admAdd(raw,g){ const m=normMission(raw); if(!m) return false; const R=ADM.rows; if(!R) ADM.rows=admRowsFrom(draftCfg()||SERVERCFG);
+  ['B','C'].forEach(x=>ADM.rows[x]=ADM.rows[x].filter(r=>r.id!==m.id)); ADM.rows[g].push({id:m.id,raw,title:m.title,on:true}); admSave(); return true; }
+function admRender(){ const B=$('mkBody'), g=ADM.g, R=ADM.rows[g], hasDraft=!!draftCfg();
+  let h=`<div class="admtabs"><button data-g="B" class="${g==='B'?'on':''}">🎯 Αποστολές Β΄</button><button data-g="C" class="${g==='C'?'on':''}">🎯 Αποστολές Γ΄</button></div>`;
+  h+=R.map((r,i)=>`<div class="admrow${r.on?'':' off'}"><input type="checkbox" data-on="${i}"${r.on?' checked':''} title="Εμφανίζεται στη λίστα">
+    <span class="t">${r.title}${r.raw?' <span class="tag">εκπαιδευτικού</span>':''}</span>
+    <button data-up="${i}" title="Πιο πάνω"${i?'':' disabled'}>▲</button><button data-dn="${i}" title="Πιο κάτω"${i<R.length-1?'':' disabled'}>▼</button>
+    ${r.raw?`<button data-mv="${i}" title="Μεταφορά στην άλλη τάξη">→ ${g==='B'?'Γ΄':'Β΄'}</button><button data-del="${i}" title="Διαγραφή">🗑</button>`:''}</div>`).join('');
+  h+=`<label style="margin-top:12px">Προσθήκη αποστολής εκπαιδευτικού στη λίστα ${g==='B'?'Β΄':'Γ΄'}</label>
+    <div class="row" style="margin-top:2px">${CHU.length?`<select id="admU" style="flex:1;min-width:200px">${CHU.map((c,i)=>`<option value="${i}">${c.title}</option>`).join('')}</select><button id="admAddU">➕ Από τη λίστα 🎓</button>`:'<span class="small">Η λίστα «🎓 Εκπαιδευτικού» αυτού του browser είναι κενή.</span>'}</div>
+    <div class="row"><input type="text" id="admLink" placeholder="…ή επικολλήστε σύνδεσμο αποστολής (#m=…)" style="flex:1"><button id="admAddL">➕ Από σύνδεσμο</button><button id="admAddF">📂 Από αρχείο</button></div>
+    <div class="small" style="margin-top:4px">Νέα αποστολή φτιάχνετε με το «🎓 Νέα αποστολή» στην ελεύθερη σχεδίαση· εκεί υπάρχει και κουμπί που τη βάζει κατευθείαν σε αυτή τη λίστα.</div>`;
+  if(ADM.msg) h+=`<div class="info">${ADM.msg}</div>`;
+  h+=`<div class="info" style="margin-top:12px">${hasDraft?'✎ Έχετε αλλαγές που φαίνονται <b>μόνο σε αυτόν τον browser</b>.':'Δεν υπάρχουν αλλαγές.'} Για να τις δουν όλοι, πατήστε «Λήψη missions.json» και ανεβάστε το αρχείο στο GitHub, στον <b>ίδιο φάκελο</b> με το idou-circuits.html (Add file → Upload files· αντικαθιστά το παλιό).<br>
+    <span class="small">Αρχείο στον διακομιστή: ${SERVERSTATE}</span></div>
+    <div class="row"><button class="primary" id="admDl">💾 Λήψη missions.json</button><button id="admDiscard"${hasDraft?'':' disabled'} title="Πίσω σε ό,τι ισχύει στο GitHub">⟲ Απόρριψη αλλαγών</button><button id="admReset" title="Όλες οι ενσωματωμένες αποστολές, με την αρχική σειρά, χωρίς αποστολές εκπαιδευτικού">↺ Αρχικές λίστες</button></div>`;
+  B.innerHTML=h;
+  const re=()=>{ admSave(); admRender(); };
+  B.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{ ADM.g=b.dataset.g; admRender(); });
+  B.querySelectorAll('[data-on]').forEach(c=>c.onchange=()=>{ R[+c.dataset.on].on=c.checked; re(); });
+  B.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; [R[i-1],R[i]]=[R[i],R[i-1]]; re(); });
+  B.querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.dn; [R[i+1],R[i]]=[R[i],R[i+1]]; re(); });
+  B.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{ const r=R.splice(+b.dataset.mv,1)[0]; ADM.rows[g==='B'?'C':'B'].push(r); re(); });
+  B.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ if(b.dataset.sure){ R.splice(+b.dataset.del,1); re(); } else { b.dataset.sure=1; b.textContent='Σίγουρα;'; } });
+  if($('admAddU')) $('admAddU').onclick=()=>{ const c=CHU[+$('admU').value]; ADM.msg=admAdd(c.raw,g)?`Προστέθηκε η «${c.title}».`:'Η αποστολή δεν είναι σωστή.'; admRender(); };
+  $('admAddL').onclick=()=>{ const m=$('admLink').value.match(/[#&]m=([\w-]+)/); let d=null; try{ d=m&&JSON.parse(b64d(m[1])); }catch(e){}
+    ADM.msg=d&&admAdd(d,g)?'Προστέθηκε η αποστολή του συνδέσμου.':'Ο σύνδεσμος δεν περιέχει σωστή αποστολή.'; admRender(); };
+  $('admAddF').onclick=()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
+    inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ let d=null; try{ d=JSON.parse(r.result); }catch(e){}
+      if(d&&d.t==='idou-missions'){ store.set(DRAFTKEY,JSON.stringify(d)); ADM.rows=admRowsFrom(d); refreshLists(); ADM.msg='Φορτώθηκε ολόκληρο αρχείο missions.json.'; }
+      else ADM.msg=d&&admAdd(d,g)?'Προστέθηκε η αποστολή του αρχείου.':'Το αρχείο δεν είναι αποστολή.'; admRender(); }; r.readAsText(f); }; inp.click(); };
+  $('admDl').onclick=()=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(admCfg(),null,1)],{type:'application/json'})); a.download='missions.json';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); };
+  $('admDiscard').onclick=()=>{ localStorage.removeItem(DRAFTKEY); ADM.rows=admRowsFrom(SERVERCFG); refreshLists(); ADM.msg='Οι λίστες είναι πάλι όπως στο GitHub.'; admRender(); };
+  $('admReset').onclick=()=>{ ADM.rows=admRowsFrom(null); admSave(); ADM.msg='Οι λίστες γύρισαν στις αρχικές. Ανεβάστε το missions.json για να ισχύσει για όλους.'; admRender(); };
+}
+$('admBtn').onclick=admOpen;
+// ---------------- teacher: embedding the circuit in the website ----------------
+const SITEURL='https://yiannisdou.github.io/Simulations/idou-circuits.html';
+let EMBO={tt:true,fx:true,edit:false,h:520,slug:''};
+const GRLAT={α:'a',ά:'a',β:'v',γ:'g',δ:'d',ε:'e',έ:'e',ζ:'z',η:'i',ή:'i',θ:'th',ι:'i',ί:'i',ϊ:'i',ΐ:'i',κ:'k',λ:'l',μ:'m',ν:'n',ξ:'x',ο:'o',ό:'o',π:'p',ρ:'r',σ:'s',ς:'s',τ:'t',υ:'y',ύ:'y',ϋ:'y',ΰ:'y',φ:'f',χ:'ch',ψ:'ps',ω:'o',ώ:'o'};
+const slugify=t=>String(t||'').toLowerCase().split('').map(ch=>GRLAT[ch]??ch).join('').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
+function embSnap(){ return JSON.stringify({v:1,title,mode:'free',comps:comps.map(({fixed,...c})=>c),wires}); }
+function embRender(){ const B=$('mkBody'), base=location.protocol.startsWith('http')&&location.hostname.endsWith('github.io')?location.origin+location.pathname:SITEURL;
+  if(!EMBO.slug) EMBO.slug=slugify(title)||'kyklwma';
+  const seq=isSeq(), q='?embed=1'+((EMBO.tt||EMBO.fx)?'&show='+[EMBO.tt?'tt':'',EMBO.fx&&!seq?'fx':''].filter(Boolean).join(','):'')+(EMBO.edit?'&edit=1':'');
+  const urlA=base+q+'#c='+b64e(embSnap()), urlB=base+q+'&c=circuits/'+EMBO.slug+'.json';
+  const ifr=u=>`<iframe src="${u}" width="100%" height="${EMBO.h}" style="border:0" loading="lazy" title="${escH(title||'Κύκλωμα')}"></iframe>`;
+  let h=`<div class="small">Το κύκλωμα θα φαίνεται μόνο του, χωρίς παλέτα και γραμμή εργαλείων· οι επισκέπτες πατούν διακόπτες και μπουτόν. Δεν πειράζει τίποτα από τη δουλειά τους στη σελίδα.</div>
+    <label>Τι φαίνεται</label>
+    <div><label style="display:inline;font-weight:normal"><input type="checkbox" id="eTT"${EMBO.tt?' checked':''}> ${seq?'Χρονικό διάγραμμα':'Πίνακας αληθείας'}</label> &nbsp;
+    ${seq?'':`<label style="display:inline;font-weight:normal"><input type="checkbox" id="eFX"${EMBO.fx?' checked':''}> Λογική έκφραση</label> &nbsp;`}
+    <label style="display:inline;font-weight:normal"><input type="checkbox" id="eED"${EMBO.edit?' checked':''}> Επιτρέπεται να αλλάξουν το κύκλωμα</label> &nbsp;
+    <label style="display:inline;font-weight:normal">Ύψος <input type="text" id="eH" value="${EMBO.h}" style="width:60px!important"> px</label></div>
+    <label>Α) Γρήγορα: το κύκλωμα μέσα στον σύνδεσμο (${urlA.length} χαρακτήρες)</label>
+    <textarea class="code" id="eA" rows="3" readonly>${escH(ifr(urlA))}</textarea>
+    <div class="row" style="margin-top:4px"><button id="eCopyA" class="primary">📋 Αντιγραφή iframe</button><button id="ePrev">👁 Προεπισκόπηση</button></div>
+    <label>Β) Μόνιμα: αρχείο στο GitHub</label>
+    <div class="small">1. Όνομα αρχείου (λατινικά): <input type="text" id="eSlug" value="${escH(EMBO.slug)}" style="width:220px!important">.json &nbsp;<button id="eDl">💾 Λήψη αρχείου</button><br>
+    2. Ανεβάστε το στο repository Simulations, στον φάκελο <b>circuits</b>. <b>Την πρώτη φορά</b> φτιάξτε στον υπολογιστή σας φάκελο «circuits», βάλτε μέσα το αρχείο και σύρετε ολόκληρο τον φάκελο στο Add file → Upload files (ή: Add file → Create new file, όνομα «circuits/${escH(EMBO.slug)}.json» και επικόλληση του περιεχομένου). <b>Τις επόμενες φορές</b> μπείτε στον φάκελο circuits και Add file → Upload files· αρχείο με το ίδιο όνομα αντικαθιστά το παλιό.<br>
+    3. Βάλτε στην ιστοσελίδα αυτό το iframe. Αν αργότερα ανεβάσετε νέα έκδοση του αρχείου, αλλάζει μόνο του παντού.</div>
+    <textarea class="code" id="eB" rows="2" readonly>${escH(ifr(urlB))}</textarea>
+    <div class="row" style="margin-top:4px"><button id="eCopyB">📋 Αντιγραφή iframe</button></div>`;
+  B.innerHTML=h;
+  const upd=()=>{ EMBO.tt=$('eTT').checked; EMBO.fx=$('eFX')?$('eFX').checked:EMBO.fx; EMBO.edit=$('eED').checked; EMBO.h=Math.max(250,Math.min(1200,parseInt($('eH').value)||520)); embRender(); };
+  ['eTT','eFX','eED'].forEach(id=>{ if($(id)) $(id).onchange=upd; }); $('eH').onchange=upd;
+  $('eSlug').onchange=()=>{ EMBO.slug=slugify($('eSlug').value)||'kyklwma'; embRender(); };
+  const copy=(ta)=>{ ta.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(e){} if(navigator.clipboard) navigator.clipboard.writeText(ta.value).then(()=>flash('Αντιγράφηκε.'),()=>{}); else flash(ok?'Αντιγράφηκε.':'Πατήστε Ctrl+C.'); };
+  $('eCopyA').onclick=()=>copy($('eA')); $('eCopyB').onclick=()=>copy($('eB'));
+  $('ePrev').onclick=()=>window.open(urlA.replace(SITEURL,location.protocol==='file:'?location.href.split(/[?#]/)[0]:SITEURL),'_blank');
+  $('eDl').onclick=()=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([embSnap()],{type:'application/json'})); a.download=EMBO.slug+'.json';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); };
+}
+$('embBtn').onclick=()=>{ if(mode!=='free') return; if(!comps.length){ flash('Σχεδιάστε πρώτα ένα κύκλωμα.'); return; } EMBO.slug=''; $('mkTitleH').textContent='🔗 Ενσωμάτωση του κυκλώματος στην ιστοσελίδα'; document.body.classList.add('mk'); embRender(); };
+// ---------------- embedded view ----------------
+function embedFit(){ if(!EMB||EMB.edit) { fitZoom(); return; } const r=cv.getBoundingClientRect(); if(!r.width||!r.height) return;
+  let bb=null; [$('wiresG'),$('compsG')].forEach(g=>{ const b=g.getBBox(); if(!b.width&&!b.height) return; bb=bb?{x1:Math.min(bb.x1,b.x),y1:Math.min(bb.y1,b.y),x2:Math.max(bb.x2,b.x+b.width),y2:Math.max(bb.y2,b.y+b.height)}:{x1:b.x,y1:b.y,x2:b.x+b.width,y2:b.y+b.height}; });
+  if(!bb) return; const pad=24, top=$('embTitle').textContent?34:0; let x=bb.x1-pad, y=bb.y1-pad-top, w=bb.x2-bb.x1+2*pad, h=bb.y2-bb.y1+2*pad+top;
+  const sc=Math.min(r.width/w,r.height/h); if(sc>1.5){ const W=r.width/1.5, H=r.height/1.5; x-=(W-w)/2; y-=(H-h)/2; w=W; h=H; }
+  zoom=Math.min(r.width/w,r.height/h); cv.setAttribute('viewBox',`${x} ${y} ${w} ${h}`); }
+if(EMB){ document.body.classList.add('embed'); if(EMB.edit) document.body.classList.add('edit'); $('clearBtn').innerHTML='⟲<span class="txt"> Αρχικό κύκλωμα</span>'; $('clearBtn').title='Επαναφορά του κυκλώματος όπως ήταν';
+  const tt=EMB.show.includes('tt'), fx=EMB.show.includes('fx'); if(!tt&&!fx) document.body.classList.add('noside'); if(!tt) document.body.classList.add('nott'); if(!fx) document.body.classList.add('nofx');
+  XM=false; mode='free';
+  $('embTheme').onclick=()=>{ $('themeBtn').click(); $('embTheme').textContent=document.body.classList.contains('dark')?'☀️':'🌙'; };
+  $('embTheme').textContent=document.body.classList.contains('dark')?'☀️':'🌙'; }
 fillChSel(); enterMode();
-(()=>{ const m=location.hash.match(/[#&]m=([\w-]+)/); if(!m) return; let d=null; try{ d=JSON.parse(b64d(m[1])); }catch(e){}
+if(EMB){ const show=(json)=>{ if(!json||!load(json)){ defaultLayout(); comps=[]; wires=[]; flash('Το κύκλωμα δεν βρέθηκε.'); }
+    mode='free'; $('embTitle').textContent=title; EMB.orig=json; hist=[]; hpos=-1; commit(); redraw(); requestAnimationFrame(()=>{ embedFit(); }); };
+  const mh=location.hash.match(/[#&]c=([\w-]+)/);
+  if(mh){ let j=null; try{ j=b64d(mh[1]); }catch(e){} show(j); }
+  else if(EMB.file&&/^[\w\-\/.]+\.json$/.test(EMB.file)&&!EMB.file.includes('..')) fetch(EMB.file,{cache:'no-cache'}).then(r=>r.ok?r.text():null).then(show,()=>show(null));
+  else show(null); }
+// the mission lists everybody sees (missions.json next to the page)
+if(!EMB) fetch('missions.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{ if(d&&d.t==='idou-missions'){ SERVERCFG=d; SERVERSTATE='βρέθηκε το missions.json ✓'; } else SERVERSTATE='δεν υπάρχει ακόμα missions.json (ισχύουν οι αρχικές λίστες)'; refreshLists(); },
+  ()=>{ SERVERSTATE='δεν διαβάστηκε (η σελίδα άνοιξε από αρχείο ή χωρίς σύνδεση)'; refreshLists(); });
+if(ADMIN&&!EMB) refreshLists();
+(()=>{ if(EMB) return; const m=location.hash.match(/[#&]m=([\w-]+)/); if(!m) return; let d=null; try{ d=JSON.parse(b64d(m[1])); }catch(e){}
   if(!d||!openMission(d)) flash('Ο σύνδεσμος της αποστολής δεν είναι σωστός (ίσως κόπηκε στην αντιγραφή).'); })();
 </script>
 </body>
