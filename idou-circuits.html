@@ -145,20 +145,34 @@ body.dark #props button.on{color:#0d1420}
 /* right side */
 #side{display:flex;flex-direction:column;padding:8px 10px;gap:7px;overflow:hidden}
 #side h2{font-size:16px;margin:0;display:flex;align-items:center;gap:6px}
-#chCard{border:1px solid var(--line);border-radius:8px;background:var(--accent-soft);padding:7px 10px;font-size:15px;line-height:1.35}
+#chCard{border:1px solid var(--line);border-radius:8px;background:var(--accent-soft);padding:6px 9px;font-size:14px;line-height:1.3;max-height:32vh;overflow:auto;flex:0 0 auto}
 #chCard .ct{font-weight:bold;font-size:16px;margin-bottom:2px}
 #chCard .cr{font-size:13px;color:var(--muted);margin-top:4px}
-#chBtns{display:flex;gap:6px;flex-wrap:wrap}
-#chBtns button{flex:1;min-width:110px}
+#chBtns{display:flex;gap:5px}
+#chBtns button{flex:1 1 auto;min-width:0;padding:4px 6px;font-size:14px;white-space:nowrap}
+#tankBox{border:1px solid var(--line);border-radius:8px;padding:3px 6px 4px;flex:0 0 auto}
+#side{overflow-y:auto}
+.ttbox{min-height:96px}
+#chCard .more{display:none;color:var(--accent);cursor:pointer;font-size:13px}
+@media (max-height:800px){ #chCard .ctext{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+  #chCard .ctext.open{display:block;cursor:default} #chCard .more{display:inline} }
+.tankbar{display:flex;align-items:center;gap:6px;font-size:13px}
+#tankG{pointer-events:none}
+.tankbar button{padding:2px 9px;font-size:13px;white-space:nowrap}
+#tankMsg{font-size:12px}
+#tankMsg{color:var(--muted);line-height:1.15}
+#tankMsg.bad{color:var(--bad);font-weight:bold}
+#chCard a{color:var(--accent)}
 #result{font-size:15px;padding:6px 10px;border-radius:8px;display:none}
 #result.show{display:block}
 #result.ok{background:var(--ok-soft);color:var(--ok)} #result.bad{background:var(--bad-soft);color:var(--bad)} #result.info{background:var(--warn-soft)}
-.ttbox{flex:1;min-height:0;overflow:auto}
+.ttbox{flex:1;min-height:110px;overflow:auto}
 table.tt{border-collapse:collapse;width:100%;font-size:15px}
 table.tt th,table.tt td{border:1px solid var(--line);padding:2px 4px;text-align:center}
 table.tt th{background:var(--chip);color:var(--muted);position:sticky;top:0}
 table.tt th.grp{font-size:12px}
 table.tt td.o{font-weight:bold}
+table.tt.wide{font-size:12.5px} table.tt.wide th,table.tt.wide td{padding:1px 1px}
 table.tt td.v1{color:var(--one)}
 table.tt tr.cur td{background:var(--accent-soft)}
 table.tt tr{cursor:pointer}
@@ -172,7 +186,7 @@ table.tt td.okc{color:var(--ok);font-weight:bold} table.tt td.badc{color:var(--b
 .tde{stroke:var(--accent);stroke-width:1;stroke-dasharray:3 3;opacity:.7}
 .tdu{stroke:var(--muted);stroke-width:2;stroke-dasharray:4 3}
 .tdnote{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.3}
-#exprs{font-size:17px;line-height:2.1;border-top:1px solid var(--line);padding-top:6px;min-height:28px}
+#exprs{font-size:17px;line-height:2.1;border-top:1px solid var(--line);padding-top:6px;min-height:28px;max-height:34%;overflow:auto;flex:0 1 auto}
 #exprs div{margin:2px 0;overflow-wrap:anywhere}
 #exprs .note{font-size:13px;color:var(--muted)}
 .ov{border-top:1.6px solid currentColor}
@@ -203,7 +217,7 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <button id="themeBtn">🌙 Σκούρο θέμα</button>
   </header>
   <div class="toolbar">
-    <div class="seg"><button id="mFree" class="on" title="Ελεύθερη σχεδίαση">✏️<span class="txt"> Ελεύθερη σχεδίαση</span></button><button id="mCh" title="Αποστολές">🎯<span class="txt"> Αποστολές</span></button></div>
+    <div class="seg"><button id="mFree" class="on" title="Ελεύθερη σχεδίαση">✏️<span class="txt"> Ελεύθερη σχεδίαση</span></button><button id="mChB" title="Αποστολές της Β΄ τάξης: λογικές πύλες και συνδυαστικά κυκλώματα">🎯<span class="txt"> Αποστολές</span> Β΄</button><button id="mChC" title="Αποστολές της Γ΄ τάξης: μανταλωτές, flip-flop, καταχωρητές, απαριθμητές">🎯<span class="txt"> Αποστολές</span> Γ΄</button></div>
     <select id="chSel" style="display:none"></select>
     <span class="spacer"></span>
     <button id="undoBtn" class="ico" title="Αναίρεση (Ctrl+Z)">↶</button><button id="redoBtn" class="ico" title="Επανάληψη (Ctrl+Y)">↷</button>
@@ -222,7 +236,7 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
       <svg id="cv" xmlns="http://www.w3.org/2000/svg">
         <defs><pattern id="gridp" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1.2" style="fill:var(--grid)"/></pattern></defs>
         <rect id="bgRect" width="100%" height="100%" fill="url(#gridp)"/>
-        <g id="wiresG"></g><g id="compsG"></g><path id="temp" class="tempwire" d="" style="display:none;pointer-events:none"/>
+        <g id="tankG"></g><g id="wiresG"></g><g id="compsG"></g><path id="temp" class="tempwire" d="" style="display:none;pointer-events:none"/>
       </svg>
       <input id="titleIn" maxlength="60" spellcheck="false" placeholder="✎ Τίτλος κυκλώματος" title="Ο τίτλος γίνεται όνομα αρχείου και μπαίνει στην εικόνα">
       <div id="props"></div>
@@ -238,6 +252,8 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
         <div id="chBtns" style="margin-top:6px"><button class="primary" id="checkBtn">✔ Έλεγχος</button><button id="hintBtn">💡 Βοήθεια</button><button id="nextChBtn">Επόμενη →</button></div>
       </div>
       <div id="result"></div>
+      <div id="tankBox" style="display:none">
+        <div class="tankbar"><button id="tankRun" class="primary" title="Έναρξη / παύση της προσομοίωσης">▶ Έναρξη</button><button id="tankReset" title="Η στάθμη γυρίζει στη μέση">⟲</button><span id="tankMsg"></span></div></div>
       <div id="tdArea" style="display:none">
         <h2>Χρονικό διάγραμμα <span class="sp"></span><button id="tdClear" title="Νέο διάγραμμα από την τρέχουσα κατάσταση">⟲ Νέο</button></h2>
         <div id="tdBox"></div>
@@ -254,13 +270,13 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <div id="helpBody"><h3><span>Πώς λειτουργεί</span><button id="helpClose" title="Κλείσιμο (Esc)">✕</button></h3>
     <p><b>Σχεδίαση.</b> Σύρετε μια πύλη από την αριστερή στήλη πάνω στον πίνακα (ή κάντε απλό κλικ πάνω της). Για να ενώσετε δύο ακροδέκτες, πατήστε σε έναν ακροδέκτη (κυκλάκι) και τραβήξτε μέχρι τον άλλο. Μια έξοδος μπορεί να οδηγεί πολλές εισόδους (στις διακλαδώσεις μπαίνει τελεία), αλλά κάθε είσοδος δέχεται ένα μόνο καλώδιο. Το κάθετο τμήμα ενός αγωγού μετακινείται αν το σύρετε δεξιά ή αριστερά. Αν σύρετε ένα οριζόντιο τμήμα πάνω ή κάτω, ο αγωγός κάνει «σκαλοπάτι» και το τμήμα πηγαίνει στο νέο ύψος· αν το ξαναφέρετε στο ύψος του ακροδέκτη, ο αγωγός ισιώνει. Ένας νέος αγωγός έχει μία γωνία (σχήμα Γ): αν ξεκινήσετε να σέρνετε οριζόντια, πηγαίνει πρώτα οριζόντια και μετά κάθετα· αν ξεκινήσετε κάθετα, το αντίθετο. Για να αλλάξετε, γυρίστε το ποντίκι στο σημείο εκκίνησης και ξεκινήστε ξανά. Κάθε ευθύγραμμο τμήμα ενός αγωγού μετακινείται αν το σύρετε. Όπως στα σχηματικά: όπου υπάρχει τελεία οι αγωγοί ενώνονται, ενώ όπου δύο αγωγοί απλώς διασταυρώνονται (χωρίς τελεία) δεν συνδέονται. Με το κουμπί «Αγωγοί» αλλάζετε σε καμπύλους αγωγούς. Μετακινείτε ένα εξάρτημα σέρνοντάς το· το επιλέγετε με κλικ και το διαγράφετε με το Delete ή με το 🗑.</p>
     <p><b>Κόμβοι.</b> Ο κόμβος είναι ένα σημείο σύνδεσης όπου ενώνονται έως 4 αγωγοί: ένας που τον τροφοδοτεί και έως τρεις που φεύγουν από αυτόν. Αν αφήσετε έναν κόμβο πάνω σε υπάρχον καλώδιο (από την παλέτα ή μετακινώντας έναν ασύνδετο κόμβο), το καλώδιο χωρίζεται στα δύο. Από έναν κόμβο ξεκινάτε καλώδιο τραβώντας τον· για να τον μετακινήσετε, κάντε πρώτα κλικ πάνω του (επιλογή) και μετά σύρετέ τον. Αν διαγράψετε έναν κόμβο, οι αγωγοί που έφευγαν από αυτόν συνδέονται απευθείας με την πηγή του.</p>
-    <p><b>Πύλες πολλών εισόδων και ονόματα.</b> Όταν επιλέξετε μια πύλη AND, OR, NAND ή NOR, κάτω αριστερά εμφανίζεται η επιλογή «Είσοδοι: 2 · 3 · 4» (στις αποστολές οι πύλες έχουν πάντα 2 εισόδους). Όταν επιλέξετε έναν διακόπτη ή ένα LED, μπορείτε να του δώσετε δικό σας όνομα (έως 8 γράμματα ή ψηφία), π.χ. «Πόρτα» ή «Συναγερμός».</p>
+    <p><b>Πύλες πολλών εισόδων και ονόματα.</b> Όταν επιλέξετε μια πύλη AND, OR, NAND ή NOR, κάτω αριστερά εμφανίζεται η επιλογή «Είσοδοι: 2 · 3 · 4» (στις αποστολές οι πύλες έχουν 2 εισόδους, εκτός αν η αποστολή λέει αλλιώς). Όταν επιλέξετε έναν διακόπτη ή ένα LED, μπορείτε να του δώσετε δικό σας όνομα (έως 8 γράμματα ή ψηφία), π.χ. «Πόρτα» ή «Συναγερμός».</p>
     <p><b>Αναίρεση και εικόνα.</b> Με τα ↶ ↷ (ή Ctrl+Z / Ctrl+Y) αναιρείτε ή επαναλαμβάνετε τις αλλαγές στο κύκλωμα, ακόμη και τον καθαρισμό. Με το 🖼 κατεβάζετε εικόνα PNG με το κύκλωμα, τον πίνακα αληθείας και τις εκφράσεις, πάντα σε φωτεινό θέμα, για να μπει σε φύλλο εργασίας ή να εκτυπωθεί. Στο πεδίο «Τίτλος κυκλώματος» (πάνω αριστερά στον πίνακα) γράφετε τίτλο, π.χ. «Άσκηση 3 – Παπαδόπουλος»· ο τίτλος γίνεται όνομα του αρχείου (.json και .png) και τυπώνεται πάνω στην εικόνα.</p>
     <p><b>Μνήμη (ακολουθιακά κυκλώματα).</b> Στην καρτέλα «Μνήμη» της παλέτας υπάρχουν μανταλωτές SR (με πύλες NOR, ενεργοποίηση με 1, και με πύλες NAND, ενεργοποίηση με 0), flip-flop SR, D, JK και T, ρολόι και μπουτόν. Επιλέγοντας ένα flip-flop ορίζετε αν διεγείρεται στο θετικό (↑) ή στο αρνητικό (↓) μέτωπο του παλμού (το αρνητικό σημειώνεται με κυκλάκι στην είσοδο CLK) και αν έχει εισόδους PRE και CLR (ενεργές με 0). Το ρολόι δίνει συνεχείς παλμούς (0,5, 1 ή 2 Hz) ή, όταν είναι σταματημένο, έναν παλμό κάθε φορά. Μπορείτε επίσης να φτιάξετε μόνοι σας έναν μανταλωτή με δύο πύλες NOR ή NAND, γυρίζοντας την έξοδο της καθεμιάς στην είσοδο της άλλης. Όταν το κύκλωμα έχει μνήμη, στη δεξιά στήλη εμφανίζεται χρονικό διάγραμμα αντί για πίνακα αληθείας.</p>
     <p><b>Ηλεκτρικά στοιχεία (⚡).</b> Στην καρτέλα ⚡ της παλέτας υπάρχουν τροφοδοσία +5 V, γείωση, διακόπτης, αντίσταση και LED σε πέντε χρώματα, για να στήσετε το κύκλωμα όπως στο Tinkercad ή στο breadboard. Τα στοιχεία αυτά δεν έχουν «είσοδο» και «έξοδο»: ενώνετε οποιονδήποτε ακροδέκτη τους με οποιονδήποτε άλλο, και με το πλήκτρο R (ή το ↻) τα περιστρέφετε. Ο διακόπτης ανοίγει και κλείνει με κλικ στον μοχλό· συνήθως συνδέεται στα +5 V, με αντίσταση pull-down 10 kΩ προς τη γείωση, ώστε η είσοδος της πύλης να είναι 0 όταν είναι ανοιχτός. Η έξοδος μιας πύλης οδηγεί ένα LED μέσα από αντίσταση 220 Ω προς τη γείωση· η άνοδος του LED είναι στην πλευρά του τριγώνου. Στα ηλεκτρικά καλώδια το χρώμα δείχνει την τάση (γκρι 0 V έως κόκκινο 5 V)· μια είσοδος πύλης διαβάζει 1 πάνω από 2 V και 0 κάτω από 0,8 V. Αν μια είσοδος μείνει «στον αέρα», αν ένα LED μπει χωρίς αντίσταση, αν γίνει βραχυκύκλωμα ή υπερφορτωθεί μια έξοδος, εμφανίζεται μήνυμα· ένα LED με πάνω από 60 mA καίγεται και το αλλάζετε με «Νέο LED». Οι ηλεκτρικοί διακόπτες και τα LED μπαίνουν κανονικά στον πίνακα αληθείας.</p>
     <p><b>Λογικές καταστάσεις.</b> Κλικ σε έναν διακόπτη αλλάζει την είσοδο από 0 σε 1. Τα καλώδια με λογικό 1 φαίνονται κόκκινα και με 0 γκρι· τα διακεκομμένα καλώδια σημαίνουν ότι η τιμή είναι απροσδιόριστη, επειδή κάποια είσοδος πύλης έμεινε ασύνδετη. Το LED ανάβει όταν η έξοδος είναι 1.</p>
     <p><b>Πίνακας αληθείας και έκφραση.</b> Ο πίνακας υπολογίζεται για όλους τους συνδυασμούς των εισόδων και η τρέχουσα γραμμή φωτίζεται. Κάτω από τον πίνακα φαίνεται η λογική έκφραση κάθε εξόδου, γραμμένη όπως στο βιβλίο (· για AND, + για OR, γραμμή από πάνω για NOT, ⊕ για XOR, ⊙ για XNOR).</p>
-    <p><b>Αποστολές.</b> Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τις πύλες που επιτρέπονται. Ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα· όταν ταιριάζουν όλες οι γραμμές, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
+    <p><b>Αποστολές.</b> Υπάρχουν δύο ομάδες αποστολών. Οι <b>Αποστολές Β΄</b> είναι για τη Β΄ τάξη: λογικές πύλες και συνδυαστικά κυκλώματα (αθροιστές, συγκριτής, πολυπλέκτης, αποπολυπλέκτης, κωδικοποιητής, αποκωδικοποιητής). Οι <b>Αποστολές Γ΄</b> είναι για τη Γ΄ τάξη: μανταλωτές, flip-flop, καταχωρητές και απαριθμητές, με πρώτη την αντλία της δεξαμενής. Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τα εξαρτήματα που επιτρέπονται. Στη Β΄ ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα. Στη Γ΄, επειδή τα κυκλώματα έχουν μνήμη, ο πίνακας γίνεται «δοκιμή βήμα-βήμα»: ξεκινά με όλα στο 0, αλλάζει τις εισόδους με τη σειρά (↑ = θετικό μέτωπο του CLK) και συγκρίνει τις εξόδους σε κάθε βήμα· με κλικ σε μια γραμμή το κύκλωμα εκτελεί τα βήματα ως εκεί. Στην αποστολή της δεξαμενής η δεξαμενή φαίνεται δεξιά στον χώρο σχεδίασης: η έξοδος Y οδηγεί την αντλία και τα καλώδια των αισθητήρων SA, SB φτάνουν στους διακόπτες A, B. Με το ▶ η στάθμη ανεβαίνει και κατεβαίνει και οι αισθητήρες αλλάζουν μόνοι τους τους διακόπτες. Όταν ταιριάζουν όλα, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
   </div>
   </details>
 </div>
@@ -368,7 +384,7 @@ function gateFn(t,v){
 }
 
 // ---------------- challenges ----------------
-const CH=[
+const CHB=[
  {id:'nand', title:'NAND από AND και NOT', text:'Φτιάξτε κύκλωμα με έξοδο Y = <span class="ov">A·B</span>, χρησιμοποιώντας μόνο πύλες AND και NOT.',
   ins:['A','B'], outs:['Y'], gates:['AND','NOT'], f:(A,B)=>[!(A&&B)], hint:'Συνδέστε την έξοδο της AND στην είσοδο μιας NOT.'},
  {id:'nor', title:'NOR από OR και NOT', text:'Φτιάξτε κύκλωμα με έξοδο Y = <span class="ov">A + B</span>, χρησιμοποιώντας μόνο πύλες OR και NOT.',
@@ -388,9 +404,74 @@ const CH=[
  {id:'major', title:'Πλειοψηφία', text:'Τρεις κριτές ψηφίζουν (1 = ναι). Το LED Y ανάβει όταν <b>τουλάχιστον δύο</b> ψηφίσουν ναι.',
   ins:['A','B','C'], outs:['Y'], gates:['AND','OR'], f:(A,B,C)=>[(A&&B)||(A&&C)||(B&&C)], hint:'Y = A·B + A·C + B·C: τρεις AND και δύο OR.'},
  {id:'half', title:'Ημιαθροιστής', text:'Προσθέστε δύο bits: A + B. Η έξοδος S είναι το άθροισμα και η C το κρατούμενο (θυμηθείτε: 1 + 1 = 10).',
-  ins:['A','B'], outs:['S','C'], gates:ALLGATES, f:(A,B)=>[A!==B, A&&B], hint:'S = A ⊕ B (πύλη XOR) και C = A·B (πύλη AND). Οι είσοδοι A και B πηγαίνουν και στις δύο πύλες.'}
+  ins:['A','B'], outs:['S','C'], gates:ALLGATES, f:(A,B)=>[A!==B, A&&B], hint:'S = A ⊕ B (πύλη XOR) και C = A·B (πύλη AND). Οι είσοδοι A και B πηγαίνουν και στις δύο πύλες.'},
+ {id:'full', title:'Πλήρης αθροιστής', text:'Προσθέστε τρία bits: A + B + Cin (Cin = κρατούμενο από την προηγούμενη βαθμίδα). Η έξοδος S είναι το άθροισμα και η Cout το νέο κρατούμενο.',
+  ins:['A','B','Cin'], outs:['S','Cout'], gates:ALLGATES, f:(A,B,C)=>[(A+B+C)%2===1, A+B+C>=2], hint:'S = A ⊕ B ⊕ Cin (δύο XOR) και Cout = A·B + Cin·(A ⊕ B): δύο AND και μία OR. Δηλαδή δύο ημιαθροιστές και μία OR.'},
+ {id:'cmp', title:'Συγκριτής 1 bit', text:'Συγκρίνετε δύο bits A και B. Το Y1 ανάβει όταν A &gt; B, το Y2 όταν A = B και το Y3 όταν A &lt; B.',
+  ins:['A','B'], outs:['Y1','Y2','Y3'], gates:['AND','NOT','XNOR','NOR','XOR','OR'], f:(A,B)=>[A&&!B, A===B, !A&&B], hint:'Y1 = A·<span class="ov">B</span>, Y3 = <span class="ov">A</span>·B και Y2 = A ⊙ B (πύλη XNOR) ή <span class="ov">Y1 + Y3</span> (πύλη NOR).'},
+ {id:'mux2', title:'Πολυπλέκτης 2 σε 1', text:'Ο πολυπλέκτης στέλνει στην έξοδο Y μία από τις δύο εισόδους δεδομένων: την I0 όταν S = 0 και την I1 όταν S = 1 (S = είσοδος επιλογής).',
+  ins:['S','I1','I0'], outs:['Y'], gates:['AND','OR','NOT'], f:(S,I1,I0)=>[S?I1:I0], hint:'Y = I0·<span class="ov">S</span> + I1·S: μία NOT για το S, δύο AND και μία OR.'},
+ {id:'demux2', title:'Αποπολυπλέκτης 1 σε 2', text:'Ο αποπολυπλέκτης στέλνει την είσοδο δεδομένων E σε μία από τις δύο εξόδους: στην D0 όταν I0 = 0 και στην D1 όταν I0 = 1 (I0 = είσοδος επιλογής). Η άλλη έξοδος είναι 0.',
+  ins:['E','I0'], outs:['D0','D1'], gates:['AND','NOT'], f:(E,I0)=>[E&&!I0, E&&I0], hint:'D0 = E·<span class="ov">I0</span> και D1 = E·I0: μία NOT και δύο AND.'},
+ {id:'dec24', title:'Αποκωδικοποιητής 2 σε 4', text:'Ο αποκωδικοποιητής διαβάζει τον δυαδικό αριθμό B A (00 έως 11) και ανάβει μόνο την αντίστοιχη έξοδο: D0 για το 00, D1 για το 01, D2 για το 10 και D3 για το 11.',
+  ins:['B','A'], outs:['D0','D1','D2','D3'], gates:['AND','NOT'], f:(B,A)=>[!B&&!A, !B&&A, B&&!A, B&&A],
+  hint:'Δύο NOT δίνουν τα <span class="ov">B</span> και <span class="ov">A</span>. Κάθε έξοδος είναι μία AND: D0 = <span class="ov">B</span>·<span class="ov">A</span>, D1 = <span class="ov">B</span>·A, D2 = B·<span class="ov">A</span>, D3 = B·A.'},
+ {id:'enc42', title:'Κωδικοποιητής 4 σε 2', text:'Ο κωδικοποιητής έχει 4 εισόδους I0–I3, από τις οποίες μόνο μία είναι 1 κάθε φορά, και δίνει στις εξόδους D1 D0 τον αριθμό της (π.χ. I2 = 1 → D1 D0 = 10). Χρησιμοποιήστε πύλες OR.',
+  ins:['I0','I1','I2','I3'], outs:['D0','D1'], gates:['OR'], f:(I0,I1,I2,I3)=>[I1||I3, I2||I3], hint:'Το D1 είναι 1 για τις εισόδους I2 και I3, άρα D1 = I2 + I3. Το D0 είναι 1 για τις I1 και I3, άρα D0 = I1 + I3. Η I0 δεν χρειάζεται (δίνει 00).'}
 ];
-CH.forEach((c,i)=>c.n=i+1);
+// Γ΄ τάξη: sequential circuits, checked step by step (all flip-flops start at Q = 0, the switches at 0)
+const QB='Q̄';
+const clkSeq=(start,steps)=>{ const r=[]; steps.forEach(([iv,out])=>{ r.push([{...iv,CLK:0},null]); r.push([{CLK:1},out]); }); return [[start[0],start[1]],...r]; };
+const CHC=[
+ {id:'tank', tank:true, title:'Αντλία δεξαμενής με μανταλωτή',
+  text:'Μια αντλία γεμίζει αυτόματα μια δεξαμενή. Ο αισθητήρας SA (είσοδος A) δίνει 1 όταν η στάθμη ξεπεράσει τη μέγιστη και ο SB (είσοδος B) δίνει 1 όταν πέσει κάτω από την ελάχιστη. Η έξοδος Y = 1 ξεκινά την αντλία όταν η στάθμη πέσει κάτω από την ελάχιστη και Y = 0 τη σταματά όταν ξεπεράσει τη μέγιστη. Σχεδιάστε το κύκλωμα με έναν μανταλωτή. <b>Σας συμφέρει μανταλωτής με πύλες NAND ή με πύλες NOR;</b>',
+  full:'Μία αντλία χρησιμοποιείται για το αυτόματο γέμισμα μίας δεξαμενής υγρού σε μία βιομηχανία. Δύο αισθητήρες (sensors) SA και SB ελέγχουν τη στάθμη του υγρού μέσα στη δεξαμενή: ο αισθητήρας SA δίνει «1» όταν η στάθμη υπερβεί τη μέγιστη επιτρεπόμενη στάθμη και ο αισθητήρας SB δίνει «1» όταν η στάθμη πέσει κάτω από την ελάχιστη επιτρεπόμενη στάθμη. Να σχεδιάσετε ένα ψηφιακό κύκλωμα ελέγχου της λειτουργίας της αντλίας χρησιμοποιώντας έναν μανταλωτή. Το κύκλωμα έχει δύο εισόδους Α και Β που συνδέονται με δύο διακόπτες οι οποίοι είναι συνδεδεμένοι με τους δύο αισθητήρες και μία έξοδο Υ που δίνει «1» για την εκκίνηση της αντλίας όταν η στάθμη του υγρού πέσει κάτω από την ελάχιστη επιτρεπόμενη στάθμη και «0» για το σταμάτημα της αντλίας όταν η στάθμη του υγρού υπερβεί τη μέγιστη επιτρεπόμενη στάθμη. Σας συμφέρει να χρησιμοποιήσετε μανταλωτή με πύλες NAND ή μανταλωτή με πύλες NOR;',
+  ins:['A','B'], outs:['Y'], parts:['NOR','NAND','NOT','SRL','SRLN'],
+  seq:[[{A:0,B:1},[1]],[{B:0},[1]],[{A:1},[0]],[{A:0},[0]],[{B:1},[1]],[{B:0},[1]],[{A:1},[0]],[{A:0},[0]]],
+  hint:'Όταν B = 1 (χαμηλή στάθμη) θέλουμε Y = 1, δηλαδή Set· όταν A = 1 (υψηλή στάθμη) Y = 0, δηλαδή Reset· όταν A = B = 0 η αντλία κρατά ό,τι έκανε (μνήμη). Άρα B → S, A → R και Y = Q. Ο μανταλωτής NOR ενεργοποιείται με 1, όπως δίνουν οι αισθητήρες, οπότε αρκούν δύο πύλες NOR. Με NAND (ενεργοποίηση με 0) θα χρειαζόσασταν και δύο NOT. Οι αισθητήρες δεν δίνουν ποτέ ταυτόχρονα 1, άρα η απαγορευμένη κατάσταση δεν εμφανίζεται.',
+  done:g=>{ const t=g.map(x=>x.type); return t.length===2&&t.every(x=>x==='NOR')?' Και με τον οικονομικότερο τρόπο: μανταλωτής με δύο πύλες NOR, γιατί οι αισθητήρες δίνουν 1 όταν πρέπει να δράσουν.'
+    :t.includes('NAND')?' Παρατηρήστε ότι με πύλες NAND χρειάζονται και αντιστροφείς· με μανταλωτή NOR αρκούν δύο πύλες, γιατί οι αισθητήρες δίνουν 1 όταν πρέπει να δράσουν.':''; }},
+ {id:'srnor', title:'Μανταλωτής SR με πύλες NOR', text:'Φτιάξτε μανταλωτή SR με <b>δύο</b> πύλες NOR. Με S = 1 η έξοδος Q γίνεται 1 (Set), με R = 1 γίνεται 0 (Reset), και με S = R = 0 κρατά την τιμή της. Η Q̄ είναι πάντα το αντίθετο της Q.',
+  ins:['S','R'], outs:['Q',QB], parts:['NOR'], max:2,
+  seq:[[{S:1,R:0},[1,0]],[{S:0},[1,0]],[{R:1},[0,1]],[{R:0},[0,1]],[{S:1},[1,0]],[{S:0},[1,0]]],
+  hint:'Η έξοδος κάθε NOR πηγαίνει στη δεύτερη είσοδο της άλλης. Το R πηγαίνει στην πύλη που δίνει το Q και το S στην πύλη που δίνει το Q̄.'},
+ {id:'srnand', title:'Μανταλωτής SR με πύλες NAND', text:'Φτιάξτε μανταλωτή SR με <b>δύο</b> πύλες NAND. Εδώ οι είσοδοι ενεργοποιούνται με 0: με S = 0 η Q γίνεται 1 (Set), με R = 0 γίνεται 0 (Reset), και με S = R = 1 κρατά την τιμή της.',
+  ins:['S','R'], outs:['Q',QB], parts:['NAND'], max:2,
+  seq:[[{S:0,R:1},[1,0]],[{S:1},[1,0]],[{R:0},[0,1]],[{R:1},[0,1]],[{S:0},[1,0]],[{S:1},[1,0]]],
+  hint:'Η έξοδος κάθε NAND πηγαίνει στη δεύτερη είσοδο της άλλης. Το S πηγαίνει στην πύλη που δίνει το Q και το R στην πύλη που δίνει το Q̄ (ανάποδα από τον μανταλωτή NOR).'},
+ {id:'dlatch', title:'Μανταλωτής D', text:'Όταν E = 1 η έξοδος Q ακολουθεί την είσοδο D· όταν E = 0 η Q «κλειδώνει» και κρατά την τελευταία τιμή, ό,τι κι αν κάνει το D.',
+  ins:['D','E'], outs:['Q'], parts:['NAND','NOR','AND','NOT','SRL','SRLN'],
+  seq:[[{D:1,E:1},[1]],[{D:0},[0]],[{D:1},[1]],[{E:0},[1]],[{D:0},[1]],[{D:1},[1]],[{D:0},[1]],[{E:1},[0]],[{E:0},[0]],[{D:1},[0]]],
+  hint:'Με πύλες NAND: S = <span class="ov">D·E</span> και R = <span class="ov"><span class="ov">D</span>·E</span> οδηγούν έναν μανταλωτή NAND (συνολικά 4 NAND και 1 NOT). Ή με μανταλωτή NOR: S = D·E, R = <span class="ov">D</span>·E.'},
+ {id:'div2', title:'Διαιρέτης συχνότητας ÷2', text:'Με <b>ένα</b> flip-flop D φτιάξτε κύκλωμα που αλλάζει την έξοδο Q σε κάθε θετικό μέτωπο (↑) του CLK. Η Q έχει μισή συχνότητα από το CLK.',
+  ins:['CLK'], outs:['Q'], parts:['DFF','NOT'],
+  seq:[[{CLK:0},[0]],[{CLK:1},[1]],[{CLK:0},[1]],[{CLK:1},[0]],[{CLK:0},[0]],[{CLK:1},[1]],[{CLK:0},[1]],[{CLK:1},[0]]],
+  hint:'Συνδέστε την έξοδο Q̄ του flip-flop στην είσοδο D: σε κάθε μέτωπο το flip-flop παίρνει το αντίθετο της τιμής του.'},
+ {id:'tff', title:'Flip-flop T από flip-flop D', text:'Με ένα flip-flop D και πύλες φτιάξτε flip-flop T: σε κάθε θετικό μέτωπο του CLK, αν T = 1 η Q αλλάζει, ενώ αν T = 0 μένει ίδια.',
+  ins:['T','CLK'], outs:['Q'], parts:['DFF','XOR','XNOR','AND','OR','NOT'],
+  seq:clkSeq([{T:1,CLK:0},[0]],[[{},[1]],[{},[0]],[{T:0},[0]],[{},[0]],[{T:1},[1]],[{T:0},[1]],[{T:1},[0]]]),
+  hint:'Η επόμενη τιμή είναι Q = T ⊕ Q. Βάλτε μια πύλη XOR με εισόδους T και Q και την έξοδό της στο D.'},
+ {id:'reg2', title:'Καταχωρητής 2 bit', text:'Ο καταχωρητής αποθηκεύει τα D1 D0 στις εξόδους Q1 Q0 μόνο τη στιγμή του θετικού μετώπου του CLK. Ανάμεσα στα μέτωπα, οι έξοδοι δεν αλλάζουν ό,τι κι αν κάνουν τα D.',
+  ins:['D1','D0','CLK'], outs:['Q1','Q0'], parts:['DFF'],
+  seq:[[{D1:1,D0:0,CLK:0},[0,0]],[{CLK:1},[1,0]],[{CLK:0},[1,0]],[{D1:0,D0:1},[1,0]],[{CLK:1},[0,1]],[{CLK:0},[0,1]],[{D1:1},[0,1]],[{CLK:1},[1,1]],[{D0:0},[1,1]],[{CLK:0},[1,1]],[{CLK:1},[1,0]]],
+  hint:'Δύο flip-flop D: D1 → Q1 και D0 → Q0, και το CLK πηγαίνει και στα δύο (παράλληλη φόρτωση).'},
+ {id:'shift3', title:'Καταχωρητής ολίσθησης 3 bit', text:'Σε κάθε θετικό μέτωπο του CLK η τιμή του D μπαίνει στο Q0, η παλιά Q0 πηγαίνει στο Q1 και η παλιά Q1 στο Q2 (ολίσθηση προς τα δεξιά).',
+  ins:['D','CLK'], outs:['Q0','Q1','Q2'], parts:['DFF'],
+  seq:clkSeq([{D:1,CLK:0},[0,0,0]],[[{},[1,0,0]],[{D:0},[0,1,0]],[{D:1},[1,0,1]],[{},[1,1,0]],[{D:0},[0,1,1]],[{},[0,0,1]]]),
+  hint:'Τρία flip-flop D στη σειρά: D → D του πρώτου, Q0 → D του δεύτερου, Q1 → D του τρίτου. Το CLK πηγαίνει και στα τρία.'},
+ {id:'cnta', title:'Ασύγχρονος απαριθμητής 2 bit', text:'Όταν E = 1 ο απαριθμητής μετρά 00 → 01 → 10 → 11 → 00 … (Q1 Q0) σε κάθε θετικό μέτωπο του CLK· όταν E = 0 σταματά. Στον ασύγχρονο απαριθμητή το CLK πηγαίνει μόνο στο πρώτο flip-flop.',
+  ins:['E','CLK'], outs:['Q1','Q0'], parts:['TFF','JKFF','DFF','AND','NOT'],
+  seq:clkSeq([{E:1,CLK:0},[0,0]],[[{},[0,1]],[{},[1,0]],[{},[1,1]],[{},[0,0]],[{},[0,1]],[{E:0},[0,1]],[{E:1},[1,0]]]),
+  hint:'Δύο flip-flop T με T = E. Το CLK πηγαίνει στο πρώτο (Q0). Το δεύτερο (Q1) πρέπει να αλλάζει όταν το Q0 πέφτει από 1 σε 0: δώστε του για ρολόι το Q̄0 (ή διαλέξτε αρνητικό μέτωπο ↓ και δώστε το Q0).'},
+ {id:'cnts', sync:true, title:'Σύγχρονος απαριθμητής 2 bit', text:'Ίδια μέτρηση με την προηγούμενη αποστολή, αλλά <b>σύγχρονα</b>: το CLK πηγαίνει σε όλα τα flip-flop και αλλάζουν όλα μαζί.',
+  ins:['E','CLK'], outs:['Q1','Q0'], parts:['TFF','JKFF','DFF','AND','NOT','XOR'],
+  seq:clkSeq([{E:1,CLK:0},[0,0]],[[{},[0,1]],[{},[1,0]],[{},[1,1]],[{},[0,0]],[{},[0,1]],[{E:0},[0,1]],[{E:1},[1,0]]]),
+  hint:'Δύο flip-flop T με κοινό CLK. Το Q0 αλλάζει σε κάθε μέτωπο: T0 = E. Το Q1 αλλάζει μόνο όταν Q0 = 1: T1 = E·Q0 (μία AND).'}
+];
+CHB.forEach((c,i)=>c.n=i+1); CHC.forEach((c,i)=>c.n=i+1);
+let grade=store.get('gateBuilderGrade')==='C'?'C':'B', CH=grade==='C'?CHC:CHB;
+const lastIdx={B:0,C:0};
+const partName=t=>MEMNAME[t]||t;
 
 // ---------------- state ----------------
 let mode='free', chIdx=0;
@@ -423,8 +504,10 @@ function defaultLayout(){
     addComp('OUT',snap(w-80),snap(h*0.47),{label:'Y'});
   } else {
     const c=CH[chIdx];
-    c.ins.forEach((L,i)=>addComp('IN',90,snap(h*(i+1)/(c.ins.length+1)),{label:L,fixed:true}));
-    c.outs.forEach((L,i)=>addComp('OUT',snap(w-80),snap(h*(i+1)/(c.outs.length+1)),{label:L,fixed:true}));
+    c.ins.forEach((L,i)=>addComp('IN',90,snap(h*(i+1)/(c.ins.length+1)),{label:L,key:'k'+i,fixed:true}));
+    const dy=Math.max(h/(c.outs.length+1),c.outs.length>4?72:0);
+    c.outs.forEach((L,i)=>addComp('OUT',snap(w-80),snap(c.outs.length>4?60+i*dy:h*(i+1)/(c.outs.length+1)),{label:L,key:'k'+i,fixed:true}));
+    if(c.tank){ const g=tankGeom(), Y=comps[comps.length-1]; Y.x=snap(g.P.x-100); Y.y=snap(g.P.y); }
   }  fitZoom();
 }
 // key = the original letter (A–D, Y–W): fixes the order in the truth table even after a rename
@@ -432,8 +515,8 @@ function addComp(type,x,y,extra){ const c={id:nextId++,type,x:snap(x),y:snap(y),
   if((type==='BTN'||type==='SW')&&c.val===undefined) c.val=0;
   if(ELEC.includes(type)&&c.r===undefined) c.r=0; if(type==='RES'&&!c.ohm) c.ohm=220; if(type==='ELED'&&!c.color) c.color='red';
   if((type==='IN'||type==='OUT'||type==='BTN'||type==='SW'||type==='ELED')&&!c.key) c.key=c.label; comps.push(c); return c; }
-const LABEL_RE=/^[\p{L}\p{N}_]{1,8}$/u;
-const cleanLabel=s=>String(s??'').replace(/[^\p{L}\p{N}_]/gu,'').slice(0,8)||'?';
+const LABEL_RE=/^[\p{L}\p{M}\p{N}_]{1,8}$/u;
+const cleanLabel=s=>String(s??'').replace(/[^\p{L}\p{M}\p{N}_]/gu,'').slice(0,8)||'?';
 function load(json){
   try{ const d=JSON.parse(json); if(!d||!Array.isArray(d.comps)||!Array.isArray(d.wires)) return false;
     comps=d.comps.filter(c=>c&&typeof c.id==='number'&&(c.type==='IN'||c.type==='OUT'||c.type==='NODE'||ALLGATES.includes(c.type)||MEM.includes(c.type)||c.type==='BTN'||c.type==='CLK'||ELEC.includes(c.type)));
@@ -453,7 +536,8 @@ function load(json){
     sel=null; return true; }catch(e){ return false; }
 }
 function enterMode(){
-  $('mFree').classList.toggle('on',mode==='free'); $('mCh').classList.toggle('on',mode==='ch');
+  $('mFree').classList.toggle('on',mode==='free'); $('mChB').classList.toggle('on',mode==='ch'&&grade==='B'); $('mChC').classList.toggle('on',mode==='ch'&&grade==='C');
+  fillChSel(); seqMsg='';
   $('chSel').style.display=mode==='ch'?'':'none'; $('chArea').style.display=mode==='ch'?'':'none';
   showResult(null);
   const saved=store.get(storageKey());
@@ -461,8 +545,10 @@ function enterMode(){
   if(mode==='ch'){ // make sure the fixed inputs/outputs exist (e.g. after an odd saved file)
     const c=CH[chIdx]; const L=new Set(comps.filter(x=>x.fixed).map(x=>x.label));
     if(!c.ins.concat(c.outs).every(l=>L.has(l))) defaultLayout();
+    comps.forEach(x=>{ if(!x.fixed) return; const k=x.type==='IN'?c.ins.indexOf(x.label):c.outs.indexOf(x.label); if(k>=0) x.key='k'+k; }); // table order = mission order, also for older saved circuits
   }
   tdSamples=[]; prevV={};
+  tankInit();
   buildPalette(); renderChCard(); fitToolbar(); fitZoom(); propsKey=''; redraw(); resetHistory();
 }
 
@@ -472,7 +558,67 @@ function srcMap(){ const m={}; wires.forEach(w=>{ (m[w.to]=m[w.to]||[])[w.pin]=w
 // The circuit is evaluated by repeated passes until nothing changes (this also settles feedback loops,
 // e.g. a latch built from two NOR gates). Flip-flops change only at the active clock edge.
 // inVals given = a pure evaluation for the truth table (nothing is stored); null = the live circuit.
-let prevV={};
+let prevV={}, lastV={};
+// ---------------- the tank of the first Γ΄ mission ----------------
+// level 0–100 %, SA = 1 above 80 %, SB = 1 below 20 %; the pump (Y = 1) fills faster than the factory empties it
+const TK={lvl:50,run:false,timer:null,t:0};
+const tankOn=()=>mode==='ch'&&!!CH[chIdx].tank;
+// the tank is drawn inside the drawing area, on the right; the sensor cables go to the switches A, B and the pump is driven by Y
+function tankGeom(){ const {w,h}=canvasSize(), X1=w-40, X0=X1-Math.round(Math.min(180,Math.max(110,w*0.17))), T=Math.round(Math.max(100,h*0.24)), Bt=h-58;
+  return {w,h,X0,X1,T,Bt,H:Bt-T,P:{x:X0-48,y:T+34}}; }
+function tankInit(){ tankStop(); TK.lvl=50; $('tankBox').style.display=tankOn()?'':'none'; if(!tankOn()){ $('tankG').innerHTML=''; return; }
+  const g=tankGeom(), Y=fixedL('Y'); if(Y&&(Y.x>g.X0-90||Y.x<200)){ Y.x=snap(g.P.x-100); Y.y=snap(g.P.y); }
+  tankSensors(); }
+function tankStop(){ TK.run=false; clearInterval(TK.timer); TK.timer=null; if($('tankRun')) $('tankRun').innerHTML='▶ Έναρξη'; }
+function tankSensors(){ const A=fixedL('A'), B=fixedL('B'); if(!A||!B) return false; const sa=TK.lvl>80?1:0, sb=TK.lvl<20?1:0;
+  if(A.val===sa&&B.val===sb) return false; A.val=sa; B.val=sb; return true; }
+function tankPump(){ const Y=fixedL('Y'); return Y?lastV[Y.id]:null; }
+function tankTick(){ if(!tankOn()){ tankStop(); return; }
+  TK.t++; const p=tankPump()===1; TK.lvl=Math.max(0,Math.min(100,TK.lvl+(p?1.3:0)-0.5));
+  if(tankSensors()) redraw(); else tankDraw(); }
+function tankDraw(){ const G=$('tankG'); if(!tankOn()){ G.innerHTML=''; return; }
+  const {w,h,X0,X1,T,Bt,H,P}=tankGeom(), L=TK.lvl, yL=Bt-L/100*H, p=tankPump(), on=p===1;
+  const A=fixedL('A'), B=fixedL('B'), Y=fixedL('Y'), sa=A?A.val:0, sb=B?B.val:0, yMax=Bt-0.8*H, yMin=Bt-0.2*H, XM=(X0+X1)/2;
+  const water='#4a9fe0', ph=(TK.t%8)*2, ang=on?TK.t*30:0, col=v=>v?'var(--one)':'var(--zero)';
+  const cab=(d,v)=>`<path d="${d}" fill="none" stroke="${col(v)}" stroke-width="2.6" stroke-dasharray="7 4" stroke-linejoin="round"/>`;
+  let g=`<rect x="${X0-110}" y="${T-62}" width="${w-X0+104}" height="${Bt-T+100}" rx="12" fill="var(--accent-soft)" opacity=".45"/>
+   <text x="${X0-100}" y="${T-42}" font-size="14" font-weight="bold" fill="var(--muted)">Δεξαμενή</text>`;
+  // sensor cables: SA along the top, SB along the bottom, to the switches A and B
+  if(A) g+=cab(`M${X1+20},${yMax} H${w-14} V${44} H${A.x+12} V${A.y-18}`,sa)+`<text x="${Math.max(A.x+24,250)}" y="38" font-size="13" font-weight="bold" fill="var(--muted)">καλώδιο του αισθητήρα SA → διακόπτης A</text>`;
+  if(B) g+=cab(`M${X1+20},${yMin} H${w-14} V${h-14} H${B.x+12} V${B.y+18}`,sb)+`<text x="${B.x+24}" y="${h-20}" font-size="13" font-weight="bold" fill="var(--muted)">καλώδιο του αισθητήρα SB → διακόπτης B</text>`;
+  // Y → pump
+  if(Y) g+=cab(`M${Y.x+16},${Y.y} H${(Y.x+16+P.x-18)/2} V${P.y} H${P.x-18}`,on);
+  g+=`<defs><clipPath id="tkc"><rect x="${X0}" y="${T}" width="${X1-X0}" height="${H}"/></clipPath></defs>
+   <rect x="${X0}" y="${yL}" width="${X1-X0}" height="${Bt-yL}" fill="${water}" opacity=".85" clip-path="url(#tkc)"/>
+   <path d="M${X0},${T-6} V${Bt} H${X1} V${T-6}" fill="none" stroke="var(--stroke)" stroke-width="4" stroke-linejoin="round"/>
+   <line x1="${X0}" y1="${yMax}" x2="${X1+8}" y2="${yMax}" stroke="var(--bad)" stroke-width="1.6" stroke-dasharray="6 4"/>
+   <line x1="${X0}" y1="${yMin}" x2="${X1+8}" y2="${yMin}" stroke="var(--bad)" stroke-width="1.6" stroke-dasharray="6 4"/>
+   <text x="${X1-6}" y="${yMax-7}" font-size="12" text-anchor="end" fill="var(--bad)">μέγιστη</text>
+   <text x="${X1-6}" y="${yMin-7}" font-size="12" text-anchor="end" fill="var(--bad)">ελάχιστη</text>
+   <rect x="${X1+6}" y="${yMax-9}" width="16" height="18" rx="3" fill="${sa?'var(--one)':'var(--panel)'}" stroke="var(--stroke)" stroke-width="1.8"/>
+   <rect x="${X1+6}" y="${yMin-9}" width="16" height="18" rx="3" fill="${sb?'var(--one)':'var(--panel)'}" stroke="var(--stroke)" stroke-width="1.8"/>
+   <text x="${X1+14}" y="${yMax-15}" font-size="13" font-weight="bold" text-anchor="middle" fill="var(--text)">SA</text>
+   <text x="${X1+14}" y="${yMin+25}" font-size="13" font-weight="bold" text-anchor="middle" fill="var(--text)">SB</text>
+   <text x="${X1+14}" y="${yMax+1}" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="${sa?'#fff':'var(--text)'}">${sa}</text>
+   <text x="${X1+14}" y="${yMin+1}" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="${sb?'#fff':'var(--text)'}">${sb}</text>
+   <text x="${XM}" y="${L>8?(yL+Bt)/2+6:Bt-8}" font-size="18" font-weight="bold" text-anchor="middle" fill="var(--text)">${Math.round(L)} %</text>
+   <path d="M${P.x+18},${P.y} H${X0+2}" fill="none" stroke="${on?water:'var(--zero)'}" stroke-width="7"/>
+   <path d="M${P.x},${P.y+18} V${Bt+24}" fill="none" stroke="${on?water:'var(--zero)'}" stroke-width="7"/>
+   <text x="${P.x+10}" y="${Bt+20}" font-size="12" fill="var(--muted)">νερό</text>
+   ${on?`<path d="M${X0+4},${P.y+2} Q${X0+22},${P.y+4} ${X0+26},${Math.max(P.y+10,yL)}" fill="none" stroke="${water}" stroke-width="4" stroke-dasharray="6 4" stroke-dashoffset="${-ph}"/>`:''}
+   <circle cx="${P.x}" cy="${P.y}" r="18" fill="${on?'var(--ok-soft)':'var(--panel)'}" stroke="var(--stroke)" stroke-width="2.4"/>
+   <g transform="rotate(${ang} ${P.x} ${P.y})" stroke="var(--stroke)" stroke-width="3" stroke-linecap="round"><line x1="${P.x-11}" y1="${P.y}" x2="${P.x+11}" y2="${P.y}"/><line x1="${P.x}" y1="${P.y-11}" x2="${P.x}" y2="${P.y+11}"/></g>
+   <text x="${P.x}" y="${P.y-26}" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--text)">Αντλία</text>
+   <text x="${P.x}" y="${P.y-44}" font-size="13" font-weight="bold" text-anchor="middle" fill="${on?'var(--ok)':p===null||p===undefined?'var(--bad)':'var(--muted)'}">${on?'ON':p===null||p===undefined?'?':'OFF'}</text>
+   <path d="M${XM},${Bt} V${Bt+22} H${X1+12}" fill="none" stroke="${L>0.5?water:'var(--zero)'}" stroke-width="6"/>
+   <text x="${XM+8}" y="${Bt+16}" font-size="12" fill="var(--muted)">κατανάλωση</text>`;
+  if(L>=100) g+=`<text x="${XM}" y="${T-14}" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--bad)">⚠ Υπερχείλιση!</text>`;
+  else if(L<=0) g+=`<text x="${XM}" y="${T-14}" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--bad)">⚠ Άδειασε!</text>`;
+  G.innerHTML=g;
+  const m=$('tankMsg'); m.className='';
+  if(L>=100){ m.className='bad'; m.textContent='⚠ Υπερχείλιση! Η αντλία δεν σταμάτησε στη μέγιστη στάθμη.'; }
+  else if(L<=0){ m.className='bad'; m.textContent='⚠ Η δεξαμενή άδειασε! Η αντλία δεν ξεκίνησε στην ελάχιστη στάθμη.'; }
+  else m.textContent=TK.run?(on?'Η αντλία γεμίζει τη δεξαμενή.':'Η δεξαμενή αδειάζει (κατανάλωση).'):'Οι αισθητήρες οδηγούν τους διακόπτες A και B.'; }
 // ---- electrical layer: wires join pin ends into nets; a net with an electrical terminal (or +5 V / ground) is solved
 // by nodal analysis (resistors, switches, LEDs as diodes, gate outputs as 5 V / 0 V sources with 50 Ω inside)
 function eKey(w,side){ const c=byId(side?w.to:w.from); if(!c) return null; if(c.type==='NODE') return 'n'+c.id;
@@ -914,7 +1060,7 @@ function redraw(){
   else if(F.short) showMsg('bad','Βραχυκύκλωμα: τα +5 V ενώνονται με τη γείωση χωρίς αντίσταση (π.χ. μέσα από κλειστό διακόπτη). Στο πραγματικό κύκλωμα το τροφοδοτικό θα υπερφορτωνόταν.');
   else if(F.burnt&&F.burnt.length) showMsg('bad',`Το LED ${F.burnt.map(c=>c.label).join(', ')} κάηκε: πέρασε πολύ ρεύμα (πάνω από 60 mA). Βάλτε αντίσταση σε σειρά (π.χ. 220 Ω), επιλέξτε το LED και πατήστε «Νέο LED».`);
   else if(F.over&&F.over.length){ const o=F.over[0], g=byId(o.id); showMsg('bad',`Υπερφόρτωση: η έξοδος ${g?(g.type==='IN'?'του διακόπτη '+g.label:'της πύλης '+(ALLGATES.includes(g.type)?g.type:MEMNAME[g.type]||'')):''} δίνει ή δέχεται ${o.mA} mA (το όριο είναι περίπου 25 mA). Μήπως συνδέθηκε απευθείας στη γείωση, στα +5 V, σε άλλη έξοδο ή σε LED χωρίς αντίσταση;`); }
-  else if(mode==='ch'&&hasLoop()) showMsg('bad','Το κύκλωμα έχει βρόχο (μια έξοδος γυρίζει πίσω στην είσοδό της). Στις αποστολές φτιάχνουμε μόνο συνδυαστικά κυκλώματα.');
+  else if(mode==='ch'&&!CH[chIdx].seq&&hasLoop()) showMsg('bad','Το κύκλωμα έχει βρόχο (μια έξοδος γυρίζει πίσω στην είσοδό της). Στις αποστολές φτιάχνουμε μόνο συνδυαστικά κυκλώματα.');
   else if(F.osc) showMsg('bad','Το κύκλωμα δεν σταθεροποιείται: ταλαντώνεται (π.χ. μια NOT που η έξοδός της γυρίζει στην είσοδό της).');
   else if(badC) showMsg('warn',`Μη χρησιμοποιούμενη κατάσταση ${badB.name?'στον '+badB.name:'στο '+MEMNAME[badC.type]}: ${badB.why}.`);
   else if(F.efloat) showMsg('warn','Μια είσοδος πύλης ή LED είναι «στον αέρα» (π.χ. με ανοιχτό διακόπτη): η τιμή της είναι απροσδιόριστη. Βάλτε αντίσταση pull-down 10 kΩ προς τη γείωση (ή pull-up 10 kΩ προς τα +5 V).');
@@ -932,7 +1078,7 @@ function redraw(){
     : sc&&sc.type==='NODE'
     ? `Επιλεγμένος κόμβος (${nodeDeg(sc.id)} από ${MAXNODE} αγωγοί): σύρετέ τον για να τον μετακινήσετε. Για νέο καλώδιο, κάντε κλικ σε κενό σημείο και μετά τραβήξτε από τον κόμβο.`
     : 'Κλικ = επιλογή · Delete = διαγραφή · κλικ στον διακόπτη = 0/1 · σύρετε ένα τμήμα αγωγού (↔ κάθετο, ↕ οριζόντιο) για να το μετακινήσετε';
-  if(mode==='free'&&isSeq()) tdRecord(V,sim); else tdSamples=[];
+  lastV=V; if(mode==='free'&&isSeq()) tdRecord(V,sim); else tdSamples=[]; tankDraw();
   renderTable(); autosave(); renderProps(); syncHint();
   if(!drag&&document.activeElement?.id!=='nameIn') commit();
   $('undoBtn').disabled=hpos<=0; $('redoBtn').disabled=hpos>=hist.length-1;
@@ -1015,7 +1161,7 @@ function renderProps(){
     P.querySelector('[data-pulse]').onclick=()=>{ if(c.run) return; c.val=1; redraw(); setTimeout(()=>{ c.val=0; redraw(); },350); };
     return; }
   if(c&&MULTI.includes(c.type)){
-    if(mode==='ch'){ P.className='show'; P.dataset.k=''; propsKey='';
+    if(mode==='ch'&&!CH[chIdx].multi){ P.className='show'; P.dataset.k=''; propsKey='';
       P.innerHTML=`<b>Είσοδοι:</b> 2 <span class="note">(στις αποστολές οι πύλες έχουν 2 εισόδους)</span>`; return; }
     const n=gateN(c), k='n'+c.id+':'+n; if(propsKey===k) return; propsKey=k; P.className='show';
     P.innerHTML='<b>Είσοδοι:</b>'+[2,3,4].map(m=>`<button data-n="${m}" class="${m===n?'on':''}">${m}</button>`).join('');
@@ -1108,12 +1254,22 @@ function renderTable(){
   const seq=mode==='free'&&isSeq();
   $('tdArea').style.display=seq?'':'none'; $('ttH').style.display=seq?'none':''; $('ttBox').style.display=seq?'none':''; $('exprs').style.display=seq?'none':'';
   if(seq){ renderTiming(); return; }
-  const T=truthTable(), ch=mode==='ch'?CH[chIdx]:null;
+  const ch0=mode==='ch'?CH[chIdx]:null;
+  $('ttH').innerHTML=ch0&&ch0.seq?'Δοκιμή βήμα-βήμα <span style="font-weight:normal;font-size:13px;color:var(--muted)">· κλικ σε γραμμή</span>':'Πίνακας αληθείας <span style="font-weight:normal;font-size:13px;color:var(--muted)">· κλικ σε γραμμή</span>';
+  if(ch0&&ch0.seq){ renderSeqTable(ch0); return; }
+  const T=truthTable(), ch=ch0;
   const cur=T.ins.map(c=>c.val).join('');
   const cell=v=>v===null||v===undefined?'<td class="o">?</td>':`<td class="o v${v}">${v}</td>`;
   let h='';
   if(!T.ins.length){ $('tt').innerHTML='<tr><td>Προσθέστε τουλάχιστον έναν διακόπτη.</td></tr>'; $('exprs').innerHTML=''; return; }
-  if(ch){
+  if(ch&&ch.outs.length>4){ // many outputs: the target and the circuit as one string each (D0 … D7)
+    const bits=(a,t)=>a.map((v,k)=>{ const x=v===null||v===undefined?'?':v; return t&&t[k]!==v?`<span style="color:var(--bad);text-decoration:underline">${x}</span>`:x; }).join('');
+    h=`<tr><th class="grp" colspan="${T.ins.length}">Είσοδοι</th><th class="grp">Στόχος</th><th class="grp">Κύκλωμα</th><th class="grp"></th></tr>`;
+    h+=`<tr>${T.ins.map(c=>`<th>${c.label}</th>`).join('')}<th>${ch.outs[0]} … ${ch.outs[ch.outs.length-1]}</th><th>${ch.outs[0]} … ${ch.outs[ch.outs.length-1]}</th><th>✓</th></tr>`;
+    T.rows.forEach((r,ri)=>{ const tgt=ch.f(...ch.ins.map(l=>r.iv[l]===1)).map(x=>x?1:0);
+      const mine=ch.outs.map(l=>{ const k=T.outs.findIndex(o=>o.label===l); return k<0?null:r.ov[k]; }), ok=tgt.every((t,k)=>t===mine[k]);
+      h+=`<tr data-row="${ri}" class="${T.ins.map(c=>r.iv[c.label]).join('')===cur?'cur':''}">${T.ins.map(c=>`<td>${r.iv[c.label]}</td>`).join('')}<td class="o" style="font-family:Consolas,monospace;letter-spacing:2px">${bits(tgt)}</td><td class="o" style="font-family:Consolas,monospace;letter-spacing:2px">${bits(mine,tgt)}</td><td class="${ok?'okc':'badc'}">${ok?'✓':'✗'}</td></tr>`; });
+  } else if(ch){
     h=`<tr><th class="grp" colspan="${T.ins.length}">Είσοδοι</th><th class="grp" colspan="${ch.outs.length}">Στόχος</th><th class="grp" colspan="${T.outs.length}">Κύκλωμα</th><th class="grp"></th></tr>`;
     h+=`<tr>${T.ins.map(c=>`<th>${c.label}</th>`).join('')}${ch.outs.map(l=>`<th>${l}</th>`).join('')}${T.outs.map(c=>`<th>${c.label}</th>`).join('')}<th>✓</th></tr>`;
     T.rows.forEach((r,ri)=>{ const tgt=ch.f(...ch.ins.map(l=>r.iv[l]===1)).map(x=>x?1:0);
@@ -1124,7 +1280,7 @@ function renderTable(){
     h=`<tr>${T.ins.map(c=>`<th>${c.label}</th>`).join('')}${T.outs.map(c=>`<th style="color:var(--accent)">${c.label}</th>`).join('')}</tr>`;
     T.rows.forEach((r,ri)=>{ h+=`<tr data-row="${ri}" class="${T.ins.map(c=>r.iv[c.label]).join('')===cur?'cur':''}">${T.ins.map(c=>`<td>${r.iv[c.label]}</td>`).join('')}${r.ov.map(cell).join('')}</tr>`; });
   }
-  $('tt').innerHTML=h;
+  $('tt').innerHTML=h; $('tt').classList.remove('wide');
   $('tt').querySelectorAll('tr[data-row]').forEach(tr=>tr.onclick=()=>{ const r=T.rows[+tr.dataset.row]; T.ins.forEach(c=>c.val=r.iv[c.label]); redraw(); });
   // expressions
   const src=srcMap(); let e='';
@@ -1164,10 +1320,11 @@ function buildPalette(){
     h+=`<div class="pi" data-type="NODE" title="Σημείο σύνδεσης έως 4 αγωγών">${iconSVG('NODE')}<span>Κόμβος</span></div>`;
     h+='<div class="ph">Είσοδος / έξοδος</div>'+`<div class="pirow"><div class="pi" data-type="IN">${iconSVG('IN')}<span>Διακ.</span></div><div class="pi" data-type="OUT">${iconSVG('OUT')}<span>LED</span></div></div>`;
   } else {
-    h='<div class="ph">Πύλες</div>';
-    const allowed=CH[chIdx].gates; ALLGATES.filter(t=>allowed.includes(t)).forEach(t=>h+=`<div class="pi" data-type="${t}">${iconSVG(t)}<span>${t}</span></div>`);
+    const allowed=CH[chIdx].parts||CH[chIdx].gates, gs=ALLGATES.filter(t=>allowed.includes(t)), ms=MEM.filter(t=>allowed.includes(t));
+    h=gs.length?'<div class="ph">Πύλες</div>':''; gs.forEach(t=>h+=`<div class="pi" data-type="${t}">${iconSVG(t)}<span>${t}</span></div>`);
+    if(ms.length){ h+='<div class="ph">Μνήμη</div>'; ms.forEach(t=>h+=`<div class="pi mem" data-type="${t}" title="${MEMTITLE[t]}">${iconSVG(t)}<span>${MEMNAME[t]}</span></div>`); }
     h+=`<div class="pi" data-type="NODE" title="Σημείο σύνδεσης έως 4 αγωγών">${iconSVG('NODE')}<span>Κόμβος</span></div>`;
-    h+=`<div class="ph" style="font-weight:normal;margin-top:6px">Μόνο οι πύλες της αποστολής${CH[chIdx].max?`<br>(το πολύ ${CH[chIdx].max})`:''}</div>`;
+    h+=`<div class="ph" style="font-weight:normal;margin-top:6px">Μόνο ${CH[chIdx].parts?'τα εξαρτήματα':'οι πύλες'} της αποστολής${CH[chIdx].max?`<br>(το πολύ ${CH[chIdx].max} πύλες)`:''}</div>`;
   }
   p.innerHTML=h;
   p.querySelectorAll('.pi').forEach(el=>el.addEventListener('pointerdown',ev=>startNew(ev,el.dataset.type)));
@@ -1384,7 +1541,7 @@ function circuitSVG(){ // a self-contained copy of the drawing, cropped to the c
   const src=$('cv'), clone=src.cloneNode(true), A=src.querySelectorAll('*'), B=clone.querySelectorAll('*');
   A.forEach((el,i)=>{ const cs=getComputedStyle(el); B[i].setAttribute('style',STYLE_PROPS.map(p=>`${p}:${cs.getPropertyValue(p)}`).join(';')); });
   clone.querySelectorAll('.pinhit,.hitbox,.wirehit,.nodehit,.selbox,.selring,#temp,#bgRect,defs').forEach(e=>e.remove());
-  let bb=null; [$('wiresG'),$('compsG')].forEach(g=>{ const b=g.getBBox(); if(!b.width&&!b.height) return;
+  let bb=null; [$('wiresG'),$('compsG'),$('tankG')].forEach(g=>{ const b=g.getBBox(); if(!b.width&&!b.height) return;
     bb=bb?{x1:Math.min(bb.x1,b.x),y1:Math.min(bb.y1,b.y),x2:Math.max(bb.x2,b.x+b.width),y2:Math.max(bb.y2,b.y+b.height)}:{x1:b.x,y1:b.y,x2:b.x+b.width,y2:b.y+b.height}; });
   if(!bb) return null; const pad=24, x=bb.x1-pad, y=bb.y1-pad, w=bb.x2-bb.x1+2*pad, h=bb.y2-bb.y1+2*pad;
   clone.setAttribute('viewBox',`${x} ${y} ${w} ${h}`); clone.setAttribute('width',w); clone.setAttribute('height',h); clone.removeAttribute('id');
@@ -1406,7 +1563,8 @@ $('pngBtn').onclick=()=>{
   const wasDark=document.body.classList.contains('dark'), keepSel=sel; sel=null;
   if(wasDark) document.body.classList.remove('dark'); redraw();
   const seq=mode==='free'&&isSeq();
-  const C=circuitSVG(); const T=seq?{ins:[],outs:[],rows:[]}:truthTable(); const exprDivs=seq?[]:[...$('exprs').children];
+  const chSeq=mode==='ch'&&!!CH[chIdx].seq;
+  const C=circuitSVG(); const T=seq||chSeq?{ins:[],outs:[],rows:[]}:truthTable(); const exprDivs=seq||chSeq?[]:[...$('exprs').children];
   let TD=null; if(seq&&tdSamples.length){ const el=$('tdBox').querySelector('svg'); const vb=el.viewBox.baseVal;
     const cl=el.cloneNode(true), A=el.querySelectorAll('*'), B=cl.querySelectorAll('*');
     A.forEach((e,i)=>{ const cs=getComputedStyle(e); B[i].setAttribute('style',STYLE_PROPS.map(p=>`${p}:${cs.getPropertyValue(p)}`).join(';')); });
@@ -1460,18 +1618,70 @@ $('openBtn').onclick=()=>$('fileIn').click();
 $('fileIn').onchange=()=>{ const f=$('fileIn').files[0]; if(!f) return; const r=new FileReader();
   r.onload=()=>{ let d=null; try{ d=JSON.parse(r.result); }catch(e){}
     if(!d){ flash('Το αρχείο δεν είναι κύκλωμα αυτής της εφαρμογής.'); return; }
-    if(d.mode==='ch'&&d.ch){ const k=CH.findIndex(c=>c.id===d.ch); if(k>=0){ mode='ch'; chIdx=k; $('chSel').value=k; } } else mode='free';
+    if(d.mode==='ch'&&d.ch){ const g=CHB.some(c=>c.id===d.ch)?'B':CHC.some(c=>c.id===d.ch)?'C':null;
+      if(g){ setGrade(g); mode='ch'; chIdx=CH.findIndex(c=>c.id===d.ch); } else mode='free'; } else mode='free';
     enterMode(); if(!load(r.result)) flash('Το αρχείο δεν είναι κύκλωμα αυτής της εφαρμογής.'); fitZoom(); redraw(); };
   r.readAsText(f); $('fileIn').value=''; };
 
+// ---------------- sequential missions: step-by-step test ----------------
+// The test starts from power-on: every flip-flop at Q = 0, every switch at 0. Each step sets some switches
+// and the circuit settles (clock edges included); the outputs are then compared with the target.
+const fixedL=l=>comps.find(c=>c.fixed&&c.label===l);
+function runSeq(ch,upto,keep){
+  const save=comps.map(c=>({c,val:c.val,q:c.q,pclk:c.pclk,bad:c.bad})), sp=prevV, rows=[];
+  prevV={}; comps.forEach(c=>{ if(MEM.includes(c.type)){ c.q=0; delete c.bad; delete c.pclk; } });
+  const cur={}; ch.ins.forEach(l=>cur[l]=0);
+  ch.seq.forEach(([iv,ex],i)=>{ if(upto!==undefined&&i>upto) return; const prev={...cur}; Object.assign(cur,iv);
+    ch.ins.forEach(l=>{ const c=fixedL(l); if(c) c.val=cur[l]; });
+    const sm=simulate(null), got=ch.outs.map(l=>{ const o=fixedL(l); return o?(sm.val[o.id]??null):null; });
+    rows.push({iv:{...cur},prev,ex,got,ok:!ex||ex.every((e,k)=>e===null||e===got[k])}); });
+  if(!keep){ save.forEach(o=>{ o.c.val=o.val; o.c.q=o.q; if(o.pclk===undefined) delete o.c.pclk; else o.c.pclk=o.pclk; if(o.bad) o.c.bad=o.bad; else delete o.c.bad; }); prevV=sp; }
+  return rows; }
+let seqMsg='';
+function renderSeqTable(ch){
+  const rows=runSeq(ch), cell=v=>v===null||v===undefined?'<td class="o">?</td>':`<td class="o v${v}">${v}</td>`;
+  let h=`<tr><th class="grp"></th><th class="grp" colspan="${ch.ins.length}">Είσοδοι</th><th class="grp" colspan="${ch.outs.length}">Στόχος</th><th class="grp" colspan="${ch.outs.length}">Κύκλωμα</th><th class="grp"></th></tr>`;
+  h+=`<tr><th>#</th>${ch.ins.map(l=>`<th>${l}</th>`).join('')}${ch.outs.map(l=>`<th>${l}</th>`).join('')}${ch.outs.map(l=>`<th>${l}</th>`).join('')}<th>✓</th></tr>`;
+  rows.forEach((r,i)=>{ h+=`<tr data-step="${i}"><td>${i+1}</td>${ch.ins.map(l=>{ const v=r.iv[l], ed=l==='CLK'&&r.prev[l]===0&&v===1, ch2=r.prev[l]!==v&&i>0;
+        return `<td${ch2?' style="font-weight:bold;color:var(--accent)"':''}>${ed?'↑':v}</td>`; }).join('')}
+      ${r.ex?r.ex.map(e=>e===null?'<td class="o">–</td>':cell(e)).join(''):ch.outs.map(()=>'<td class="o">–</td>').join('')}${r.got.map(cell).join('')}
+      <td class="${r.ok?'okc':'badc'}">${r.ex?(r.ok?'✓':'✗'):''}</td></tr>`; });
+  $('tt').innerHTML=h;
+  $('tt').querySelectorAll('tr[data-step]').forEach(tr=>tr.onclick=()=>{ const i=+tr.dataset.step; runSeq(ch,i,true); tankStop(); redraw();
+    flash(`Το κύκλωμα πέρασε από τα βήματα 1–${i+1} της δοκιμής (ξεκινώντας με όλα τα flip-flop στο 0).`); });
+  $('exprs').innerHTML=`<div class="note" style="line-height:1.25;margin:0">Αρχή: διακόπτες${ch.parts.some(t=>FFS.includes(t))?' και flip-flop':''} στο 0. Έντονο = η είσοδος που αλλάζει${ch.ins.includes('CLK')?'· ↑ = θετικό μέτωπο του CLK':''}.</div>`;
+}
+function clkSource(c){ // follow the wire into the CLK pin back through nodes
+  const ci=boxIns(c).indexOf('CLK'); let w=wires.find(x=>x.to===c.id&&x.pin===ci), guard=0;
+  while(w&&guard++<50){ const s=byId(w.from); if(!s) return null; if(s.type!=='NODE') return s; w=wires.find(x=>x.to===s.id); }
+  return null; }
+function checkSeq(){
+  const c=CH[chIdx], parts=comps.filter(x=>!x.fixed&&x.type!=='NODE'), gates=parts.filter(x=>ALLGATES.includes(x.type));
+  const bad=parts.find(p=>!c.parts.includes(p.type)); if(bad){ showResult('bad',`✘ Το εξάρτημα ${partName(bad.type)} δεν επιτρέπεται σε αυτή την αποστολή.`); return; }
+  if(c.max&&gates.length>c.max){ showResult('bad',`✘ Χρησιμοποιήσατε ${gates.length} πύλες· επιτρέπονται το πολύ ${c.max}.`); return; }
+  if(!parts.length){ showResult('bad','✘ Δεν έχετε βάλει ακόμα κανένα εξάρτημα.'); return; }
+  const rows=runSeq(c);
+  const und=rows.findIndex(r=>r.ex&&r.ex.some((e,k)=>e!==null&&(r.got[k]===null||r.got[k]===undefined)));
+  if(und>=0){ showResult('bad',`✘ Στο βήμα ${und+1} κάποια έξοδος είναι απροσδιόριστη (?): μήπως έμεινε ασύνδετη μια είσοδος πύλης ή flip-flop;`); return; }
+  const wrong=rows.filter(r=>!r.ok).length;
+  if(wrong){ const first=rows.findIndex(r=>!r.ok)+1; showResult('bad',`✘ ${wrong} ${wrong===1?'βήμα της δοκιμής δεν ταιριάζει':'βήματα της δοκιμής δεν ταιριάζουν'} με τον στόχο (το πρώτο είναι το βήμα ${first}). Κάντε κλικ σε εκείνη τη γραμμή για να δείτε τι κάνει το κύκλωμα.`); return; }
+  if(c.sync){ const ffs=comps.filter(x=>FFS.includes(x.type)), cl=fixedL('CLK');
+    if(ffs.some(f=>clkSource(f)!==cl)){ showResult('bad','✘ Η μέτρηση είναι σωστή, αλλά ο απαριθμητής δεν είναι σύγχρονος: το CLK πρέπει να πηγαίνει απευθείας σε όλα τα flip-flop.'); return; } }
+  markDone(c.id); fillChSel(); renderChCard();
+  showResult('ok',`🎉 Μπράβο! Το κύκλωμα περνά όλα τα βήματα της δοκιμής.${c.done?c.done(gates):''}${chIdx<CH.length-1?' Πατήστε «Επόμενη →».':' Ολοκληρώσατε όλες τις αποστολές της Γ΄ τάξης!'}`);
+}
 // ---------------- challenges UI ----------------
-function fillChSel(){ const d=doneSet(); $('chSel').innerHTML=CH.map((c,i)=>`<option value="${i}">${d.has(c.id)?'✓ ':''}${c.n}. ${c.title}</option>`).join(''); $('chSel').value=chIdx; }
+function fillChSel(){ const d=doneSet(); $('chSel').innerHTML=CH.map((c,i)=>`<option value="${i}">${grade==="C"?"Γ":"Β"}΄ ${d.has(c.id)?'✓ ':''}${c.n}. ${c.title}</option>`).join(''); $('chSel').value=chIdx; }
 function renderChCard(){ if(mode!=='ch') return; const c=CH[chIdx];
-  $('chCard').innerHTML=`<div class="ct">Αποστολή ${c.n}: ${c.title}${doneSet().has(c.id)?' ✓':''}</div>${c.text}
-    <div class="cr">Πύλες: ${c.gates.join(', ')}${c.max?` · το πολύ ${c.max}`:''}</div>`;
+  $('chCard').innerHTML=`<div class="ct">Αποστολή ${c.n}: ${c.title}${doneSet().has(c.id)?' ✓':''}</div><div class="ctext">${c.text}</div>
+    <div class="cr">${c.parts?'Εξαρτήματα: '+c.parts.map(partName).join(', '):'Πύλες: '+c.gates.join(', ')}${c.max?` · το πολύ ${c.max} πύλες`:''}${c.full?' · <a href="#" id="fullLink">📄 Πλήρης εκφώνηση</a>':''}</div>`;
+  const fl=$('fullLink'); if(fl) fl.onclick=ev=>{ ev.preventDefault(); showResult('info',c.full); };
+  const ct=$('chCard').querySelector('.ctext'); if(ct.scrollHeight>ct.clientHeight+2){ const m=document.createElement('span'); m.className='more'; m.textContent='▾ όλο το κείμενο';
+    ct.after(m); const tg=()=>{ const o=ct.classList.toggle('open'); m.textContent=o?'▴ λιγότερα':'▾ όλο το κείμενο'; }; m.onclick=tg; ct.onclick=()=>{ if(!ct.classList.contains('open')) tg(); }; }
   $('nextChBtn').disabled=chIdx>=CH.length-1; }
 function showResult(cls,html){ const r=$('result'); if(!cls){ r.className=''; r.innerHTML=''; return; } r.className='show '+cls; r.innerHTML=html; }
 $('checkBtn').onclick=()=>{
+  if(CH[chIdx].seq){ checkSeq(); return; }
   const c=CH[chIdx], T=truthTable(), gates=comps.filter(x=>ALLGATES.includes(x.type));
   if(T.cycle){ showResult('bad','✘ Το κύκλωμα έχει βρόχο. Αφαιρέστε το καλώδιο που γυρίζει πίσω.'); return; }
   if(T.rows.some(r=>r.ov.some(v=>v===null||v===undefined))){ showResult('bad','✘ Κάποια είσοδος πύλης ή κάποιο LED δεν έχει συνδεθεί.'); return; }
@@ -1487,10 +1697,15 @@ $('hintBtn').onclick=()=>showResult('info','💡 '+CH[chIdx].hint);
 $('nextChBtn').onclick=()=>{ if(chIdx<CH.length-1){ chIdx++; $('chSel').value=chIdx; enterMode(); } };
 $('chSel').onchange=()=>{ chIdx=+$('chSel').value; enterMode(); };
 $('mFree').onclick=()=>{ if(mode!=='free'){ mode='free'; enterMode(); } };
-$('mCh').onclick=()=>{ if(mode!=='ch'){ mode='ch'; enterMode(); } };
+function setGrade(g){ if(g===grade) return; lastIdx[grade]=chIdx; grade=g; CH=g==='C'?CHC:CHB; chIdx=Math.min(lastIdx[g],CH.length-1); store.set('gateBuilderGrade',g); }
+$('mChB').onclick=()=>{ if(mode!=='ch'||grade!=='B'){ setGrade('B'); mode='ch'; enterMode(); } };
+$('mChC').onclick=()=>{ if(mode!=='ch'||grade!=='C'){ setGrade('C'); mode='ch'; enterMode(); } };
 
 // keep fixed outputs at the right edge when the canvas is resized
 new ResizeObserver(()=>{ fitToolbar(); fitZoom(); redraw(); }).observe(cv);
+$('tankRun').onclick=()=>{ if(TK.run){ tankStop(); tankDraw(); return; } TK.run=true; $('tankRun').innerHTML='⏸ Παύση';
+  if(TK.lvl>=100||TK.lvl<=0) TK.lvl=50; if(tankSensors()) redraw(); TK.timer=setInterval(tankTick,100); };
+$('tankReset').onclick=()=>{ TK.lvl=50; if(tankSensors()) redraw(); else tankDraw(); };
 $('helpClose').onclick=()=>{ document.querySelector('details').open=false; };
 $('helpShade').onclick=()=>{ document.querySelector('details').open=false; };
 
