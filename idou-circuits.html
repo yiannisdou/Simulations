@@ -251,6 +251,15 @@ body.mk #mkShade,body.mk #mkDlg{display:block}
 #embTheme{display:none}
 body.embed header,body.embed .toolbar,body.embed details,body.embed:not(.emission) #chArea,body.embed:not(.emission) #result,body.embed .exsw,body.embed #titleIn{display:none!important}
 body.embed.emission #embTitle{display:none}
+/* embedded exercise: the task on top, full width; drawing area and table below */
+#embTop{display:none}
+body.emission #embTop{display:flex;gap:10px;align-items:stretch;padding:8px 10px;margin-bottom:8px;max-height:36vh;overflow:auto;flex:0 0 auto}
+body.emission #embTop #chArea{flex:1;display:flex!important;gap:10px;align-items:flex-start;min-width:0}
+body.emission #embTop #chCard{flex:1;max-height:none;min-width:0}
+body.emission #embTop #chBtns{flex-direction:column;margin-top:0!important;min-width:120px}
+body.emission #embTop #result{flex:0 0 34%;overflow:auto;margin:0}
+body.emission #embTop .toolbar{display:grid!important;grid-template-columns:auto auto;gap:5px;align-content:start;margin:0;padding:0;border:none;background:none;box-shadow:none}
+body.emission #embTop .toolbar .spacer{display:none}
 body.embed .wrap{padding:6px;height:100vh;box-sizing:border-box}
 body.embed main{grid-template-columns:minmax(200px,1fr) 0 var(--sideW,300px)}
 body.embed.noside main{grid-template-columns:1fr} body.embed.noside #side,body.embed.noside #splitter{display:none}
@@ -2275,7 +2284,7 @@ function mkRender(msg){ const B=$('mkBody'), P=mkProblems(), seq=isSeq(), ins=in
   $('mkTry').onclick=()=>{ const m=get(); if(!m) return; mkClose(); autosave(); openMission(m); };
   $('mkEmb').onclick=()=>{ const m=get(); if(!m) return; const base=location.protocol.startsWith('http')&&location.hostname.endsWith('github.io')?location.origin+location.pathname:SITEURL;
     const slug=slugify(m.title)||'askisi', uA=base+'?embed=1#m='+b64e(JSON.stringify(m)), uB=base+'?embed=1&m=missions/'+slug+'.json';
-    const ifr=u=>`<iframe src="${u}" width="100%" height="640" style="border:0" loading="lazy" title="${escH(m.title)}"></iframe>`;
+    const ifr=u=>`<iframe src="${u}" width="100%" height="780" style="border:0" loading="lazy" title="${escH(m.title)}"></iframe>`;
     mkRender(`<label>Α) Γρήγορα: η άσκηση μέσα στον σύνδεσμο (${uA.length} χαρακτήρες)</label><textarea class="code" id="mkIfA" rows="3" readonly>${escH(ifr(uA))}</textarea>
       <div class="row" style="margin-top:4px"><button class="primary" id="mkCpA">📋 Αντιγραφή iframe</button></div>
       <label>Β) Μόνιμα: αρχείο στο GitHub</label><div class="small">Κατεβάστε το αρχείο και ανεβάστε το στον φάκελο <b>missions</b> του repository (την πρώτη φορά σύρετε ολόκληρο φάκελο «missions» με το αρχείο μέσα στο Add file → Upload files). Η άσκηση δεν εμφανίζεται στις λίστες αποστολών· ό,τι κάνει ο μαθητής μένει στον browser του.</div>
@@ -2478,6 +2487,8 @@ if(EMB){ document.body.classList.add('embed'); if(EMB.edit) document.body.classL
 fillChSel(); enterMode();
 let CHX=[];
 if(EMB&&EMB.mission){ document.body.classList.add('emission','edit'); $('embTitle').textContent='';
+  { const top=document.createElement('div'); top.id='embTop'; top.className='panel'; document.querySelector('main').before(top);
+    top.append($('chArea'),$('result'),document.querySelector('.toolbar')); }
   const start=d=>{ const m=d&&normMission(d); if(!m){ flash('Η άσκηση δεν βρέθηκε ή δεν είναι σωστή.'); return; }
     m.n=1; m.listed=true; m.embedded=true; CHX=[m]; grade='X'; CH=CHX; chIdx=0; mode='ch'; enterMode(); fitZoom(); redraw(); };
   const mh=location.hash.match(/[#&]m=([\w-]+)/);
