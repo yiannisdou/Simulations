@@ -199,6 +199,7 @@ table.tt td.wrongc{background:var(--bad-soft,#fdecea)!important;outline:2px soli
 .kmap td{width:40px;height:34px;text-align:center;border:1px solid var(--stroke);font-weight:bold;cursor:pointer;position:relative}
 .kmap td.v1{color:var(--one)} .kmap td.sel{background:var(--accent-soft);outline:3px solid var(--accent);outline-offset:-4px}
 .kmap td .mi{position:absolute;left:2px;top:0;font-size:9px;color:var(--muted);font-weight:normal}
+.kq{line-height:1.35;margin:4px 0 2px;padding:5px 8px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:4px}
 .kmap .corner{font-size:12px;color:var(--muted);line-height:1.1;text-align:right;border:none}
 .glist{font-size:15px;line-height:1.6}
 .glist .gc{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
@@ -378,7 +379,7 @@ h1 .h1sub{font-weight:normal;font-size:.72em;color:var(--muted)}
     <p><b>Ηλεκτρικά στοιχεία (⚡).</b> Στην καρτέλα ⚡ της παλέτας υπάρχουν τροφοδοσία +5 V, γείωση, διακόπτης, αντίσταση και LED σε πέντε χρώματα, για να στήσετε το κύκλωμα όπως στο Tinkercad ή στο breadboard. Τα στοιχεία αυτά δεν έχουν «είσοδο» και «έξοδο»: ενώνετε οποιονδήποτε ακροδέκτη τους με οποιονδήποτε άλλο, και με το πλήκτρο R (ή το ↻) τα περιστρέφετε. Ο διακόπτης ανοίγει και κλείνει με κλικ στον μοχλό· συνήθως συνδέεται στα +5 V, με αντίσταση pull-down 10 kΩ προς τη γείωση, ώστε η είσοδος της πύλης να είναι 0 όταν είναι ανοιχτός. Η έξοδος μιας πύλης οδηγεί ένα LED μέσα από αντίσταση 220 Ω προς τη γείωση· η άνοδος του LED είναι στην πλευρά του τριγώνου. Στα ηλεκτρικά καλώδια το χρώμα δείχνει την τάση (γκρι 0 V έως κόκκινο 5 V)· μια είσοδος πύλης διαβάζει 1 πάνω από 2 V και 0 κάτω από 0,8 V. Αν μια είσοδος μείνει «στον αέρα», αν ένα LED μπει χωρίς αντίσταση, αν γίνει βραχυκύκλωμα ή υπερφορτωθεί μια έξοδος, εμφανίζεται μήνυμα· ένα LED με πάνω από 60 mA καίγεται και το αλλάζετε με «Νέο LED». Οι ηλεκτρικοί διακόπτες και τα LED μπαίνουν κανονικά στον πίνακα αληθείας.</p>
     <p><b>Λογικές καταστάσεις.</b> Κλικ σε έναν διακόπτη αλλάζει την είσοδο από 0 σε 1. Τα καλώδια με λογικό 1 φαίνονται κόκκινα και με 0 γκρι· τα διακεκομμένα καλώδια σημαίνουν ότι η τιμή είναι απροσδιόριστη, επειδή κάποια είσοδος πύλης έμεινε ασύνδετη. Το LED ανάβει όταν η έξοδος είναι 1.</p>
     <p><b>Πίνακας αληθείας και έκφραση.</b> Ο πίνακας υπολογίζεται για όλους τους συνδυασμούς των εισόδων και η τρέχουσα γραμμή φωτίζεται. Κάτω από τον πίνακα φαίνεται η λογική έκφραση κάθε εξόδου, γραμμένη όπως στο βιβλίο (· για AND, + για OR, γραμμή από πάνω για NOT, ⊕ για XOR, ⊙ για XNOR).</p>
-    <p><b>Άσκηση στην ελεύθερη σχεδίαση (✎).</b> Πάνω από τον πίνακα αληθείας διαλέγετε «Αυτόματα» ή «✎ Άσκηση». Στην άσκηση ο πίνακας δεν συμπληρώνεται μόνος του. ① Ο μαθητής δοκιμάζει τους συνδυασμούς με τους διακόπτες, συμπληρώνει τις εξόδους (κλικ: 0 → 1 → κενό) και πατά «Έλεγχος πίνακα»· τα λάθος κελιά γίνονται κόκκινα. ② Γράφει τη συνάρτηση εξόδου (· = AND, + = OR, ⊕ = XOR, ¬ ή ' = NOT) και τη βλέπει με τους συμβολισμούς του βιβλίου· κάθε ισοδύναμη μορφή δεκτή. ③ Μεταφέρει τον πίνακα στον χάρτη Karnaugh (2–4 εισόδων, με σειρά 00, 01, 11, 10), τον ελέγχει, και μετά κάνει ομάδες με τους άσσους (κλικ στα κελιά και «➕ Ομάδα»). Από τις ομάδες γράφεται αυτόματα η απλοποιημένη συνάρτηση, και η σελίδα λέει αν είναι η απλούστερη ή ποια ομάδα μπορεί να μεγαλώσει ή περισσεύει. Το «💡 Λύση» δείχνει την απλούστερη ομαδοποίηση.</p>
+    <p><b>Άσκηση στην ελεύθερη σχεδίαση (✎).</b> Πάνω από τον πίνακα αληθείας διαλέγετε «Αυτόματα» ή «✎ Άσκηση». Στην άσκηση ο πίνακας δεν συμπληρώνεται μόνος του. ① Ο μαθητής δοκιμάζει τους συνδυασμούς με τους διακόπτες, συμπληρώνει τις εξόδους (κλικ: 0 → 1 → κενό) και πατά «Έλεγχος πίνακα»· τα λάθος κελιά γίνονται κόκκινα. ② Γράφει τη συνάρτηση εξόδου (· = AND, + = OR, ⊕ = XOR, ¬ ή ' = NOT) και τη βλέπει με τους συμβολισμούς του βιβλίου· κάθε ισοδύναμη μορφή δεκτή. ③ Μεταφέρει τον πίνακα στον χάρτη Karnaugh (2–4 εισόδων, με σειρά 00, 01, 11, 10), τον ελέγχει και απαντά αν γίνεται απλοποίηση. Αν δεν γίνεται (κανένας άσσος δεν έχει γειτονικό), η συνάρτηση μένει ως άθροισμα ελάχιστων όρων και προχωρά στο κύκλωμα· αν γίνεται, κάνει ομάδες με τους άσσους (κλικ στα κελιά και «➕ Ομάδα»). Από τις ομάδες γράφεται αυτόματα η απλοποιημένη συνάρτηση, και η σελίδα λέει αν είναι η απλούστερη ή ποια ομάδα μπορεί να μεγαλώσει ή περισσεύει. Το «💡 Λύση» δείχνει την απλούστερη ομαδοποίηση.</p>
     <p><b>Αποστολές.</b> Υπάρχουν δύο ομάδες αποστολών. Οι <b>Αποστολές Β΄</b> είναι για τη Β΄ τάξη: λογικές πύλες και συνδυαστικά κυκλώματα (αθροιστές, συγκριτής, πολυπλέκτης, αποπολυπλέκτης, κωδικοποιητής, αποκωδικοποιητής). Οι <b>Αποστολές Γ΄</b> είναι για τη Γ΄ τάξη: μανταλωτές, flip-flop, καταχωρητές και απαριθμητές, με πρώτη την αντλία της δεξαμενής. Κάθε αποστολή δίνει τις εισόδους, τις εξόδους και τα εξαρτήματα που επιτρέπονται. Στη Β΄ ο πίνακας δείχνει τον στόχο και το δικό σας κύκλωμα δίπλα δίπλα. Στη Γ΄, επειδή τα κυκλώματα έχουν μνήμη, ο πίνακας γίνεται «δοκιμή βήμα-βήμα»: ξεκινά με όλα στο 0, αλλάζει τις εισόδους με τη σειρά (↑ = θετικό μέτωπο του CLK) και συγκρίνει τις εξόδους σε κάθε βήμα· με κλικ σε μια γραμμή το κύκλωμα εκτελεί τα βήματα ως εκεί. Στην αποστολή της δεξαμενής η δεξαμενή φαίνεται δεξιά στον χώρο σχεδίασης: η έξοδος Y οδηγεί την αντλία και τα καλώδια των αισθητήρων SA, SB φτάνουν στους διακόπτες A, B. Με το ▶ η στάθμη ανεβαίνει και κατεβαίνει και οι αισθητήρες αλλάζουν μόνοι τους τους διακόπτες. Όταν ταιριάζουν όλα, πατήστε «Έλεγχος». Με το 💾 αποθηκεύετε το κύκλωμα σε αρχείο, για να το συνεχίσετε ή να το παραδώσετε.</p>
     <p><b>Για τον εκπαιδευτικό.</b> Ανοίξτε τη σελίδα με <b>?διαχείριση</b> στο τέλος της διεύθυνσης (π.χ. …/idou-circuits.html?διαχείριση). Τότε εμφανίζονται τρία κουμπιά που οι μαθητές δεν βλέπουν: <b>🎓 Νέα αποστολή</b>, <b>🔗 Ενσωμάτωση</b> (κώδικας iframe για να μπει το κύκλωμα στην ιστοσελίδα, είτε μέσα στον σύνδεσμο είτε ως αρχείο στον φάκελο circuits του GitHub) και <b>⚙ Αποστολές</b> (απόκρυψη, σειρά και προσθήκη αποστολών στις λίστες Β΄ και Γ΄· οι αλλαγές ισχύουν για όλους όταν ανεβάσετε το missions.json στο GitHub, δίπλα στο idou-circuits.html).</p>
     <p><b>Αποστολές του εκπαιδευτικού (🎓).</b> Στην ελεύθερη σχεδίαση (με ?διαχείριση) φτιάξτε τη λύση, με διακόπτες και LED με τα ονόματα που θέλετε, και πατήστε «🎓 Νέα αποστολή». Γράψτε τίτλο, εκφώνηση και, αν θέλετε, υπόδειξη. Σε συνδυαστικό κύκλωμα ο στόχος είναι ο πίνακας αληθείας της λύσης σας. Σε κύκλωμα με μνήμη πατήστε «⏺ Καταγραφή δοκιμής» και αλλάξτε τους διακόπτες με τη σειρά που θέλετε· κάθε αλλαγή γίνεται ένα βήμα της δοκιμής. Στα συνδυαστικά διαλέγετε τι δίνετε (συνάρτηση, πίνακα ή μόνο εκφώνηση) και τι ζητάτε (πίνακα αληθείας, συνάρτηση ή άθροισμα ελάχιστων όρων, απλοποίηση με Karnaugh, κύκλωμα σε επίπεδα πυλών). Μετά πάρτε <b>σύνδεσμο</b> (για το e-class ή την ιστοσελίδα) ή <b>αρχείο αποστολής</b> (ανοίγει με το 📂). Με το «🔗 Ενσωμάτωση ως άσκηση» η αποστολή μπαίνει σε iframe στη σελίδα δραστηριοτήτων (σύνδεσμος ή αρχείο στον φάκελο missions του GitHub), χωρίς να μπει στις λίστες. Ο μαθητής βλέπει μόνο τους διακόπτες και τα LED, και η αποστολή μένει στη λίστα «🎓 Εκπαιδευτικού» του υπολογιστή του.</p>
@@ -1596,6 +1597,7 @@ function minSOP(on,n){ // exact minimum (fewest groups, then fewest literals) fo
     const first=on.find(m=>!cov.has(m)); if(first===undefined){ const L=chosen.reduce((a,p)=>a+p.l,0); if(!best||chosen.length<best.length||(chosen.length===best.length&&L<best.L)){ best=chosen.slice(); best.L=L; } return; }
     P.forEach(p=>{ if(!p.ms.includes(first)||chosen.includes(p)) return; const nc=new Set(cov); p.ms.forEach(m=>nc.add(m)); chosen.push(p); rec2(chosen,nc); chosen.pop(); }); };
   rec2([],new Set()); return best.map(p=>p.c); }
+const canSimp=(on,n)=>on.length>0&&minSOP(on,n).reduce((a,c)=>a+lits(c,n),0)<on.length*n; // some group of 2+ cells exists
 function sopAst(cubes,ins){ if(!cubes.length) return {o:'c',v:0}; const t=cubes.map(c=>cubeTerm(c,ins)); return t.length===1?t[0]:{o:'or',a:t}; }
 // a typed simplified function: right values, sum of products, and as short as the minimum from the Karnaugh map
 function sopParts(a){ const terms=a.o==='or'?a.a:[a]; const out=[];
@@ -1676,6 +1678,12 @@ function renderExercise(T,ms){
         h+='</tr>'; }
       h+='</table>';
       if(!K.ok) h+=`<div class="note" style="line-height:1.3;margin:0">Μεταφέρετε τον πίνακα αληθείας στον χάρτη (κλικ: 1 → 0 → κενό). Ο μικρός αριθμός σε κάθε κελί είναι ο αριθμός της γραμμής του πίνακα.</div><div class="exbar"><button class="primary" data-act="kmcheck">✔ Έλεγχος χάρτη</button><button data-act="kmclear" title="Σβήνει ό,τι γράψατε στον χάρτη">⟲ Καθαρισμός</button></div>${msg('km')}`;
+      else if(!K.q){ h+=`<div class="kq"><b>Γίνεται απλοποίηση;</b> Κοιτάξτε αν υπάρχουν γειτονικοί άσσοι (και «γύρω» από τις άκρες του χάρτη) που μπορούν να ενωθούν σε ομάδα.</div>
+          <div class="exbar"><button class="primary" data-act="kqyes">Ναι, γίνεται</button><button class="primary" data-act="kqno">Όχι, δεν γίνεται</button></div>${msg('kq')}
+          <div class="exbar"><button data-act="kmreset" title="Ξανά από την αρχή ο χάρτης αυτής της εξόδου">⟲ Ο χάρτης από την αρχή</button></div>`; }
+      else if(K.q==='no'){ const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1);
+        h+=`<div class="exmsg ok">✔ Σωστά, δεν γίνεται απλοποίηση: κανένας άσσος δεν έχει γειτονικό άσσο. Η συνάρτηση μένει ως άθροισμα ελάχιστων όρων:<div style="font-weight:bold;font-size:16px;padding:6px 0 2px;line-height:1.5">${escH(o)} = ${astHTML(sopAst(minSOP(on,n),ins)).h}</div>Προχωρήστε στην κατασκευή του κυκλώματος.</div>
+          <div class="exbar"><button data-act="kqreset" title="Ξανά το ερώτημα «Γίνεται απλοποίηση;»">↩ Πίσω στο ερώτημα</button><button data-act="kmreset" title="Ξανά από την αρχή ο χάρτης αυτής της εξόδου">⟲ Ο χάρτης από την αρχή</button></div>`; }
       else { const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1), cov=new Set(K.groups.flat());
         h+=`<div class="note" style="line-height:1.3;margin:0">Ομαδοποιήστε τους άσσους: κλικ σε κελιά (1, 2, 4 ή 8 γειτονικά, και «γύρω» από τις άκρες) και «➕ Ομάδα».</div>
           <div class="exbar"><button class="primary" data-act="gadd"${EXT.sel.length?'':' disabled'}>➕ Ομάδα</button><button data-act="gclr"${EXT.sel.length?'':' disabled'}>✖ Επιλογή</button><button data-act="gsol" title="Δείχνει την απλούστερη ομαδοποίηση">💡 Λύση</button><button data-act="gdelall"${K.groups.length?'':' disabled'} title="Σβήνει όλες τις ομάδες· ο χάρτης μένει">⟲ Καθαρισμός ομάδων</button></div>${msg('kg')}`;
@@ -1685,7 +1693,7 @@ function renderExercise(T,ms){
         h+=`<div class="note" style="line-height:1.3;margin:4px 0 0">Από κάθε ομάδα γράψτε έναν όρο (μένουν οι μεταβλητές που δεν αλλάζουν μέσα στην ομάδα) και ενώστε τους με +.</div>
           <div class="fxrow"><b>${escH(o)}</b> = <input type="text" class="fxin" data-out="${escH(o)}" spellcheck="false" autocomplete="off"><div class="fxprev"></div></div>${keysHTML(ins)}
           <div class="exbar"><button class="primary" data-act="simpcheck">✔ Έλεγχος απλοποίησης</button><button data-act="simpclear" title="Σβήνει την απλοποιημένη συνάρτηση">⟲ Καθαρισμός</button></div>${msg('simp')}`;
-        h+=`<div class="exbar"><button data-act="kmreset" title="Ξανά από την αρχή ο χάρτης αυτής της εξόδου">⟲ Ο χάρτης από την αρχή</button></div>`; } } }
+        h+=`<div class="exbar"><button data-act="kqreset" title="Ξανά το ερώτημα «Γίνεται απλοποίηση;»">↩ Πίσω στο ερώτημα</button><button data-act="kmreset" title="Ξανά από την αρχή ο χάρτης αυτής της εξόδου">⟲ Ο χάρτης από την αρχή</button></div>`; } } }
   h+='</div>';
   const keepTop=B.querySelector('.extop')?.scrollTop||0, keepBot=B.querySelector('.exbot')?.scrollTop||0;
   B.innerHTML=h; B.querySelector('.extop').scrollTop=keepTop; B.querySelector('.exbot').scrollTop=keepBot;
@@ -1715,10 +1723,16 @@ function renderExercise(T,ms){
       renderTable(); });
     act('kmcheck',()=>{ if(!full){ EXT.msg.km=['bad','Πρώτα ολοκληρώστε το κύκλωμα.']; renderTable(); return; } let empty=0; const w=[];
       for(let m=0;m<(1<<n);m++){ const v=K.cells[m]||''; if(v==='') empty++; else if(+v!==truth(m,k)) w.push(m); }
-      EXT.msg.kmw=w; if(!empty&&!w.length){ K.ok=true; EXT.msg.kg=['ok','🎉 Σωστός χάρτης! Τώρα φτιάξτε ομάδες με τους άσσους.']; delete EXT.msg.km; }
+      EXT.msg.kmw=w; if(!empty&&!w.length){ K.ok=true; delete K.q; EXT.msg.kq=['ok','🎉 Σωστός χάρτης! Απαντήστε τώρα: γίνεται απλοποίηση;']; delete EXT.msg.km; }
       else EXT.msg.km=['bad',empty?`Συμπληρώστε όλα τα κελιά (λείπουν ${empty}).`:`${w.length} ${w.length===1?'κελί είναι λάθος':'κελιά είναι λάθος'} (κόκκινο). Προσέξτε τη σειρά 00, 01, 11, 10.`];
       saveEX(); renderTable(); });
     act('gclr',()=>{ EXT.sel=[]; renderTable(); });
+    const kAns=yes=>{ const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1), can=canSimp(on,n);
+      if(yes===can){ K.q=yes?'yes':'no'; delete EXT.msg.kq; if(yes) EXT.msg.kg=['ok','✔ Σωστά, γίνεται απλοποίηση. Φτιάξτε τώρα ομάδες με τους άσσους.']; saveEX(); }
+      else EXT.msg.kq=['bad',yes?(on.length?'✘ Ξανακοιτάξτε τον χάρτη: κανένας άσσος δεν έχει γειτονικό άσσο, άρα δεν σχηματίζεται ομάδα 2 ή περισσότερων κελιών.':'✘ Ο χάρτης δεν έχει άσσους, άρα δεν υπάρχει τίποτα να ομαδοποιηθεί.'):'✘ Ξανακοιτάξτε τον χάρτη: υπάρχουν γειτονικοί άσσοι (ίσως «γύρω» από τις άκρες) που ενώνονται σε ομάδα.'];
+      exSig=''; renderTable(); };
+    act('kqyes',()=>kAns(true)); act('kqno',()=>kAns(false));
+    act('kqreset',()=>{ delete K.q; K.groups=[]; EXT.sel=[]; delete EXT.msg.kg; delete EXT.msg.simp; delete EXT.msg.kq; saveEX(); exSig=''; renderTable(); });
     if(K.ok) fxBind(B,ins,()=>K.simp,(x,v)=>{ K.simp=v; delete EXT.msg.simp; saveEX(); });
     act('simpclear',()=>{ delete K.simp; delete EXT.msg.simp; saveEX(); exSig=''; renderTable(); });
     act('simpcheck',()=>{ const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1), r=simpCheck(K.simp||'',ins,on,K.groups);
@@ -1731,7 +1745,7 @@ function renderExercise(T,ms){
       K.groups.push(EXT.sel.slice().sort((a,b)=>a-b)); EXT.sel=[]; delete EXT.msg.kg; saveEX(); renderTable(); });
     B.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{ K.groups.splice(+b.dataset.gdel,1); saveEX(); renderTable(); });
     act('gsol',()=>{ const on=[...Array(1<<n).keys()].filter(m=>truth(m,k)===1); K.groups=minSOP(on,n).map(c=>cubeMs(c,n)); EXT.sel=[]; EXT.msg.kg=['info','💡 Αυτή είναι η απλούστερη ομαδοποίηση. Γράψτε τώρα τη συνάρτηση από τις ομάδες.']; saveEX(); renderTable(); });
-    act('kmreset',()=>{ EX.km[o]={cells:{},groups:[],ok:false}; EXT.sel=[]; delete EXT.msg.kg; saveEX(); renderTable(); }); }
+    act('kmreset',()=>{ EX.km[o]={cells:{},groups:[],ok:false}; EXT.sel=[]; delete EXT.msg.kg; delete EXT.msg.kq; delete EXT.msg.simp; saveEX(); renderTable(); }); }
 }
 // ---------------- palette ----------------
 function iconSVG(t){
@@ -2130,6 +2144,8 @@ function checkExer(){ // what the mission asks: truth table, function, Karnaugh,
     else res.push(`✔ Συνάρτηση εξόδου${nm(o)}${c.canon?' (άθροισμα ελάχιστων όρων)':''}`); });
   if(c.askK) c.outs.forEach((o,k)=>{ const K=EX.km[o], on=[...Array(N).keys()].filter(m=>tgt(m,k));
     if(!K||!K.ok){ res.push(`✘ Ο χάρτης Karnaugh${nm(o)} δεν έχει ελεγχθεί ακόμα (Χάρτης Karnaugh → «Έλεγχος χάρτη»).`); return; }
+    if(!K.q){ res.push(`✘ Απαντήστε στον χάρτη Karnaugh${nm(o)} στο ερώτημα «Γίνεται απλοποίηση;».`); return; }
+    if(K.q==='no'){ res.push(`✔ Χάρτης Karnaugh${nm(o)}: δεν γίνεται απλοποίηση`); return; }
     const cov=new Set(K.groups.flat()), r=simpCheck(K.simp||'',ins,on,K.groups);
     if(on.length&&!on.every(m=>cov.has(m))) res.push(`✘ Στον χάρτη Karnaugh${nm(o)} μένουν άσσοι χωρίς ομάδα.`);
     else if(!r.ok) res.push(`✘ Απλοποιημένη συνάρτηση${nm(o)}: ${r.msg.replace(/^✘ /,'')}`); else res.push(`✔ Απλοποίηση με χάρτη Karnaugh${nm(o)}`); });
