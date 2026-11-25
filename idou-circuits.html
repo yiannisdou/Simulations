@@ -1659,7 +1659,8 @@ function renderExercise(T,ms){
       outs.map((l,k)=>{ const v=(EX.tt[m]||'')[k]; return `<td class="o ans${v==='0'||v==='1'?' v'+v:''}${wr.includes(m+':'+k)?' wrongc':''}" data-ans="${m}:${k}" title="Κλικ: 0 → 1 → κενό">${v==='0'||v==='1'?v:'&nbsp;'}</td>`; }).join('')+'</tr>'; });
     h+=`</table></div><div class="exbar"><button class="primary" data-act="ttcheck">✔ Έλεγχος πίνακα</button><button data-act="ttclear">⟲ Καθαρισμός</button></div>${msg('tt')}`; }
   if(EX.tab==='fx'&&!aE||EX.tab==='km'&&!aK) EX.tab=null;
-  h+=(aE||aK?`<div class="extabs">${aE?tab('fx','② Συνάρτηση εξόδου'):''}${aK?tab('km','③ Χάρτης Karnaugh'):''}</div>`:'')+'<div class="exbot">';
+  const CN='①②③④', st0=aT||gT?1:0, fN=CN[st0], kN=CN[st0+(aE?1:0)]; // steps numbered by what is asked: ① truth table, then the function, then Karnaugh
+  h+=(aE||aK?`<div class="extabs">${aE?tab('fx',fN+' Συνάρτηση εξόδου'):''}${aK?tab('km',kN+' Χάρτης Karnaugh'):''}</div>`:'')+'<div class="exbot">';
   if(!EX.tab&&ms){ h+=`<div class="note" style="line-height:1.3">${[aT?'πίνακας αληθείας':'',aE?'συνάρτηση':'',aK?'Karnaugh':'','κύκλωμα'].filter(Boolean).join(' → ')}. Ο «Έλεγχος» τα ελέγχει όλα μαζί.</div>`; }
   else if(!EX.tab){ h+='<div class="note" style="line-height:1.3">Συμπληρώστε τον πίνακα δοκιμάζοντας τους διακόπτες. Μετά ανοίξτε τη συνάρτηση εξόδου ή τον χάρτη Karnaugh.</div>'; }
   else if(EX.tab==='fx'){
@@ -1714,7 +1715,7 @@ function renderExercise(T,ms){
       const bad=T.rows.filter(r=>{ const iv={}; ins.forEach(l=>iv[l]=r.iv[l]); return evalAst(p.ast,iv)!==truth(rowIdx(r),k); }).length;
       if(!bad&&ms&&ms.canon&&!isCanonSOP(p.ast,ins)) errs.push(`Η συνάρτηση του ${escH(o)} είναι σωστή, αλλά πρέπει να γραφτεί ως <b>άθροισμα ελάχιστων όρων</b>: κάθε όρος περιέχει όλες τις μεταβλητές (${ins.join(', ')}), π.χ. ${ins.map((l,j)=>j%2?l:'¬'+l).join('·')}.`);
       if(bad) errs.push(`Η συνάρτηση του ${escH(o)} διαφέρει ${ms?'από τον πίνακα αληθείας':'από το κύκλωμα'} σε ${bad} ${bad===1?'συνδυασμό':'συνδυασμούς'} των εισόδων.`); });
-    EXT.msg.fx=errs.length?['bad','✘ '+errs.join('<br>✘ ')]:['ok',`🎉 Σωστή συνάρτηση εξόδου!${n>=2?' Συνεχίστε στο ③ Karnaugh για να την απλοποιήσετε.':''}`]; exSig=''; renderTable(); });
+    EXT.msg.fx=errs.length?['bad','✘ '+errs.join('<br>✘ ')]:['ok',`🎉 Σωστή συνάρτηση εξόδου!${aK?` Συνεχίστε στο ${kN} Karnaugh για να την απλοποιήσετε.`:''}`]; exSig=''; renderTable(); });
   if(EX.tab==='km'&&n>=2){ const o=outs.includes(EX.kout)?EX.kout:outs[0], k=outs.indexOf(o), K=EX.km[o];
     B.querySelectorAll('[data-kout]').forEach(b=>b.onclick=()=>{ EX.kout=b.dataset.kout; EXT.sel=[]; delete EXT.msg.km; delete EXT.msg.kmw; delete EXT.msg.kg; saveEX(); renderTable(); });
     B.querySelectorAll('td[data-km]').forEach(td=>td.onclick=()=>{ const m=+td.dataset.km;
