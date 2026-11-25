@@ -55,6 +55,7 @@ body.dark .seg button.on{color:#0d1420}
 .nin .b{color:var(--muted);font-weight:bold}
 .nin .dec{color:var(--muted);font-size:13px;min-width:54px}
 .nin{gap:4px}
+.fld{display:flex;flex-direction:column;gap:2px}
 .err-msg{color:var(--bad);font-size:14px;min-height:18px}
 /* column grid */
 .gridwrap{display:flex;justify-content:center}
@@ -146,9 +147,9 @@ details p{margin:6px 0;font-size:15px;line-height:1.4}
         <span class="lbl">Σύστημα</span><div class="seg" id="segBase"><button data-b="2" class="on">Δυαδικό</button><button data-b="16">Δεκαεξαδικό</button></div>
         <span class="lbl" style="min-width:0;margin-left:10px">Πράξη</span><div class="seg" id="segOp"><button data-o="+" class="on">+ Πρόσθεση</button><button data-o="−">− Αφαίρεση</button></div>
       </div>
-      <div class="row">
-        <span class="lbl" id="lblA">1ος αριθμός</span><div class="nin"><input id="inA" autocomplete="off" spellcheck="false"><span class="b" id="bA"></span><span class="dec" id="dA"></span></div>
-        <span class="lbl" id="lblB" style="margin-left:2px">2ος αριθμός</span><div class="nin"><input id="inB" autocomplete="off" spellcheck="false"><span class="b" id="bB"></span><span class="dec" id="dB"></span></div>
+      <div class="row" style="gap:18px;align-items:flex-start">
+        <div class="fld"><span class="lbl" id="lblA">1ος αριθμός</span><div class="nin"><input id="inA" autocomplete="off" spellcheck="false"><span class="b" id="bA"></span><span class="dec" id="dA"></span></div></div>
+        <div class="fld"><span class="lbl" id="lblB">2ος αριθμός</span><div class="nin"><input id="inB" autocomplete="off" spellcheck="false"><span class="b" id="bB"></span><span class="dec" id="dB"></span></div></div>
       </div>
       <div class="err-msg" id="err"></div>
       <div class="gridwrap" id="grid"></div>
