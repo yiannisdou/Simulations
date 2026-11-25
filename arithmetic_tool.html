@@ -70,6 +70,11 @@ table.col tr.res td{border-top:3px solid var(--text);border-radius:0}
 table.col tr.res td.cur{border-radius:0 0 8px 8px}
 table.col td.op{font-size:28px;color:var(--muted);width:24px}
 table.col tr.res td.new{color:var(--accent)}
+.sol table.col td{width:32px;height:26px;font-size:20px}
+.sol table.col tr.mk td{height:18px;font-size:15px}
+.sol table.col tr.pos td{height:12px;font-size:11px}
+.sol table.col td.op{font-size:20px;width:16px}
+.sol table.col tr.res td{border-top-width:2px}
 .explain{border:1px solid var(--line);border-radius:8px;background:var(--warn-soft);padding:6px 12px;font-size:16px;min-height:52px;line-height:1.35}
 .explain b{color:var(--accent)}
 .ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -109,7 +114,8 @@ input.free.shown,input.free.shown:disabled{color:var(--one);-webkit-text-fill-co
 .settings select{width:100%}
 .score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .sc{border:1px solid var(--line);border-radius:8px;text-align:center;padding:3px;background:var(--bg)}
-.sc .n{font-size:24px;font-weight:bold}
+.sc .n{font-size:22px;font-weight:bold;line-height:1.15}
+#chal .panel{gap:6px}
 .sc .l{font-size:13px;color:var(--muted)}
 .sc.ok .n{color:var(--ok)} .sc.bad .n{color:var(--bad)} .sc.st .n{color:var(--accent)}
 .dots{display:flex;gap:6px;justify-content:center}
@@ -117,7 +123,7 @@ input.free.shown,input.free.shown:disabled{color:var(--one);-webkit-text-fill-co
 .dot.cur{border-color:var(--accent)}
 .dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
-.sol{flex:1 1 0;min-height:140px;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
+.sol{flex:none;overflow:visible;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
 .sol .empty{color:var(--muted)}
 .final .big{font-size:50px;font-weight:bold;color:var(--accent)}
 details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 14px}
@@ -416,8 +422,8 @@ function check(){
   fb.className='fb '+(right?'ok':'bad');
   fb.innerHTML=right?(streak>=3?`✔ Σωστά! ${streak} σωστές στη σειρά 🔥`:'✔ Σωστά!'):`✘ Λάθος. Η σωστή απάντηση είναι <b>${sub(Q.g.resStr,Q.base)}</b>`;
   $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('nextBtn').disabled=false; $('nextBtn').textContent=qi>=ROUND?'Αποτέλεσμα →':'Επόμενη →';
-  $('sol').innerHTML=`<div style="transform:scale(.8);transform-origin:left top;margin-bottom:-40px">${gridHTML(Q.g,Infinity,-1)}</div>
-    <p class="note" style="margin-top:6px">Τα κόκκινα 1 είναι τα ${Q.g.add?'κρατούμενα':'δανεικά'}.</p>
+  $('sol').innerHTML=`${gridHTML(Q.g,Infinity,-1)}
+    <p class="note" style="margin-top:2px">Τα κόκκινα 1 είναι τα ${Q.g.add?'κρατούμενα':'δανεικά'}.</p>
     <div style="font-size:16px"><b>Έλεγχος:</b> ${Q.g.va} ${Q.g.add?'+':'−'} ${Q.g.vb} = ${Q.g.vr} = ${sub(Q.g.resStr,Q.base)}</div>`;
   updScore(); renderDots(); $('nextBtn').focus();
 }
