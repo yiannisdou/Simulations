@@ -36,14 +36,14 @@ button:disabled{opacity:.45;cursor:default}
 .tab{padding:7px 18px;font-size:16px;font-weight:bold;border-radius:8px 8px 0 0;border-bottom:none;min-width:170px}
 .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 body.dark .tab.active{color:#0d1420}
-main{display:none;grid-template-columns:1.4fr 1fr;gap:12px}
+main{display:none;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
 main.show{display:grid}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:0}
 .panel h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .panel h2 .hint{font-weight:normal;color:var(--muted);font-size:14px}
 sub{font-size:.62em}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:none;border-radius:0;padding:5px 12px;min-width:96px}
+.seg button{border:none;border-radius:0;padding:5px 10px;min-width:82px}
 .seg button.on{background:var(--accent);color:#fff;font-weight:bold}
 body.dark .seg button.on{color:#0d1420}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -61,8 +61,8 @@ body.dark .seg button.on{color:#0d1420}
 .gridwrap{display:flex;justify-content:center}
 table.col{border-collapse:separate;border-spacing:4px 2px}
 table.col th{font-size:13px;color:var(--muted);font-weight:bold;text-align:right;padding-right:8px;white-space:nowrap}
-table.col td{width:44px;height:38px;text-align:center;font-size:28px;font-weight:bold;border-radius:8px}
-table.col tr.mk td{height:26px;font-size:17px;color:var(--one)}
+table.col td{width:44px;height:34px;text-align:center;font-size:26px;font-weight:bold;border-radius:8px}
+table.col tr.mk td{height:22px;font-size:17px;color:var(--one)}
 table.col tr.pos td{height:16px;font-size:12px;color:var(--muted);font-weight:normal}
 table.col td.pad{color:var(--zero);opacity:.55}
 table.col td.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
@@ -70,18 +70,19 @@ table.col tr.res td{border-top:3px solid var(--text);border-radius:0}
 table.col tr.res td.cur{border-radius:0 0 8px 8px}
 table.col td.op{font-size:28px;color:var(--muted);width:24px}
 table.col tr.res td.new{color:var(--accent)}
-.explain{border:1px solid var(--line);border-radius:8px;background:var(--warn-soft);padding:7px 12px;font-size:17px;min-height:58px;line-height:1.4}
+.explain{border:1px solid var(--line);border-radius:8px;background:var(--warn-soft);padding:6px 12px;font-size:16px;min-height:52px;line-height:1.35}
 .explain b{color:var(--accent)}
 .ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.ctrls button{min-width:120px}
-#stepBtn{min-width:170px}
+.ctrls button{padding:6px 10px}
+#stepBtn{min-width:150px}
 .steptxt{color:var(--muted);font-size:14px}
 /* right side */
 .card{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:7px 10px;font-size:15px}
 .card .big{font-size:20px;font-weight:bold}
 .card .okline{color:var(--ok);font-weight:bold}
 table.r{border-collapse:collapse;font-size:15px}
-table.r td,table.r th{border:1px solid var(--line);padding:2px 9px;text-align:center}
+table.r td,table.r th{border:1px solid var(--line);padding:2px 8px;text-align:center}
+.side{min-width:0}
 table.r th{background:var(--chip);color:var(--muted)}
 table.r tr.hl td{background:var(--accent-soft);font-weight:bold;color:var(--accent)}
 table.r td.hl{background:var(--accent-soft);font-weight:bold;color:var(--accent)}
@@ -348,8 +349,9 @@ function renderRules(st){
       if(r&&r.c) h+=`<p class="note">Αυτή η θέση έχει ήδη δανείσει 1, άρα το ψηφίο της μειώθηκε κατά 1 πριν την αφαίρεση.</p>`;
     }
   } else {
-    const r=st&&!st.rule.final?st.rule:null; const used=new Set(r?[r.a,r.b]:[]);
-    h+=`<table class="r"><tr><th>Ψηφίο</th>${'0123456789ABCDEF'.split('').map((c,i)=>`<td class="${used.has(i)&&i>9?'hl':''}">${c}</td>`).join('')}</tr><tr><th>Τιμή</th>${[...Array(16)].map((_,i)=>`<td class="${used.has(i)&&i>9?'hl':''}">${i}</td>`).join('')}</tr></table>`;
+    const r=st&&!st.rule.final?st.rule:null; const used=new Set(r?[r.a,r.b,(op==='+'?r.s%16:(r.raw<0?r.raw+16:r.raw))]:[]);
+    const half=(from)=>`<tr><th>Ψηφίο</th>${[...Array(8)].map((_,j)=>{const i=from+j;return `<td class="${used.has(i)&&i>9?'hl':''}">${DIG[i]}</td>`;}).join('')}</tr><tr><th>Τιμή</th>${[...Array(8)].map((_,j)=>{const i=from+j;return `<td class="${used.has(i)&&i>9?'hl':''}">${i}</td>`;}).join('')}</tr>`;
+    h+=`<table class="r">${half(0)}${half(8)}</table>`;
     h+= op==='+' ? `<p class="note"><b>Κανόνας:</b> αν το άθροισμα μιας θέσης είναι 16 ή περισσότερο, γράφω (άθροισμα − 16) και κρατάω 1.${r?` Εδώ: ${r.s} ${r.s>=16?'≥ 16 → γράφω '+(r.s-16)+' = '+DIG[r.s-16]+', κρατούμενο 1':'&lt; 16 → γράφω '+DIG[r.s]+', χωρίς κρατούμενο'}.`:''}</p>`
                  : `<p class="note"><b>Κανόνας:</b> αν το ψηφίο του μειωτέου δεν φτάνει, δανείζομαι 1 από την επόμενη θέση (που μειώνεται κατά 1) και προσθέτω 16.${r?` Εδώ: ${r.bo?`${r.a-r.c} &lt; ${r.b} → δανεικό, ${r.a-r.c+16} − ${r.b} = ${r.raw+16}`:`${r.a-r.c} ≥ ${r.b} → χωρίς δανεικό`}.`:''}</p>`;
   }
