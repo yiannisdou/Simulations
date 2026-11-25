@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Αριθμητικές πράξεις στο δυαδικό και στο δεκαεξαδικό</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --text:#1d2433; --muted:#5b6475; --line:#d5dbe5;
+  --accent:#1f5fbf; --accent-soft:#e3edfb; --one:#e8411f; --zero:#8a94a6;
+  --ok:#1e8e3e; --ok-soft:#e3f4e8; --bad:#c62828; --bad-soft:#fdeaea; --warn-soft:#fff4e0;
+  --chip:#eef1f6; --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+body.dark{
+  --bg:#121721; --panel:#1b2230; --text:#e6eaf2; --muted:#9aa4b6; --line:#2e3746;
+  --accent:#6ea8ff; --accent-soft:#22324d; --one:#ff6a4a; --zero:#6f7a8d;
+  --ok:#5fd17f; --ok-soft:#1c3324; --bad:#ff7b7b; --bad-soft:#3a2024; --warn-soft:#3a3020;
+  --chip:#263042; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:16px}
+.wrap{display:flex;flex-direction:column;padding:8px 16px 8px;max-width:1600px;margin:0 auto;gap:8px}
+header{display:flex;align-items:center;gap:14px}
+header .titles{flex:1;min-width:0}
+h1{font-size:24px;margin:0;line-height:1.15}
+.subtitle{color:var(--muted);font-size:15px;margin-top:2px}
+a.back{color:var(--accent);text-decoration:none;font-size:15px;white-space:nowrap}
+button,select{font-family:inherit;font-size:15px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:6px 12px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:bold}
+body.dark button.primary{color:#0d1420}
+button:disabled{opacity:.45;cursor:default}
+#themeBtn{min-width:150px}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px 18px;font-size:16px;font-weight:bold;border-radius:8px 8px 0 0;border-bottom:none;min-width:170px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.dark .tab.active{color:#0d1420}
+main{display:none;grid-template-columns:1.4fr 1fr;gap:12px}
+main.show{display:grid}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel h2{font-size:17px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel h2 .hint{font-weight:normal;color:var(--muted);font-size:14px}
+sub{font-size:.62em}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:none;border-radius:0;padding:5px 12px;min-width:96px}
+.seg button.on{background:var(--accent);color:#fff;font-weight:bold}
+body.dark .seg button.on{color:#0d1420}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row .lbl{color:var(--muted);font-weight:bold;font-size:14px}
+.nin{display:flex;align-items:center;gap:6px}
+.nin input{font-family:inherit;font-size:20px;font-weight:bold;width:158px;padding:3px 8px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);letter-spacing:1px}
+.nin input:focus{outline:none;border-color:var(--accent)}
+.nin input.err{border-color:var(--bad);background:var(--bad-soft)}
+.nin .b{color:var(--muted);font-weight:bold}
+.nin .dec{color:var(--muted);font-size:13px;min-width:54px}
+.nin{gap:4px}
+.err-msg{color:var(--bad);font-size:14px;min-height:18px}
+/* column grid */
+.gridwrap{display:flex;justify-content:center}
+table.col{border-collapse:separate;border-spacing:4px 2px}
+table.col th{font-size:13px;color:var(--muted);font-weight:bold;text-align:right;padding-right:8px;white-space:nowrap}
+table.col td{width:44px;height:38px;text-align:center;font-size:28px;font-weight:bold;border-radius:8px}
+table.col tr.mk td{height:26px;font-size:17px;color:var(--one)}
+table.col tr.pos td{height:16px;font-size:12px;color:var(--muted);font-weight:normal}
+table.col td.pad{color:var(--zero);opacity:.55}
+table.col td.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+table.col tr.res td{border-top:3px solid var(--text);border-radius:0}
+table.col tr.res td.cur{border-radius:0 0 8px 8px}
+table.col td.op{font-size:28px;color:var(--muted);width:24px}
+table.col tr.res td.new{color:var(--accent)}
+.explain{border:1px solid var(--line);border-radius:8px;background:var(--warn-soft);padding:7px 12px;font-size:17px;min-height:58px;line-height:1.4}
+.explain b{color:var(--accent)}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctrls button{min-width:120px}
+#stepBtn{min-width:170px}
+.steptxt{color:var(--muted);font-size:14px}
+/* right side */
+.card{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:7px 10px;font-size:15px}
+.card .big{font-size:20px;font-weight:bold}
+.card .okline{color:var(--ok);font-weight:bold}
+table.r{border-collapse:collapse;font-size:15px}
+table.r td,table.r th{border:1px solid var(--line);padding:2px 9px;text-align:center}
+table.r th{background:var(--chip);color:var(--muted)}
+table.r tr.hl td{background:var(--accent-soft);font-weight:bold;color:var(--accent)}
+table.r td.hl{background:var(--accent-soft);font-weight:bold;color:var(--accent)}
+.rules{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.side{flex:1 1 0;min-height:200px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.note{color:var(--muted);font-size:14px;margin:0}
+/* challenge */
+.qcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;min-height:0;padding:6px 0}
+.qnum{color:var(--muted);font-size:15px}
+.qtext{font-size:21px}
+input.dig{width:44px;height:40px;font-family:inherit;font-size:26px;font-weight:bold;text-align:center;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);padding:0}
+input.dig:focus{outline:none;border-color:var(--accent)}
+input.dig.right{border-color:var(--ok);background:var(--ok-soft)}
+input.dig.wrong{border-color:var(--bad);background:var(--bad-soft)}
+input.free{width:40px;height:24px;font-family:inherit;font-size:16px;text-align:center;border:1px dashed var(--line);border-radius:5px;background:transparent;color:var(--muted);padding:0}
+input.free.shown,input.free.shown:disabled{color:var(--one);-webkit-text-fill-color:var(--one);font-weight:bold;border:1px solid var(--one)}
+.qbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.qbtns button{min-width:130px;font-size:16px;padding:8px 14px}
+.fb{min-height:46px;font-size:17px;padding:6px 14px;border-radius:8px;max-width:620px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.hint{background:var(--warn-soft);color:var(--text);font-size:16px}
+.settings{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:15px}
+.settings select{width:100%}
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{border:1px solid var(--line);border-radius:8px;text-align:center;padding:3px;background:var(--bg)}
+.sc .n{font-size:24px;font-weight:bold}
+.sc .l{font-size:13px;color:var(--muted)}
+.sc.ok .n{color:var(--ok)} .sc.bad .n{color:var(--bad)} .sc.st .n{color:var(--accent)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold}
+.dot.cur{border-color:var(--accent)}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.sol{flex:1 1 0;min-height:140px;overflow:auto;border-top:1px solid var(--line);padding-top:6px;font-size:15px}
+.sol .empty{color:var(--muted)}
+.final .big{font-size:50px;font-weight:bold;color:var(--accent)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 14px}
+details summary{cursor:pointer;font-weight:bold}
+details p{margin:6px 0;font-size:15px;line-height:1.4}
+@media (max-width:1000px){ main.show{grid-template-columns:1fr} .side,.sol{overflow:visible} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" id="backLink" href="index.html">← Όλες οι προσομοιώσεις</a>
+    <div class="titles">
+      <h1>Αριθμητικές πράξεις στο δυαδικό και στο δεκαεξαδικό</h1>
+      <div class="subtitle">Δείτε την πρόσθεση και την αφαίρεση στήλη προς στήλη, με τα κρατούμενα και τα δανεικά. Στην «Πρόκληση» λύνετε μόνοι σας.</div>
+    </div>
+    <button id="themeBtn">🌙 Σκούρο θέμα</button>
+  </header>
+  <div class="tabs">
+    <button class="tab active" data-tab="steps">🧮 Βήμα βήμα</button>
+    <button class="tab" data-tab="chal">🎯 Πρόκληση</button>
+  </div>
+
+  <!-- ============ STEP BY STEP ============ -->
+  <main id="steps" class="show">
+    <section class="panel">
+      <div class="row">
+        <span class="lbl">Σύστημα</span><div class="seg" id="segBase"><button data-b="2" class="on">Δυαδικό</button><button data-b="16">Δεκαεξαδικό</button></div>
+        <span class="lbl" style="min-width:0;margin-left:10px">Πράξη</span><div class="seg" id="segOp"><button data-o="+" class="on">+ Πρόσθεση</button><button data-o="−">− Αφαίρεση</button></div>
+      </div>
+      <div class="row">
+        <span class="lbl" id="lblA">1ος αριθμός</span><div class="nin"><input id="inA" autocomplete="off" spellcheck="false"><span class="b" id="bA"></span><span class="dec" id="dA"></span></div>
+        <span class="lbl" id="lblB" style="margin-left:2px">2ος αριθμός</span><div class="nin"><input id="inB" autocomplete="off" spellcheck="false"><span class="b" id="bB"></span><span class="dec" id="dB"></span></div>
+      </div>
+      <div class="err-msg" id="err"></div>
+      <div class="gridwrap" id="grid"></div>
+      <div class="explain" id="explain"></div>
+      <div class="ctrls">
+        <button class="primary" id="stepBtn">▶ Επόμενο βήμα</button>
+        <button id="allBtn">⏩ Όλα τα βήματα</button>
+        <button id="resetBtn">↺ Από την αρχή</button>
+        <button id="rndBtn">🎲 Τυχαίοι αριθμοί</button>
+        <span class="steptxt" id="steptxt"></span>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Κανόνες <span class="hint">— φωτίζεται ο κανόνας του τρέχοντος βήματος</span></h2>
+      <div class="side">
+        <div class="rules" id="rules"></div>
+        <div class="card" id="check"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ CHALLENGE ============ -->
+  <main id="chal">
+    <section class="panel">
+      <div class="qcard" id="qcard">
+        <div class="qnum" id="qnum"></div>
+        <div class="qtext" id="qtext"></div>
+        <div class="gridwrap" id="qgrid"></div>
+        <div class="note" id="qnote">Γράψτε ένα ψηφίο σε κάθε κουτάκι, από δεξιά προς τα αριστερά. Η πάνω γραμμή είναι πρόχειρη.</div>
+        <div class="qbtns" id="qbtns">
+          <button class="primary" id="checkBtn">✔ Έλεγχος</button>
+          <button id="hintBtn">💡 Βοήθεια</button>
+          <button id="nextBtn" disabled>Επόμενη →</button>
+        </div>
+        <div class="fb" id="fb"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Ρυθμίσεις</h2>
+      <div class="settings">
+        <label for="selBase">Σύστημα</label>
+        <select id="selBase"><option value="mix">Δυαδικό και δεκαεξαδικό</option><option value="2">Μόνο δυαδικό</option><option value="16">Μόνο δεκαεξαδικό</option></select>
+        <label for="selOp">Πράξη</label>
+        <select id="selOp"><option value="mix">Πρόσθεση και αφαίρεση</option><option value="+">Μόνο πρόσθεση</option><option value="−">Μόνο αφαίρεση</option></select>
+        <label for="selLvl">Δυσκολία</label>
+        <select id="selLvl"><option value="e">Εύκολο (4 bits / 2 δεκαεξαδικά ψηφία)</option><option value="m" selected>Μέτριο (6 bits / 3 ψηφία)</option><option value="h">Δύσκολο (8 bits / 4 ψηφία)</option></select>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="score">
+        <div class="sc ok"><div class="n" id="scOk">0</div><div class="l">σωστές</div></div>
+        <div class="sc bad"><div class="n" id="scBad">0</div><div class="l">λάθος</div></div>
+        <div class="sc st"><div class="n" id="scSt">0</div><div class="l">σερί σωστών</div></div>
+      </div>
+      <h2>Λύση</h2>
+      <div class="sol" id="sol"><span class="empty">Η λύση εμφανίζεται εδώ, αφού απαντήσετε.</span></div>
+    </section>
+  </main>
+
+  <details>
+    <summary>Πώς λειτουργεί</summary>
+    <p><b>Βήμα βήμα.</b> Διαλέξτε σύστημα και πράξη και γράψτε δύο αριθμούς (έως 12 bits ή 4 δεκαεξαδικά ψηφία). Με το «▶ Επόμενο βήμα» η πράξη γίνεται στήλη προς στήλη, ξεκινώντας από τα δεξιά (LSB). Η στήλη που υπολογίζεται φωτίζεται και από κάτω εξηγείται τι γίνεται. Δεξιά φωτίζεται ο κανόνας που χρησιμοποιείται και φαίνεται ο έλεγχος στο δεκαδικό.</p>
+    <p><b>Κρατούμενο και δανεικό.</b> Στην πρόσθεση, όταν το άθροισμα μιας στήλης φτάνει τη βάση (2 ή 16), γράφουμε τη διαφορά και μεταφέρουμε κρατούμενο 1 στην επόμενη στήλη· το κρατούμενο σημειώνεται με κόκκινο πάνω από τη στήλη όπου πηγαίνει. Στην αφαίρεση, όταν το ψηφίο του μειωτέου δεν φτάνει, δανειζόμαστε 1 από την επόμενη θέση (που μειώνεται κατά 1) και προσθέτουμε τη βάση στο ψηφίο μας· το δανεικό σημειώνεται πάνω από τη στήλη από την οποία δανειζόμαστε.</p>
+    <p><b>Πρόκληση.</b> Γύροι των 10 πράξεων. Γράψτε ένα ψηφίο σε κάθε κουτάκι του αποτελέσματος (τα μηδενικά αριστερά μπορούν να μείνουν κενά) και πατήστε «Έλεγχος» ή Enter. Τα λάθος ψηφία κοκκινίζουν, τα σωστά κρατούμενα ή δανεικά εμφανίζονται με κόκκινο και δεξιά φαίνεται η λύση.</p>
+  </details>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const DIG='0123456789ABCDEF';
+const SUB={2:'₂',16:'₁₆',10:'₁₀'};
+const sub=(n,b)=>`(${n})<sub>${b}</sub>`;
+const dv=c=>DIG.indexOf(c);
+const lab=c=>dv(c)>9?`${c}(${dv(c)})`:c;
+const VALID={2:/^[01]+$/,16:/^[0-9A-F]+$/};
+const MAXLEN={2:12,16:4};
+const clean=s=>s.replace(/\s+/g,'').toUpperCase();
+// ---------------- theme ----------------
+function setTheme(d){ document.body.classList.toggle('dark',d); $('themeBtn').textContent=d?'☀️ Φωτεινό θέμα':'🌙 Σκούρο θέμα';
+  try{localStorage.setItem('gateSimTheme',d?'dark':'light')}catch(e){} $('backLink').href='index.html#'+(d?'dark':'light'); }
+(function(){ let t; if(location.hash==='#dark') t=true; else if(location.hash==='#light') t=false;
+  else { try{ t=localStorage.getItem('gateSimTheme')==='dark'; }catch(e){ t=false; } } setTheme(!!t); })();
+$('themeBtn').onclick=()=>setTheme(!document.body.classList.contains('dark'));
+try{ if(window.self!==window.top) $('backLink').style.display='none'; }catch(e){ $('backLink').style.display='none'; }
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('main').forEach(m=>m.classList.toggle('show',m.id===t.dataset.tab));
+  if(t.dataset.tab==='chal'){ if(!Q) newRound(); else focusLast(); }
+});
+
+// ---------------- the calculation, column by column ----------------
+// returns grid columns left→right: a[], b[], res[], marks[] (carry/borrow), pad flags, and the steps in order (right→left)
+function calc(A,B,base,op){
+  const add=op==='+', L=Math.max(A.length,B.length), m=add?L+1:L;
+  const a=(add?' ':'')+A.padStart(L,'0'), b=(add?' ':'')+B.padStart(L,'0');
+  const padA=[...a].map((c,i)=>i>=(add?1:0)&&i<m-A.length), padB=[...b].map((c,i)=>i>=(add?1:0)&&i<m-B.length);
+  const res=Array(m).fill(''), marks=Array(m).fill(''), steps=[];
+  let c=0;
+  for(let i=m-1;i>=(add?1:0);i--){
+    const pos=m-1-i, da=dv(a[i]), db=dv(b[i]);
+    if(add){
+      const s=da+db+c, d=s%base, co=s>=base?1:0;
+      res[i]=DIG[d]; if(co) marks[i-1]='1';
+      let t=`<b>Θέση ${pos}</b>: ${lab(a[i])} + ${lab(b[i])}${c?' + <span style="color:var(--one)">1</span> (κρατούμενο)':''} = ${s}`;
+      if(co) t+= base===2 ? ` = (${s.toString(2)})<sub>2</sub> → γράφω <b>${d}</b>, κρατούμενο <b>1</b> στην επόμενη θέση.`
+                          : ` &gt; 15 → ${s} − 16 = ${d} → γράφω <b>${DIG[d]}</b>, κρατούμενο <b>1</b> στην επόμενη θέση.`;
+      else t+= base===16&&s>9 ? ` = ${DIG[s]} → γράφω <b>${DIG[s]}</b>.` : ` → γράφω <b>${DIG[d]}</b>.`;
+      steps.push({col:i,text:t,rule:{a:da,b:db,c,s}}); c=co;
+    } else {
+      const ae=da-c, raw=ae-db, bo=raw<0?1:0, d=raw+(bo?base:0);
+      res[i]=DIG[d]; if(bo&&i>0) marks[i-1]='1';
+      let t=`<b>Θέση ${pos}</b>: `;
+      const aTxt=c?`${lab(a[i])} − 1 (δανείστηκε) = ${ae}`:lab(a[i]);
+      if(bo) t+= base===2 ? `${aTxt}, και ${ae} − ${db} δε γίνεται → δανείζομαι 1 από την επόμενη θέση: ${ae} + 2 = ${ae+2}, ${ae+2} − ${db} = <b>${d}</b>.`
+                          : `${aTxt}, και ${ae} − ${lab(b[i])} δε γίνεται → δανείζομαι 1 από την επόμενη θέση και προσθέτω 16: ${ae+16} − ${db} = ${d} → γράφω <b>${DIG[d]}</b>.`;
+      else t+= c ? `${aTxt}, και ${ae} − ${lab(b[i])} = ${d} → γράφω <b>${DIG[d]}</b>.` : `${aTxt} − ${lab(b[i])} = ${d} → γράφω <b>${DIG[d]}</b>.`;
+      steps.push({col:i,text:t,rule:{a:da,b:db,c,raw,bo}}); c=bo;
+    }
+  }
+  if(add){ if(c){ res[0]='1'; steps.push({col:0,text:'Περισσεύει κρατούμενο <b>1</b>: γράφεται ως νέο ψηφίο αριστερά (το αποτέλεσμα έχει ένα ψηφίο παραπάνω).',rule:{final:true}}); }
+    else res[0]=''; }
+  const va=parseInt(A,base), vb=parseInt(B,base), vr=add?va+vb:va-vb;
+  const resStr=res.join('').replace(/^0+(?=.)/,'')||'0';
+  if(parseInt(resStr,base)!==vr) throw new Error('calc mismatch');
+  return {add,m,a,b,padA,padB,res,marks,steps,va,vb,vr,resStr,base};
+}
+
+// ---------------- grid (shared by both tabs) ----------------
+function gridHTML(g, shown, cur, opts={}){
+  // shown: number of steps revealed (Infinity = all); cur: current column or -1
+  const revealed=new Set(g.steps.slice(0,shown).map(s=>s.col));
+  const markShown=i=>{ if(!g.marks[i]) return ''; // a mark belongs to the step that created it (column i+1)
+    return g.steps.slice(0,shown).some(s=>s.col===i+1)?'1':''; };
+  const cell=(ch,cls)=>`<td class="${cls||''}">${ch}</td>`;
+  let h=`<table class="col"><tr class="pos"><th></th><td class="op"></td>${[...Array(g.m)].map((_,i)=>cell(g.m-1-i)).join('')}</tr>`;
+  h+=`<tr class="mk"><th>${g.add?'Κρατούμενο':'Δανεικό'}</th><td class="op"></td>${[...Array(g.m)].map((_,i)=>opts.inputs?`<td><input class="free" maxlength="1" data-k="${i}"></td>`:cell(markShown(i),i===cur?'cur':'')).join('')}</tr>`;
+  h+=`<tr><th></th><td class="op"></td>${[...g.a].map((c,i)=>cell(c.trim(),(g.padA[i]?'pad ':'')+(i===cur?'cur':''))).join('')}</tr>`;
+  h+=`<tr><th></th><td class="op">${g.add?'+':'−'}</td>${[...g.b].map((c,i)=>cell(c.trim(),(g.padB[i]?'pad ':'')+(i===cur?'cur':''))).join('')}</tr>`;
+  h+=`<tr class="res"><th>Αποτέλεσμα</th><td class="op"></td>${g.res.map((d,i)=>{
+      if(opts.inputs) return `<td><input class="dig" maxlength="1" data-k="${i}" data-d="${d||'0'}" autocomplete="off" spellcheck="false"></td>`;
+      return cell(revealed.has(i)?d:'',(i===cur?'cur ':'')+(revealed.has(i)&&i===cur?'new':'')); }).join('')}</tr></table>`;
+  return h;
+}
+
+// ---------------- STEP-BY-STEP TAB ----------------
+let base=2, op='+', G=null, shown=0;
+function setSeg(id,attr,val){ document.querySelectorAll(`#${id} button`).forEach(b=>b.classList.toggle('on',b.dataset[attr]===String(val))); }
+document.querySelectorAll('#segBase button').forEach(b=>b.onclick=()=>{ base=+b.dataset.b; setSeg('segBase','b',base); randomPair(); });
+document.querySelectorAll('#segOp button').forEach(b=>b.onclick=()=>{ op=b.dataset.o; setSeg('segOp','o',op); fixOrder(); rebuild(); });
+['inA','inB'].forEach(id=>$(id).addEventListener('input',rebuild));
+function fixOrder(){ if(op!=='−') return; const A=clean($('inA').value), B=clean($('inB').value);
+  if(VALID[base].test(A)&&VALID[base].test(B)&&parseInt(A,base)<parseInt(B,base)){ $('inA').value=B; $('inB').value=A; } }
+function rebuild(){
+  const A=clean($('inA').value), B=clean($('inB').value);
+  $('bA').innerHTML=$('bB').innerHTML=`<sub>${base}</sub>`;
+  $('lblA').textContent=op==='+'?'1ος προσθετέος':'Μειωτέος'; $('lblB').textContent=op==='+'?'2ος προσθετέος':'Αφαιρετέος';
+  let err='';
+  ['inA','inB'].forEach(id=>$(id).classList.remove('err'));
+  const chk=(s,id)=>{ if(!s){ err='Γράψτε και τους δύο αριθμούς.'; $(id).classList.add('err'); return; }
+    if(!VALID[base].test(s)){ err=base===2?'Στο δυαδικό επιτρέπονται μόνο τα ψηφία 0 και 1.':'Στο δεκαεξαδικό επιτρέπονται τα ψηφία 0–9 και A–F.'; $(id).classList.add('err'); return; }
+    if(s.length>MAXLEN[base]){ err=base===2?'Έως 12 bits.':'Έως 4 δεκαεξαδικά ψηφία.'; $(id).classList.add('err'); } };
+  chk(A,'inA'); if(!err) chk(B,'inB');
+  if(!err&&op==='−'&&parseInt(A,base)<parseInt(B,base)){ err='Στην αφαίρεση ο μειωτέος πρέπει να είναι μεγαλύτερος ή ίσος από τον αφαιρετέο (εδώ δεν εξετάζουμε αρνητικούς αριθμούς).'; $('inB').classList.add('err'); }
+  $('dA').textContent=VALID[base].test(A)?'= '+parseInt(A,base):''; $('dB').textContent=VALID[base].test(B)?'= '+parseInt(B,base):'';
+  $('err').textContent=err;
+  if(err){ G=null; $('grid').innerHTML=''; $('explain').innerHTML=''; $('check').innerHTML=''; renderRules(null); updButtons(); return; }
+  G=calc(A,B,base,op); shown=0; draw();
+}
+function draw(){
+  const st=G.steps[shown-1], cur=shown>0&&shown<=G.steps.length?st.col:-1;
+  $('grid').innerHTML=gridHTML(G,shown,cur);
+  if(shown===0) $('explain').innerHTML=`Πατήστε <b>«▶ Επόμενο βήμα»</b>. Η ${G.add?'πρόσθεση':'αφαίρεση'} ξεκινά από τη δεξιά στήλη (θέση 0, ${base===2?'LSB':'λιγότερο σημαντικό ψηφίο'}).`;
+  else if(shown<=G.steps.length) $('explain').innerHTML=st.text+(shown===G.steps.length?`<br>✔ Τέλος: ${sub(G.a.trim().replace(/^0+(?=.)/,''),base)} ${G.add?'+':'−'} ${sub(G.b.trim().replace(/^0+(?=.)/,''),base)} = <b>${sub(G.resStr,base)}</b>`:'');
+  $('steptxt').textContent=`Βήμα ${Math.min(shown,G.steps.length)} από ${G.steps.length}`;
+  renderRules(shown>0?st:null); renderCheck(); updButtons();
+}
+function updButtons(){ const done=!G||shown>=G.steps.length; $('stepBtn').disabled=done; $('allBtn').disabled=done; $('resetBtn').disabled=!G||shown===0; if(!G) $('steptxt').textContent=''; }
+$('stepBtn').onclick=()=>{ if(G&&shown<G.steps.length){ shown++; draw(); } };
+$('allBtn').onclick=()=>{ if(G){ shown=G.steps.length; draw(); } };
+$('resetBtn').onclick=()=>{ if(G){ shown=0; draw(); } };
+$('rndBtn').onclick=()=>randomPair();
+function renderRules(st){
+  let h='';
+  if(base===2){
+    if(op==='+'){
+      const rows=[['0','0','','0','0'],['0','1','','1','0'],['1','0','','1','0'],['1','1','','0','1'],['1','1','1','1','1']];
+      const r=st&&!st.rule.final?st.rule:null;
+      const k=r?(r.c&&r.a+r.b===2?4:(r.c?null:r.a*2+r.b)):null;
+      h+=`<table class="r"><tr><th>A</th><th>B</th><th>Κρατ. από πριν</th><th>Γράφω</th><th>Κρατούμενο</th></tr>${rows.map((x,i)=>`<tr class="${i===k?'hl':''}">${x.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
+      if(r&&k===null) h+=`<p class="note">Με κρατούμενο: ${r.a} + ${r.b} + 1 = ${r.s} = (${r.s.toString(2)})<sub>2</sub>.</p>`;
+    } else {
+      const rows=[['0','0','0',''],['1','0','1',''],['1','1','0',''],['0','1','1','1 (από την επόμενη θέση)']];
+      const r=st?st.rule:null; let k=null;
+      if(r&&!r.c) k=r.a===0&&r.b===0?0:r.a===1&&r.b===0?1:r.a===1&&r.b===1?2:3;
+      h+=`<table class="r"><tr><th>A</th><th>B</th><th>A − B</th><th>Δανεικό</th></tr>${rows.map((x,i)=>`<tr class="${i===k?'hl':''}">${x.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
+      if(r&&r.c) h+=`<p class="note">Αυτή η θέση έχει ήδη δανείσει 1, άρα το ψηφίο της μειώθηκε κατά 1 πριν την αφαίρεση.</p>`;
+    }
+  } else {
+    const r=st&&!st.rule.final?st.rule:null; const used=new Set(r?[r.a,r.b]:[]);
+    h+=`<table class="r"><tr><th>Ψηφίο</th>${'0123456789ABCDEF'.split('').map((c,i)=>`<td class="${used.has(i)&&i>9?'hl':''}">${c}</td>`).join('')}</tr><tr><th>Τιμή</th>${[...Array(16)].map((_,i)=>`<td class="${used.has(i)&&i>9?'hl':''}">${i}</td>`).join('')}</tr></table>`;
+    h+= op==='+' ? `<p class="note"><b>Κανόνας:</b> αν το άθροισμα μιας θέσης είναι 16 ή περισσότερο, γράφω (άθροισμα − 16) και κρατάω 1.${r?` Εδώ: ${r.s} ${r.s>=16?'≥ 16 → γράφω '+(r.s-16)+' = '+DIG[r.s-16]+', κρατούμενο 1':'&lt; 16 → γράφω '+DIG[r.s]+', χωρίς κρατούμενο'}.`:''}</p>`
+                 : `<p class="note"><b>Κανόνας:</b> αν το ψηφίο του μειωτέου δεν φτάνει, δανείζομαι 1 από την επόμενη θέση (που μειώνεται κατά 1) και προσθέτω 16.${r?` Εδώ: ${r.bo?`${r.a-r.c} &lt; ${r.b} → δανεικό, ${r.a-r.c+16} − ${r.b} = ${r.raw+16}`:`${r.a-r.c} ≥ ${r.b} → χωρίς δανεικό`}.`:''}</p>`;
+  }
+  $('rules').innerHTML=h;
+}
+function renderCheck(){
+  if(!G) return;
+  const done=shown>=G.steps.length;
+  $('check').innerHTML=`<b>Έλεγχος στο δεκαδικό</b><div class="big" style="margin-top:4px">${G.va} ${G.add?'+':'−'} ${G.vb} = ${G.vr}</div>
+    <div>${done?`<span class="okline">✔ ${sub(G.resStr,base)} = ${G.vr} στο δεκαδικό</span>`:'Ολοκληρώστε τα βήματα για να δείτε αν συμφωνεί το αποτέλεσμα.'}</div>`;
+}
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function randomPair(){
+  const max=base===2?255:4095, min=base===2?20:100;
+  let a=rnd(min,max), b=rnd(min,max);
+  if(op==='−'&&a<b) [a,b]=[b,a];
+  $('inA').value=a.toString(base).toUpperCase(); $('inB').value=b.toString(base).toUpperCase(); rebuild();
+}
+
+// ---------------- CHALLENGE TAB ----------------
+const ROUND=10, LEN={e:{2:4,16:2},m:{2:6,16:3},h:{2:8,16:4}};
+let Q=null, qi=0, results=[], ok=0, bad=0, streak=0, answered=false;
+function pick(){
+  const bs=$('selBase').value, os=$('selOp').value, lvl=$('selLvl').value;
+  const b=bs==='mix'?(Math.random()<.5?2:16):+bs, o=os==='mix'?(Math.random()<.5?'+':'−'):os, n=LEN[lvl][b];
+  const max=Math.pow(b,n)-1, min=Math.pow(b,n-1);
+  let x,y,tries=0;
+  do{ x=rnd(min,max); y=rnd(1,max); if(o==='−'&&x<y) [x,y]=[y,x]; tries++; }
+  while((o==='−'&&x===y)&&tries<20);
+  const A=x.toString(b).toUpperCase(), B=y.toString(b).toUpperCase().padStart(n,'0');
+  return {g:calc(A,B,b,o),base:b,op:o,A,B};
+}
+function newRound(){ qi=0; results=[]; ok=0; bad=0; streak=0; updScore(); nextQ(); }
+function nextQ(){
+  if(qi>=ROUND){ finalScreen(); return; }
+  Q=pick(); answered=false;
+  $('qnum').textContent=`Άσκηση ${qi+1} από ${ROUND}`;
+  $('qtext').innerHTML=`Υπολογίστε: ${sub(Q.A,Q.base)} ${Q.op} ${sub(Q.B.replace(/^0+(?=.)/,''),Q.base)}`;
+  $('qgrid').innerHTML=gridHTML(Q.g,0,-1,{inputs:true});
+  $('qnote').style.display=''; $('qbtns').style.display=''; $('fb').className='fb'; $('fb').innerHTML='';
+  $('checkBtn').disabled=false; $('hintBtn').disabled=false; $('nextBtn').disabled=true; $('nextBtn').textContent='Επόμενη →';
+  $('sol').innerHTML='<span class="empty">Η λύση εμφανίζεται εδώ, αφού απαντήσετε.</span>';
+  const ds=[...document.querySelectorAll('#qgrid input.dig')];
+  ds.forEach((inp,k)=>{ inp.addEventListener('input',()=>{ inp.classList.remove('right','wrong'); if(inp.value.length===1&&k>0) ds[k-1].focus(); });
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); check(); } }); });
+  renderDots(); focusLast();
+}
+function focusLast(){ const ds=document.querySelectorAll('#qgrid input.dig'); if(ds.length&&!answered) ds[ds.length-1].focus(); }
+function check(){
+  if(answered) return;
+  const fs=[...document.querySelectorAll('#qgrid input.dig')], vals=fs.map(f=>clean(f.value)), fb=$('fb');
+  const first=vals.findIndex(v=>v!=='');
+  if(first<0){ fb.className='fb hint'; fb.textContent='Γράψτε το αποτέλεσμα, ένα ψηφίο σε κάθε κουτάκι.'; return; }
+  if(vals.slice(first).some(v=>v==='')){ fb.className='fb hint'; fb.textContent='Συμπληρώστε όλα τα ψηφία (μόνο τα μηδενικά αριστερά μπορούν να μείνουν κενά).'; return; }
+  const badc=fs.find((f,k)=>vals[k]!==''&&!VALID[Q.base].test(vals[k]));
+  if(badc){ badc.classList.add('wrong'); fb.className='fb hint'; fb.textContent=Q.base===2?'Στο δυαδικό επιτρέπονται μόνο 0 και 1.':'Στο δεκαεξαδικό επιτρέπονται 0–9 και A–F.'; return; }
+  let right=true; fs.forEach((f,k)=>{ const okc=(vals[k]||'0')===f.dataset.d; f.classList.toggle('right',okc); f.classList.toggle('wrong',!okc); if(!okc) right=false; });
+  answered=true; results.push(right); qi++;
+  if(right){ ok++; streak++; } else { bad++; streak=0; }
+  fs.forEach(f=>f.disabled=true);
+  document.querySelectorAll('#qgrid input.free').forEach(f=>{ const k=+f.dataset.k; f.value=Q.g.marks[k]; if(Q.g.marks[k]) f.classList.add('shown'); else f.style.visibility='hidden'; f.disabled=true; });
+  fb.className='fb '+(right?'ok':'bad');
+  fb.innerHTML=right?(streak>=3?`✔ Σωστά! ${streak} σωστές στη σειρά 🔥`:'✔ Σωστά!'):`✘ Λάθος. Η σωστή απάντηση είναι <b>${sub(Q.g.resStr,Q.base)}</b>`;
+  $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('nextBtn').disabled=false; $('nextBtn').textContent=qi>=ROUND?'Αποτέλεσμα →':'Επόμενη →';
+  $('sol').innerHTML=`<div style="transform:scale(.8);transform-origin:left top;margin-bottom:-40px">${gridHTML(Q.g,Infinity,-1)}</div>
+    <p class="note" style="margin-top:6px">Τα κόκκινα 1 είναι τα ${Q.g.add?'κρατούμενα':'δανεικά'}.</p>
+    <div style="font-size:16px"><b>Έλεγχος:</b> ${Q.g.va} ${Q.g.add?'+':'−'} ${Q.g.vb} = ${Q.g.vr} = ${sub(Q.g.resStr,Q.base)}</div>`;
+  updScore(); renderDots(); $('nextBtn').focus();
+}
+function hint(){ let t;
+  if(Q.base===2) t=Q.op==='+'?'Ξεκινήστε από δεξιά. 1 + 1 = 10: γράφω 0 και κρατάω 1. 1 + 1 + 1 = 11: γράφω 1 και κρατάω 1. Σημειώστε τα κρατούμενα στην πάνω γραμμή.'
+                         :'Ξεκινήστε από δεξιά. Όπου έχετε 0 − 1, δανειστείτε 1 από την επόμενη θέση: γράφετε 1 και η επόμενη θέση μειώνεται κατά 1.';
+  else t=Q.op==='+'?'Μετατρέψτε τα γράμματα σε αριθμούς (A=10 … F=15). Αν το άθροισμα μιας θέσης φτάσει το 16, γράψτε (άθροισμα − 16) και κρατήστε 1.'
+                   :'A=10 … F=15. Αν το ψηφίο του μειωτέου δεν φτάνει, δανειστείτε 1 από την επόμενη θέση και προσθέστε 16 στο ψηφίο σας.';
+  $('fb').className='fb hint'; $('fb').innerHTML='💡 '+t; focusLast(); }
+function renderDots(){ let h=''; for(let i=0;i<ROUND;i++){ const r=results[i]; h+=`<span class="dot${r===true?' ok':r===false?' bad':''}${i===results.length&&!answered?' cur':''}">${r===true?'✓':r===false?'✗':i+1}</span>`; } $('dots').innerHTML=h; }
+function updScore(){ $('scOk').textContent=ok; $('scBad').textContent=bad; $('scSt').textContent=streak; }
+function finalScreen(){
+  const p=ok/ROUND, msg=p===1?'Τέλεια! Όλες σωστές! 🏆':p>=.8?'Πολύ καλά! 👏':p>=.5?'Καλά, συνεχίστε την εξάσκηση. 💪':'Δείτε ξανά πράξεις στο «Βήμα βήμα» και δοκιμάστε πάλι. 📘';
+  $('qnum').textContent='Τέλος γύρου'; $('qtext').innerHTML=''; $('qnote').style.display='none'; $('qbtns').style.display='none';
+  $('qgrid').innerHTML=`<div class="final"><div class="big">${ok} / ${ROUND}</div><div style="font-size:19px">${msg}</div></div>`;
+  $('fb').className='fb'; $('fb').innerHTML='<button class="primary" id="againBtn" style="font-size:18px;padding:10px 24px">↻ Νέος γύρος</button>';
+  $('againBtn').onclick=newRound; $('againBtn').focus();
+}
+$('checkBtn').onclick=check; $('hintBtn').onclick=hint; $('nextBtn').onclick=nextQ;
+$('nextBtn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); nextQ(); } });
+['selBase','selOp','selLvl'].forEach(id=>$(id).onchange=newRound);
+
+// start with the textbook example 1011 + 0110
+$('inA').value='1011'; $('inB').value='0110'; rebuild();
+</script>
+</body>
+</html>
