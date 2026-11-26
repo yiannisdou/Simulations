@@ -1510,6 +1510,7 @@ function renderTiming(){
 }
 function renderTable(){
   const seq=mode==='free'&&isSeq();
+  $('exBox').style.display='none'; // shown again below only for an exercise
   $('tdArea').style.display=seq?'':'none'; $('ttH').style.display=seq?'none':''; $('ttBox').style.display=seq?'none':''; $('exprs').style.display=seq?'none':'';
   if(seq){ renderTiming(); return; }
   const ch0=mode==='ch'?CH[chIdx]:null;
