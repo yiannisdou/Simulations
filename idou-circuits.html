@@ -541,6 +541,8 @@ const CHB=[
 // Γ΄ τάξη: sequential circuits, checked step by step (all flip-flops start at Q = 0, the switches at 0)
 const QB='Q̄';
 const clkSeq=(start,steps)=>{ const r=[]; steps.forEach(([iv,out])=>{ r.push([{...iv,CLK:0},null]); r.push([{CLK:1},out]); }); return [[start[0],start[1]],...r]; };
+// negative edge: CLK goes 1 then 0; on ↑ nothing may change, the count moves on ↓
+const clkSeqN=(start,steps)=>{ const r=[]; let prev=start[1]; steps.forEach(([iv,out])=>{ r.push([{...iv,CLK:1},prev]); r.push([{CLK:0},out]); prev=out; }); return [[start[0],start[1]],...r]; };
 const CHC=[
  {id:'srnor', title:'Μανταλωτής SR με πύλες NOR', text:'Φτιάξτε μανταλωτή SR με <b>δύο</b> πύλες NOR. Με S = 1 η έξοδος Q γίνεται 1 (Set), με R = 1 γίνεται 0 (Reset), και με S = R = 0 κρατά την τιμή της. Η Q̄ είναι πάντα το αντίθετο της Q.',
   ins:['S','R'], outs:['Q',QB], parts:['NOR'], max:2,
@@ -578,10 +580,10 @@ const CHC=[
   ins:['D','CLK'], outs:['Q0','Q1','Q2'], parts:['DFF'],
   seq:clkSeq([{D:1,CLK:0},[0,0,0]],[[{},[1,0,0]],[{D:0},[0,1,0]],[{D:1},[1,0,1]],[{},[1,1,0]],[{D:0},[0,1,1]],[{},[0,0,1]]]),
   hint:'Τρία flip-flop D στη σειρά: D → D του πρώτου, Q0 → D του δεύτερου, Q1 → D του τρίτου. Το CLK πηγαίνει και στα τρία.'},
- {id:'cnta', title:'Ασύγχρονος απαριθμητής 2 bit', text:'Όταν E = 1 ο απαριθμητής μετρά 00 → 01 → 10 → 11 → 00 … (Q1 Q0) σε κάθε θετικό μέτωπο του CLK· όταν E = 0 σταματά. Στον ασύγχρονο απαριθμητή το CLK πηγαίνει μόνο στο πρώτο flip-flop.',
+ {id:'cnta', title:'Ασύγχρονος απαριθμητής 2 bit', text:'Όταν E = 1 ο απαριθμητής μετρά 00 → 01 → 10 → 11 → 00 … (Q1 Q0) σε κάθε <b>αρνητικό μέτωπο ↓</b> του CLK (όταν το CLK πέφτει από 1 σε 0)· όταν E = 0 σταματά. Στον ασύγχρονο απαριθμητή το CLK πηγαίνει μόνο στο πρώτο flip-flop. Όλα τα flip-flop να έχουν <b>αρνητικό μέτωπο ↓</b> (μπορεί να είναι T, JK ή ένα από το καθένα).', allneg:true, neg:true,
   ins:['E','CLK'], outs:['Q1','Q0'], parts:['TFF','JKFF','DFF','AND','NOT'],
-  seq:clkSeq([{E:1,CLK:0},[0,0]],[[{},[0,1]],[{},[1,0]],[{},[1,1]],[{},[0,0]],[{},[0,1]],[{E:0},[0,1]],[{E:1},[1,0]]]),
-  hint:'Δύο flip-flop T με T = E. Το CLK πηγαίνει στο πρώτο (Q0). Το δεύτερο (Q1) πρέπει να αλλάζει όταν το Q0 πέφτει από 1 σε 0: δώστε του για ρολόι το Q̄0 (ή διαλέξτε αρνητικό μέτωπο ↓ και δώστε το Q0).'},
+  seq:clkSeqN([{E:1,CLK:0},[0,0]],[[{},[0,1]],[{},[1,0]],[{},[1,1]],[{},[0,0]],[{},[0,1]],[{E:0},[0,1]],[{E:1},[1,0]]]),
+  hint:'Δύο flip-flop JK με J = K = E ή T με T = E (μπορείτε και ένα JK με ένα T). Επιλέξτε το καθένα και διαλέξτε μέτωπο ↓ αρνητικό. Το CLK πηγαίνει στο ρολόι του πρώτου (Q0) και το Q0 στο ρολόι του δεύτερου (Q1): όταν το Q0 πέφτει από 1 σε 0, το Q1 αλλάζει.'},
  {id:'cnts', sync:true, title:'Σύγχρονος απαριθμητής 2 bit', text:'Ίδια μέτρηση με την προηγούμενη αποστολή, αλλά <b>σύγχρονα</b>: το CLK πηγαίνει σε όλα τα flip-flop και αλλάζουν όλα μαζί.',
   ins:['E','CLK'], outs:['Q1','Q0'], parts:['TFF','JKFF','DFF','AND','NOT','XOR'],
   seq:clkSeq([{E:1,CLK:0},[0,0]],[[{},[0,1]],[{},[1,0]],[{},[1,1]],[{},[0,0]],[{},[0,1]],[{E:0},[0,1]],[{E:1},[1,0]]]),
@@ -2121,14 +2123,14 @@ function renderSeqTable(ch){
   const rows=runSeq(ch), cell=v=>v===null||v===undefined?'<td class="o">?</td>':`<td class="o v${v}">${v}</td>`;
   let h=`<tr><th class="grp"></th><th class="grp" colspan="${ch.ins.length}">Είσοδοι</th><th class="grp" colspan="${ch.outs.length}">Στόχος</th><th class="grp" colspan="${ch.outs.length}">Κύκλωμα</th><th class="grp"></th></tr>`;
   h+=`<tr><th>#</th>${ch.ins.map(l=>`<th>${l}</th>`).join('')}${ch.outs.map(l=>`<th>${l}</th>`).join('')}${ch.outs.map(l=>`<th>${l}</th>`).join('')}<th>✓</th></tr>`;
-  rows.forEach((r,i)=>{ h+=`<tr data-step="${i}"><td>${i+1}</td>${ch.ins.map(l=>{ const v=r.iv[l], ed=l==='CLK'&&r.prev[l]===0&&v===1, ch2=r.prev[l]!==v&&i>0;
-        return `<td${ch2?' style="font-weight:bold;color:var(--accent)"':''}>${ed?'↑':v}</td>`; }).join('')}
+  rows.forEach((r,i)=>{ h+=`<tr data-step="${i}"><td>${i+1}</td>${ch.ins.map(l=>{ const v=r.iv[l], ed=l==='CLK'&&r.prev[l]===0&&v===1, edn=l==='CLK'&&r.prev[l]===1&&v===0&&i>0, ch2=r.prev[l]!==v&&i>0;
+        return `<td${ch2?' style="font-weight:bold;color:var(--accent)"':''}>${ed&&!ch.neg?'↑':edn&&ch.neg?'↓':v}</td>`; }).join('')}
       ${r.ex?r.ex.map(e=>e===null?'<td class="o">–</td>':cell(e)).join(''):ch.outs.map(()=>'<td class="o">–</td>').join('')}${r.got.map(cell).join('')}
       <td class="${r.ok?'okc':'badc'}">${r.ex?(r.ok?'✓':'✗'):''}</td></tr>`; });
   $('tt').innerHTML=h;
   $('tt').querySelectorAll('tr[data-step]').forEach(tr=>tr.onclick=()=>{ const i=+tr.dataset.step; runSeq(ch,i,true); tankStop(); redraw();
     flash(`Το κύκλωμα πέρασε από τα βήματα 1–${i+1} της δοκιμής (ξεκινώντας με όλα τα flip-flop στο 0).`); });
-  $('exprs').innerHTML=`<div class="note" style="line-height:1.25;margin:0">Αρχή: διακόπτες${ch.parts.some(t=>FFS.includes(t))?' και flip-flop':''} στο 0. Έντονο = η είσοδος που αλλάζει${ch.ins.includes('CLK')?'· ↑ = θετικό μέτωπο του CLK':''}.</div>`;
+  $('exprs').innerHTML=`<div class="note" style="line-height:1.25;margin:0">Αρχή: διακόπτες${ch.parts.some(t=>FFS.includes(t))?' και flip-flop':''} στο 0. Έντονο = η είσοδος που αλλάζει${ch.ins.includes('CLK')?(ch.neg?'· ↓ = αρνητικό μέτωπο του CLK':'· ↑ = θετικό μέτωπο του CLK'):''}.</div>`;
 }
 function clkSource(c){ // follow the wire into the CLK pin back through nodes
   const ci=boxIns(c).indexOf('CLK'); let w=wires.find(x=>x.to===c.id&&x.pin===ci), guard=0;
@@ -2167,6 +2169,10 @@ function checkSeq(){
   const bad=parts.find(p=>!c.parts.includes(p.type)); if(bad){ showResult('bad',`✘ Το εξάρτημα ${partName(bad.type)} δεν επιτρέπεται σε αυτή την αποστολή.`); return; }
   if(c.max&&gates.length>c.max){ showResult('bad',`✘ Χρησιμοποιήσατε ${gates.length} πύλες· επιτρέπονται το πολύ ${c.max}.`); return; }
   if(!parts.length){ showResult('bad','✘ Δεν έχετε βάλει ακόμα κανένα εξάρτημα.'); return; }
+  if(c.same){ const ffs=parts.filter(x=>FFS.includes(x.type)); // all flip-flops alike: same type and same clock edge
+    if(ffs.some(f=>f.type!==ffs[0].type||!!f.neg!==!!ffs[0].neg)){ showResult('bad','✘ Τα flip-flop πρέπει να είναι ίδια: ίδιος τύπος (π.χ. όλα T ή όλα JK) και ίδιο μέτωπο ρολογιού (όλα ↑ ή όλα ↓).'); return; } }
+  if(c.allneg){ const ffs=parts.filter(x=>FFS.includes(x.type)); if(ffs.some(f=>!f.neg)){ showResult('bad','✘ Όλα τα flip-flop πρέπει να έχουν <b>αρνητικό μέτωπο ↓</b>: επιλέξτε κάθε flip-flop και διαλέξτε «↓ αρνητικό».'); return; } }
+  if(c.neg){ const ffs=parts.filter(x=>FFS.includes(x.type)); if(ffs.length&&ffs.every(f=>!f.neg)){ showResult('bad','✘ Ο απαριθμητής πρέπει να μετρά στο <b>αρνητικό μέτωπο ↓</b> του CLK: επιλέξτε κάθε flip-flop και διαλέξτε «↓ αρνητικό».'); return; } }
   const rows=runSeq(c);
   const und=rows.findIndex(r=>r.ex&&r.ex.some((e,k)=>e!==null&&(r.got[k]===null||r.got[k]===undefined)));
   if(und>=0){ showResult('bad',`✘ Στο βήμα ${und+1} κάποια έξοδος είναι απροσδιόριστη (?): μήπως έμεινε ασύνδετη μια είσοδος πύλης ή flip-flop;`); return; }
