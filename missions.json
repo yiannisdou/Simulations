@@ -1,0 +1,36 @@
+{
+ "t": "idou-missions",
+ "v": 1,
+ "B": [
+  "nand",
+  "nor",
+  "xor",
+  "half",
+  "alarm",
+  "safe",
+  "car",
+  "major",
+  "full",
+  "notnand",
+  "andnand",
+  "cmp",
+  "ornand",
+  "mux2",
+  "demux2",
+  "dec24",
+  "enc42"
+ ],
+ "C": [
+  "srnor",
+  "srnand",
+  "tank",
+  "dlatch",
+  "div2",
+  "tff",
+  "reg2",
+  "shift3",
+  "cnta",
+  "cnts"
+ ],
+ "hidden": []
+}
