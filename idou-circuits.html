@@ -990,17 +990,18 @@ function parseExpr(src,labels){
   const ws=()=>{ while(i<s.length&&/\s/.test(s[i])) i++; };
   const peekLabel=()=>{ for(const l of L){ if(s.startsWith(l,i)) return l; } for(const l of L){ if(s.slice(i,i+l.length).toUpperCase()===l.toUpperCase()) return l; } return null; };
   const AND='·*.&∧⋅•×', OR='+|∨', XOR='⊕^', XNOR='⊙', NOT='¬!~', POST="'’′";
-  const startsFactor=()=>{ ws(); if(i>=s.length) return false; const ch=s[i]; return ch==='('||ch==='['||NOT.includes(ch)||!!peekLabel()||ch==='0'||ch==='1'; };
+  const kw=()=>{ const m=/^(xnor|xor|and|or|not)(?![A-Za-z0-9_])/i.exec(s.slice(i)); return m&&!L.some(l=>s.startsWith(l,i)&&l.length>=m[0].length)?m[1].toLowerCase():null; };
+  const startsFactor=()=>{ ws(); if(i>=s.length) return false; const k=kw(); if(k) return k==='not'; const ch=s[i]; return ch==='('||ch==='['||NOT.includes(ch)||!!peekLabel()||ch==='0'||ch==='1'; };
   function factor(){ ws(); if(i>=s.length) err('Η έκφραση τελειώνει απότομα.');
     const ch=s[i]; let n;
-    if(NOT.includes(ch)){ i++; n={o:'not',a:factor()}; return n; }
+    if(NOT.includes(ch)||kw()==='not'){ i+=NOT.includes(ch)?1:3; n={o:'not',a:factor()}; return n; }
     if(ch==='('||ch==='['){ const cl=ch==='('?')':']'; i++; n=orx(); ws(); if(s[i]!==cl) err(`Λείπει «${cl}».`); i++; }
     else { const l=peekLabel(); if(l){ n={o:'v',n:l}; i+=l.length; } else if(ch==='0'||ch==='1'){ n={o:'c',v:+ch}; i++; } else err(`Άγνωστο σύμβολο «${ch}».`); }
     for(;;){ ws(); if(i<s.length&&POST.includes(s[i])){ i++; n={o:'not',a:n}; } else break; }
     return n; }
-  function term(){ const a=[factor()]; for(;;){ ws(); if(i<s.length&&AND.includes(s[i])){ i++; a.push(factor()); } else if(startsFactor()) a.push(factor()); else break; }
+  function term(){ const a=[factor()]; for(;;){ ws(); if(kw()==='and'){ i+=3; a.push(factor()); } else if(i<s.length&&AND.includes(s[i])){ i++; a.push(factor()); } else if(startsFactor()) a.push(factor()); else break; }
     return a.length===1?a[0]:{o:'and',a}; }
-  function orx(){ let n=term(); for(;;){ ws(); const ch=s[i]; const op=ch===undefined?null:OR.includes(ch)?'or':XOR.includes(ch)?'xor':XNOR.includes(ch)?'xnor':null; if(!op) break; i++;
+  function orx(){ let n=term(); for(;;){ ws(); const ch=s[i], k=kw(); const op=k==='or'||k==='xor'||k==='xnor'?k:ch===undefined?null:OR.includes(ch)?'or':XOR.includes(ch)?'xor':XNOR.includes(ch)?'xnor':null; if(!op) break; i+=k===op?k.length:1;
       const b=term(); n=n.o===op?{o:op,a:[...n.a,b]}:{o:op,a:[n,b]}; } return n; }
   try{ ws(); if(i>=s.length) return {err:'Γράψτε μια έκφραση.'}; const n=orx(); ws(); if(i<s.length) err(s[i]===')'?'Περισσεύει «)».':`Άγνωστο σύμβολο «${s[i]}».`); return {ast:n}; }
   catch(e){ if(e&&e.msg) return {err:e.msg,pos:e.pos}; throw e; } }
